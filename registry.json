@@ -59,6 +59,21 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "member-selector",
+      "type": "registry:ui",
+      "title": "Member Selector",
+      "description": "An avatar row for picking people, with a searchable dropdown to add more.",
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/member-selector.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

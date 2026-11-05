@@ -262,6 +262,80 @@ export function Demo() {
 }`,
     credits: ["Ripple inspired by morphin.dev"],
   },
+  {
+    name: "Member Selector",
+    href: "/components/member-selector",
+    category: "inputs",
+    isNew: true,
+    registry: "member-selector",
+    description:
+      "An avatar row for picking people, with a searchable dropdown to add more.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/member-selector.tsx`,
+    interaction:
+      "Tap an avatar to select or deselect it; selected people glide to the front and unselected ones fade to grayscale with a small plus badge. Tap Add to open a dropdown, search by name or email, and toggle anyone from the list. When the row is full, avatars pushed out shrink away as new ones pop in. Press Escape or click outside to close. Honors prefers-reduced-motion.",
+    props: [
+      {
+        name: "members",
+        type: "Member[]",
+        required: true,
+        description:
+          "Everyone who can be picked. Each member has an id and name, plus an optional email and avatar url; without an avatar, initials show instead.",
+      },
+      {
+        name: "selected",
+        type: "string[]",
+        required: true,
+        description: "Ids of the selected members.",
+      },
+      {
+        name: "onChange",
+        type: "(selected: string[]) => void",
+        required: true,
+        description: "Called with the new list of ids when someone is toggled.",
+      },
+      {
+        name: "max",
+        type: "number",
+        description:
+          "Most members that can be selected. Extra picks are ignored. Unlimited by default.",
+      },
+      {
+        name: "maxVisible",
+        type: "number",
+        default: "5",
+        description:
+          "How many avatars show in the row. Selected members fill it first.",
+      },
+      {
+        name: "label",
+        type: "string",
+        description: "Small uppercase heading above the row.",
+      },
+    ],
+    usage: `"use client"
+
+import { useState } from "react"
+import { MemberSelector, type Member } from "@/components/ui/member-selector"
+
+const members: Member[] = [
+  { id: "1", name: "Yuki Tanaka", email: "yuki@company.com" },
+  { id: "2", name: "Matt Cooper", email: "matt@company.com" },
+  { id: "3", name: "Sofia Martinez", email: "sofia@company.com" },
+]
+
+export function Demo() {
+  const [selected, setSelected] = useState(["1"])
+
+  return (
+    <MemberSelector
+      members={members}
+      selected={selected}
+      onChange={setSelected}
+      label="Participants"
+    />
+  )
+}`,
+  },
 ];
 
 export type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
