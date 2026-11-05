@@ -57,6 +57,7 @@ export default function DescriptionPanel({
   };
 
   const [isHovered, setIsHovered] = useState(false);
+  const [isSidebarHovered, setIsSidebarHovered] = useState(false);
   const [pullOffset, setPullOffset] = useState(0);
   const [isPulling, setIsPulling] = useState(false);
   const dragStartTimeRef = useRef(0);
@@ -265,6 +266,8 @@ export default function DescriptionPanel({
       </svg>
 
       <motion.div
+        onMouseEnter={() => setIsSidebarHovered(true)}
+        onMouseLeave={() => setIsSidebarHovered(false)}
         initial={false}
         animate={{ x: currentPanelX }}
         transition={
@@ -273,7 +276,7 @@ export default function DescriptionPanel({
             : { type: "spring", stiffness: 320, damping: 28, mass: 0.8 }
         }
         style={{ width }}
-        className="pointer-events-auto relative flex h-full flex-col"
+        className="group/sidebar pointer-events-auto relative flex h-full flex-col"
       >
         <div
           onMouseEnter={() => setIsHovered(true)}
@@ -294,10 +297,18 @@ export default function DescriptionPanel({
               scale: open ? 0.85 : 1,
             }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute inset-0 rounded-l-2xl border-y border-l border-black/[0.08] bg-[#F4F4F9] shadow-[0_4px_24px_rgba(0,0,0,0.1),-4px_0_16px_rgba(0,0,0,0.06)] dark:border-apple dark:bg-neutral-900 dark:shadow-[0_4px_24px_rgba(0,0,0,0.6),-4px_0_16px_rgba(0,0,0,0.4)]"
+            className="absolute inset-0 rounded-l-2xl bg-[#F4F4F9] shadow-[0_4px_24px_rgba(0,0,0,0.1),-4px_0_16px_rgba(0,0,0,0.06)] dark:bg-neutral-900 dark:shadow-[0_4px_24px_rgba(0,0,0,0.6),-4px_0_16px_rgba(0,0,0,0.4)]"
           />
 
-          <div className="relative z-10 h-9 w-1 rounded-full bg-foreground/25 transition-all duration-200 group-hover:h-11 group-hover:bg-foreground/50" />
+          <div
+            className={cn(
+              "relative z-10 h-9 w-1 rounded-full bg-foreground/25 transition-all duration-200 group-hover:h-11 group-hover:bg-foreground/50",
+              open &&
+                (isSidebarHovered || isResizing
+                  ? "opacity-100"
+                  : "opacity-0 group-hover/sidebar:opacity-100"),
+            )}
+          />
 
           <AnimatePresence>
             {isHovered && !isPulling && !isResizing && (
@@ -308,14 +319,24 @@ export default function DescriptionPanel({
                 transition={{ duration: 0.15, ease: "easeOut" }}
                 className="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-3.5 flex items-center"
               >
-                <span className="whitespace-nowrap rounded-xl border border-black/[0.08] bg-popover px-3 py-1.5 text-xs font-medium text-foreground shadow-xl dark:border-white/10 dark:bg-[#1E1E1E]">
+                <span className="whitespace-nowrap rounded-xl bg-popover px-3 py-1.5 text-xs font-medium text-foreground shadow-xl dark:bg-[#1E1E1E]">
                   {open ? "Drag to resize or close" : "Drag to open"}
                 </span>
-                <div className="absolute -right-1 top-1/2 -translate-y-1/2 h-2 w-2 rotate-45 border-r border-t border-black/[0.08] bg-popover dark:border-white/10 dark:bg-[#1E1E1E]" />
+                <div className="absolute -right-1 top-1/2 -translate-y-1/2 h-2 w-2 rotate-45 bg-popover dark:bg-[#1E1E1E]" />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
+        {open && onWidthChange && (
+          <div
+            onPointerDown={handleButtonDragStart}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label="Resize or collapse controls panel"
+            className="group absolute -left-2.5 inset-y-0 z-40 flex w-5 cursor-col-resize select-none"
+          />
+        )}
 
         <div
           style={{
@@ -324,7 +345,7 @@ export default function DescriptionPanel({
           }}
           className={cn(
             "relative flex h-full flex-col overflow-hidden bg-background",
-            open && "rounded-2xl border-l border-black/[0.08] dark:border-apple shadow-[-4px_0_24px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_32px_rgba(0,0,0,0.5)]",
+            open && "rounded-2xl shadow-[-4px_0_24px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_32px_rgba(0,0,0,0.5)]",
           )}
         >
           {isPullActive && (
@@ -336,20 +357,10 @@ export default function DescriptionPanel({
               <path
                 d={curveBorderD}
                 fill="none"
-                className="stroke-black/[0.08] dark:stroke-apple drop-shadow-[0_4px_24px_rgba(0,0,0,0.1),-4px_0_16px_rgba(0,0,0,0.06)] dark:drop-shadow-[0_4px_24px_rgba(0,0,0,0.6),-4px_0_16px_rgba(0,0,0,0.4)]"
-                strokeWidth={1}
+                className="drop-shadow-[0_4px_24px_rgba(0,0,0,0.1),-4px_0_16px_rgba(0,0,0,0.06)] dark:drop-shadow-[0_4px_24px_rgba(0,0,0,0.6),-4px_0_16px_rgba(0,0,0,0.4)]"
+                strokeWidth={0}
               />
             </svg>
-          )}
-
-          {open && onWidthChange && (
-            <div
-              onPointerDown={handleButtonDragStart}
-              role="separator"
-              aria-orientation="vertical"
-              aria-label="Resize or collapse controls panel"
-              className="group absolute -left-2.5 inset-y-0 z-40 flex w-5 cursor-col-resize select-none"
-            />
           )}
 
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-gradient-to-t from-background to-transparent" />

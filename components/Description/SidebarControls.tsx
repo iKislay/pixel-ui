@@ -113,7 +113,7 @@ function ButterfliesControls() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
         <SectionHeader title="Style" />
-        <div className="flex rounded-xl bg-muted/60 p-1 border border-black/[0.06] dark:border-white/10">
+        <div className="flex rounded-xl bg-muted/60 p-1">
           {(["color", "mono"] as const).map((v) => {
             const active = variant === v;
             return (
@@ -137,7 +137,7 @@ function ButterfliesControls() {
 
       <div className="flex flex-col gap-2">
         <SectionHeader title="Number of Butterflies" />
-        <div className="flex gap-1.5 rounded-xl bg-muted/60 p-1 border border-black/[0.06] dark:border-white/10">
+        <div className="flex gap-1.5 rounded-xl bg-muted/60 p-1">
           {[1, 2, 3, 4, 5].map((n) => {
             const active = count === n;
             return (
@@ -171,7 +171,7 @@ function JellyfishControls() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
         <SectionHeader title="Style" />
-        <div className="flex rounded-xl bg-muted/60 p-1 border border-black/[0.06] dark:border-white/10">
+        <div className="flex rounded-xl bg-muted/60 p-1">
           {(["color", "mono"] as const).map((v) => {
             const active = variant === v;
             return (
@@ -195,7 +195,7 @@ function JellyfishControls() {
 
       <div className="flex flex-col gap-2">
         <SectionHeader title="Number of Jellyfish" />
-        <div className="flex gap-1.5 rounded-xl bg-muted/60 p-1 border border-black/[0.06] dark:border-white/10">
+        <div className="flex gap-1.5 rounded-xl bg-muted/60 p-1">
           {[1, 2, 3, 4, 5, 6].map((n) => {
             const active = count === n;
             return (
@@ -230,7 +230,7 @@ function ToastControls() {
             key={action.label}
             type="button"
             onClick={action.run}
-            className="flex items-center justify-between rounded-xl border border-black/[0.06] bg-muted/40 px-3 py-2 text-xs font-medium text-foreground transition-all hover:bg-muted/80 active:scale-[0.98] dark:border-white/10"
+            className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2 text-xs font-medium text-foreground transition-all hover:bg-muted/80 active:scale-[0.98]"
           >
             <span>{action.label}</span>
             <span className="text-[10px] text-muted-foreground">Trigger</span>
@@ -250,7 +250,7 @@ function MemberSelectorControls() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
         <SectionHeader title="Max Visible" />
-        <div className="flex gap-1.5 rounded-xl bg-muted/60 p-1 border border-black/[0.06] dark:border-white/10">
+        <div className="flex gap-1.5 rounded-xl bg-muted/60 p-1">
           {[3, 4, 5].map((n) => {
             const active = max === n;
             return (
@@ -278,14 +278,14 @@ function MemberSelectorControls() {
           <button
             type="button"
             onClick={() => setSelected("1,2,3,4,5,6,7,8")}
-            className="flex-1 rounded-lg border border-black/[0.06] bg-muted/40 py-2 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors dark:border-white/10"
+            className="flex-1 rounded-lg bg-muted/40 py-2 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors"
           >
             Select all
           </button>
           <button
             type="button"
             onClick={() => setSelected("")}
-            className="flex-1 rounded-lg border border-black/[0.06] bg-muted/40 py-2 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors dark:border-white/10"
+            className="flex-1 rounded-lg bg-muted/40 py-2 text-xs font-medium text-foreground hover:bg-muted/80 transition-colors"
           >
             Clear
           </button>
@@ -325,10 +325,10 @@ function AudioChatControls() {
                 type="button"
                 onClick={() => toggleSpeaker(speaker.id)}
                 className={cn(
-                  "flex items-center justify-between rounded-xl border px-3 py-2 text-xs font-medium transition-all",
+                  "flex items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-all",
                   active
-                    ? "border-brand/40 bg-brand/10 text-brand dark:border-brand/50 dark:bg-brand/20"
-                    : "border-black/[0.06] bg-muted/40 text-foreground hover:bg-muted/80 dark:border-white/10",
+                    ? "bg-brand/10 text-brand dark:bg-brand/20"
+                    : "bg-muted/40 text-foreground hover:bg-muted/80",
                 )}
               >
                 <span>{speaker.name}</span>
@@ -345,10 +345,10 @@ function AudioChatControls() {
           type="button"
           onClick={() => setMuted(isMuted ? "false" : "true")}
           className={cn(
-            "rounded-xl border py-2.5 px-3 text-xs font-semibold transition-all text-center",
+            "rounded-xl py-2.5 px-3 text-xs font-semibold transition-all text-center",
             isMuted
-              ? "border-destructive/40 bg-destructive/10 text-destructive"
-              : "border-black/[0.06] bg-muted/40 text-foreground hover:bg-muted/80 dark:border-white/10",
+              ? "bg-destructive/10 text-destructive"
+              : "bg-muted/40 text-foreground hover:bg-muted/80",
           )}
         >
           {isMuted ? "Unmute microphone" : "Mute microphone"}
@@ -372,7 +372,7 @@ export default function SidebarControls({
 
   return (
     <div className={cn("flex flex-col gap-6 text-left", className)}>
-      <div className="flex flex-col gap-1 pb-4 border-b border-black/[0.06] dark:border-white/10">
+      <div className="flex flex-col gap-1 pb-4">
         <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/40 select-none">
           Controls
         </span>
@@ -389,12 +389,12 @@ export default function SidebarControls({
 
       <ColorSwatches showLabel />
 
-      <div className="flex flex-col gap-2 pt-4 border-t border-black/[0.06] dark:border-white/10">
+      <div className="flex flex-col gap-2 pt-4">
         {onOpenCode && (
           <button
             type="button"
             onClick={onOpenCode}
-            className="flex w-full items-center justify-between rounded-xl border border-black/[0.06] bg-muted/40 px-3.5 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground dark:border-white/10"
+            className="flex w-full items-center justify-between rounded-xl bg-muted/40 px-3.5 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
           >
             <span>View full code</span>
             <span className="text-xs text-foreground/40">↗</span>
@@ -403,7 +403,7 @@ export default function SidebarControls({
         <button
           type="button"
           onClick={scrollToDocs}
-          className="flex w-full items-center justify-between rounded-xl border border-black/[0.06] bg-muted/40 px-3.5 py-2.5 text-xs font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground dark:border-white/10"
+          className="flex w-full items-center justify-between rounded-xl bg-muted/40 px-3.5 py-2.5 text-xs font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground"
         >
           <span>Installation &amp; Props</span>
           <span className="text-xs text-foreground/40">↓</span>
