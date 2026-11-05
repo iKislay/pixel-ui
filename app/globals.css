@@ -216,6 +216,16 @@ html {
   color: #fff;
 }
 
+@keyframes voice-bar {
+  50% {
+    transform: scaleY(1);
+  }
+  0%,
+  100% {
+    transform: scaleY(0.43);
+  }
+}
+
 @keyframes marquee-y {
   to {
     transform: translateY(-50%);

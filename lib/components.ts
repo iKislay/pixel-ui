@@ -82,6 +82,77 @@ export const PANEL_INFO = {
 
 export const components: ComponentItem[] = [
   {
+    name: "Audio Chat Room",
+    href: "/components/audio-chat-room",
+    category: "display",
+    isNew: true,
+    registry: "audio-chat-room",
+    description:
+      "A voice chat pill that morphs into a card showing everyone in the room.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/audio-chat-room.tsx`,
+    interaction:
+      "Click the pill to open the room. The avatars glide out into a grid, the names fade in and anyone speaking gets a live level badge. Press Join now to enter, or close it with the X button or Escape. Honors prefers-reduced-motion: the layout snaps and content cross-fades, and the level bars stop moving.",
+    props: [
+      {
+        name: "participants",
+        type: "{ id: string; name: string; avatar?: string; speaking?: boolean }[]",
+        required: true,
+        description:
+          "Who is in the room. The pill stacks the first 4 avatars and counts the rest. Without an avatar, initials show instead.",
+      },
+      {
+        name: "title",
+        type: "string",
+        default: '"Voice chat"',
+        description: "The heading of the open card.",
+      },
+      {
+        name: "joinLabel",
+        type: "string",
+        default: '"Join now"',
+        description: "Text of the join button.",
+      },
+      {
+        name: "helperText",
+        type: "string",
+        default: '"Mic will be muted initially."',
+        description: "Muted line under the join button.",
+      },
+      {
+        name: "onJoin",
+        type: "() => void",
+        description: "Runs when the join button is pressed.",
+      },
+      {
+        name: "expanded",
+        type: "boolean",
+        description: "Controls the open state. Pair it with onExpandedChange.",
+      },
+      {
+        name: "defaultExpanded",
+        type: "boolean",
+        default: "false",
+        description: "Starts the room open when the state is not controlled.",
+      },
+      {
+        name: "onExpandedChange",
+        type: "(expanded: boolean) => void",
+        description: "Runs when the room opens or closes.",
+      },
+    ],
+    usage: `import { AudioChatRoom } from "@/components/ui/audio-chat-room"
+
+const people = [
+  { id: "1", name: "Ana", avatar: "/ana.jpg", speaking: true },
+  { id: "2", name: "Sam" },
+]
+
+export function Demo() {
+  return <AudioChatRoom participants={people} onJoin={() => {}} />
+}`,
+    credits: ["Inspired by morphin.dev"],
+  },
+  {
     name: "Toast",
     href: "/components/toast",
     category: "feedback",

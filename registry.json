@@ -37,6 +37,28 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "audio-chat-room",
+      "type": "registry:ui",
+      "title": "Audio Chat Room",
+      "description": "A voice chat pill that morphs into a card showing everyone in the room.",
+      "css": {
+        "@keyframes voice-bar": {
+          "0%, 100%": {
+            "transform": "scaleY(0.43)"
+          },
+          "50%": {
+            "transform": "scaleY(1)"
+          }
+        }
+      },
+      "files": [
+        {
+          "path": "components/ui/audio-chat-room.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
