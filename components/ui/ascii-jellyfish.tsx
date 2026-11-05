@@ -74,10 +74,14 @@ const hash = (x: number, y: number) => {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 };
 
+// paints the text color to read it back as rgb, since browsers may report lab() or oklch()
 const isDark = (el: Element) => {
-  const m = getComputedStyle(el).color.match(/[\d.]+/g);
-  if (!m) return true;
-  return 0.299 * +m[0] + 0.587 * +m[1] + 0.114 * +m[2] > 128;
+  const probe = document.createElement("canvas").getContext("2d");
+  if (!probe) return true;
+  probe.fillStyle = getComputedStyle(el).color;
+  probe.fillRect(0, 0, 1, 1);
+  const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
+  return 0.299 * r + 0.587 * g + 0.114 * b > 128;
 };
 
 const clamp = (v: number, lo: number, hi: number) =>
