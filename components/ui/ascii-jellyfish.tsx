@@ -13,7 +13,7 @@ const STEP = 1 / 60;
 const MAX_STEPS = 4;
 const SEGMENTS = 22;
 const PULSE = 0.35;
-const RAMP = ".:-=+*#%@";
+const TEXTURE = ".':;tos%SX8@";
 const TENTACLES = [-0.8, -0.52, -0.22, 0.22, 0.52, 0.8];
 const ARMS = [-0.1, 0.1];
 const CHAINS = TENTACLES.length + ARMS.length;
@@ -27,12 +27,12 @@ const PALETTES: Record<Scheme, Record<AsciiJellyfishVariant, Palette>> = {
   dark: {
     color: {
       tints: [
-        [150, 205, 255],
-        [95, 145, 255],
-        [195, 222, 255],
-        [120, 195, 245],
+        [130, 210, 240],
+        [105, 165, 255],
+        [165, 222, 250],
+        [95, 195, 230],
       ],
-      hi: [236, 245, 255],
+      hi: [235, 250, 255],
       mote: [150, 195, 255],
     },
     mono: {
@@ -68,14 +68,10 @@ const PALETTES: Record<Scheme, Record<AsciiJellyfishVariant, Palette>> = {
   },
 };
 
-// ascii stroke for an outline whose outward normal is (nx, ny)
-const outline = (nx: number, ny: number) => {
-  const deg = (Math.atan2(ny, nx) * 180) / Math.PI;
-  if (deg < -67.5 && deg > -112.5) return "-";
-  if (deg > 67.5 && deg < 112.5) return "_";
-  if (Math.abs(deg) <= 22.5) return ")";
-  if (Math.abs(deg) >= 157.5) return "(";
-  return (deg < 0) === (Math.abs(deg) < 90) ? "\\" : "/";
+const hash = (x: number, y: number) => {
+  let h = Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 668265263);
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 };
 
 const isDark = (el: Element) => {
@@ -154,7 +150,7 @@ class Sea {
     this.width = width;
     this.height = height;
     if (first) this.seed();
-    const base = clamp(Math.min(width, height) * 0.09, 30, 70);
+    const base = clamp(Math.min(width, height) * 0.13, 40, 100);
     for (const j of this.jellies) {
       j.size = base * j.scale;
       j.x = clamp(j.x, 0, width);
@@ -205,7 +201,7 @@ class Sea {
   }
 
   chainLength(j: Jelly, k: number) {
-    return k < TENTACLES.length ? j.size * (2.4 + 0.25 * ((k * 7) % 3)) : j.size * 1.3;
+    return k < TENTACLES.length ? j.size * (1.9 + 0.25 * ((k * 7) % 3)) : j.size * 1.1;
   }
 
   rootOf(j: Jelly, k: number, out: { x: number; y: number }) {
@@ -556,7 +552,7 @@ class Painter {
     const dirX = Math.cos(j.axis);
     const dirY = Math.sin(j.axis);
     const rw = j.size * (1 - 0.22 * c);
-    const hh = j.size * (0.72 + 0.2 * c);
+    const hh = j.size * (0.88 + 0.2 * c);
     const skirt = j.size * 0.16;
     const flare = 0.07 * (1 - c);
     const spacing = Math.min(cw, ch) * 0.5;
@@ -591,7 +587,7 @@ class Painter {
               false,
             );
           } else {
-            const a = (1 - along) ** 0.9 * 0.7 * depthA;
+            const a = (1 - along) ** 0.9 * 0.8 * depthA;
             const m = 0.35 + 0.3 * (1 - along);
             this.set(
               x,
@@ -649,8 +645,6 @@ class Painter {
     const c1 = Math.ceil((j.x + reach) / cw);
     const r0 = Math.floor((j.y - reach) / ch);
     const r1 = Math.ceil((j.y + reach) / ch);
-    const e = 0.5;
-
     for (let row = r0; row <= r1; row++) {
       for (let col = c0; col <= c1; col++) {
         const cx = col * cw + cw / 2;
@@ -662,57 +656,46 @@ class Painter {
           }
         }
         if (hits === 0) continue;
+        const cov = hits / 9;
 
         const dx = cx - j.x;
         const dy = cy - j.y;
         const u = dx * dirX + dy * dirY;
         const v = -dx * dirY + dy * dirX;
+        // keyed to the bell's own cells so the texture rides along with it
+        const grain = hash(Math.round(u / ch) * 31 + j.tint * 977, Math.round(v / cw) + 4096);
 
-        // cells barely touching the edge are dropped so the outline stays one cell thick
-        if (hits < 3) continue;
-        if (hits < 9) {
-          const gx = field(dx + e, dy) - field(dx - e, dy);
-          const gy = field(dx, dy + e) - field(dx, dy - e);
-          const glyph = u < -skirt * 0.2 ? "~" : outline(gx, gy);
-          const light = u < 0 ? 0.7 : 0.9;
-          this.set(
-            cx,
-            cy,
-            glyph,
-            ramp(deep, tint, hi, light, 0),
-            ramp(deep, tint, hi, light, 1),
-            ramp(deep, tint, hi, light, 2),
-            (u < 0 ? 0.7 : 0.9) * depthA,
-            true,
-          );
-          continue;
-        }
-
-        let light: number;
-        let solid: number;
+        let dens: number;
+        let caustic = 0;
         if (u >= 0) {
           const rr = Math.min(1, Math.hypot(u / hh, v / rw));
-          // slow caustics drifting through the clear jelly
+          // slow caustics drifting through the jelly
           const flow =
             Math.sin(u * 0.11 + t * 1.3 + Math.sin(v * 0.07 - t * 0.9 + j.tint) * 2) *
             Math.sin(v * 0.09 - t * 1.1 + Math.sin(u * 0.06 + t * 0.7) * 2);
-          const caustic = smoothstep(0.35, 0.95, flow);
+          caustic = smoothstep(0.35, 0.95, flow);
+          const cap = smoothstep(-0.2, 0.9, u / hh);
+          const rim = smoothstep(0.8, 1, rr);
           const gonads = Math.exp(-(((rr - 0.4) / 0.09) ** 2));
-          const wall = smoothstep(0.82, 1, rr);
-          light = clamp(0.12 + 0.3 * wall + 0.35 * gonads + 0.45 * caustic + 0.12 * c, 0, 1);
-          solid = clamp(0.06 + 0.25 * wall + 0.35 * gonads + 0.5 * caustic, 0, 1);
+          dens = 0.28 + 0.45 * cap + 0.2 * rim + 0.3 * gonads + 0.3 * caustic + 0.1 * c;
         } else {
-          light = 0.4;
-          solid = 0.3;
+          dens = 0.3;
         }
+        dens = clamp(dens + (grain - 0.5) * 0.4, 0, 1);
+
+        let glyph: string;
+        if (cov < 0.45) glyph = u > hh * 0.4 ? "." : u < 0 ? "'" : ":";
+        else glyph = TEXTURE[Math.floor(dens * (TEXTURE.length - 1))];
+        const light = caustic > 0.8 && grain > 0.8 ? 1 : clamp(0.2 + 0.75 * dens, 0, 1);
+        const a = (0.3 + 0.7 * dens) * Math.min(1, cov * 1.4) * depthA;
         this.set(
           cx,
           cy,
-          RAMP[Math.floor(light * (RAMP.length - 1))],
+          glyph,
           ramp(deep, tint, hi, light, 0),
           ramp(deep, tint, hi, light, 1),
           ramp(deep, tint, hi, light, 2),
-          solid * depthA,
+          a,
           true,
         );
       }

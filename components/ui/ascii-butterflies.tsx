@@ -202,23 +202,23 @@ class Meadow {
 
       if (b.resting) {
         b.speed += (0 - b.speed) * Math.min(1, dt * 5);
-        b.flap += dt * 1.4;
+        b.flap += dt * 0.9;
         if (t > b.until) {
           b.resting = false;
           b.until = t + rand(7, 13);
           b.heading = (b.facing === 1 ? 0 : Math.PI) + rand(-0.6, 0.2) * b.facing;
         }
       } else {
-        b.flap += dt * (17 + b.fright * 9);
+        b.flap += dt * (10 + b.fright * 8);
         if (t > b.retarget) {
           b.goalX = rand(W * 0.12, W * 0.88);
           b.goalY = rand(H * 0.2, H * 0.8);
-          b.retarget = t + rand(2.5, 5);
+          b.retarget = t + rand(4, 8);
         }
         const toGoal = Math.atan2(b.goalY - b.y, b.goalX - b.x);
-        b.wobble += dt * 1.6;
+        b.wobble += dt * 1.1;
         const flutter = Math.sin(b.wobble) * 0.6 + Math.sin(b.wobble * 2.3 + 1.3) * 0.4;
-        b.heading += (clamp(angleDiff(b.heading, toGoal), -1, 1) * 1.1 + flutter) * dt;
+        b.heading += (clamp(angleDiff(b.heading, toGoal), -1, 1) * 0.8 + flutter * 0.7) * dt;
 
         if (pointer.active) {
           const dx = b.x - pointer.x;
@@ -240,7 +240,7 @@ class Meadow {
 
         // each downstroke gives a small burst of speed
         const beat = 0.5 + 0.5 * Math.sin(b.flap);
-        const target = (28 + 20 * beat) * (1 + b.fright * 2);
+        const target = (15 + 11 * beat) * (1 + b.fright * 2);
         b.speed += (target - b.speed) * Math.min(1, dt * 4);
 
         if (t > b.until && b.fright < 0.05 && Math.hypot(b.goalX - b.x, b.goalY - b.y) < 120) {
