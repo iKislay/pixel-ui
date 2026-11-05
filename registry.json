@@ -1,0 +1,42 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "pixel-ui",
+  "homepage": "https://github.com/ikislay/pixel-ui",
+  "items": [
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "title": "Utils",
+      "description": "The cn helper for merging Tailwind classes.",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "files": [
+        {
+          "path": "lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast",
+      "description": "A toast notification whose status lands with a rippling pulse and whose text morphs word by word.",
+      "dependencies": [
+        "motion",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/toast.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    }
+  ]
+}

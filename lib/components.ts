@@ -1,0 +1,257 @@
+import { createElement, type ReactNode } from "react";
+import { MotionIcon } from "@/components/Description/icons";
+
+export type Dependency = {
+  name: string;
+  icon?: ReactNode;
+};
+
+export type ComponentProp = {
+  name: string;
+  type: string;
+  default?: string;
+  required?: boolean;
+  options?: string[];
+  control?: "swatch";
+  optionColors?: Record<string, string>;
+  description: string;
+};
+
+export type ComponentCategory =
+  | "ai"
+  | "navigation"
+  | "inputs"
+  | "feedback"
+  | "display";
+
+export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
+  ai: "AI kit",
+  navigation: "Navigation",
+  inputs: "Inputs",
+  feedback: "Feedback",
+  display: "Display",
+};
+
+export const CATEGORY_ORDER: ComponentCategory[] = [
+  "display",
+  "ai",
+  "navigation",
+  "inputs",
+  "feedback",
+];
+
+export type ComponentItem = {
+  name: string;
+  href: string;
+  category: ComponentCategory;
+  isNew?: boolean;
+  description?: string;
+  registry?: string;
+  source?: string;
+  preview?: string;
+  previewScale?: number;
+  featured?: boolean;
+  dependencies?: Dependency[];
+  interaction?: string;
+  usage?: string;
+  props?: ComponentProp[];
+  credits?: string[];
+};
+
+export const REGISTRY_HOMEPAGE = "https://github.com/ikislay/pixel-ui";
+export const REGISTRY_REPO = "ikislay/pixel-ui";
+
+export const PANEL_INFO = {
+  sourceHint:
+    "Click the code icon in the top-right corner to view the source code.",
+  keepInMind:
+    "Most components here are recreations of great work from around the web. I don't claim to be the original creator - this is my attempt to reverse-engineer, replicate, and often add a few extra features. I've tried to credit everyone; if I missed someone, let me know.",
+  contactEmail: "hello@pixelui.dev",
+  contactNote: "Found a bug or issue? Feel free to drop a DM.",
+  license: [
+    "MIT with the Commons Clause and an attribution requirement. Free to use, modify and ship in personal and commercial projects, closed source included. You own the code once it is in your project.",
+    "Credit is required. Any project shipping a Pixel UI component must credit Pixel UI with a visible link back to pixelui.dev, in a footer, an about page, a credits screen or a README.",
+    "Don't strip the credit or the copyright notice from the source you copied.",
+    "Don't sell, sublicense or redistribute the components themselves, on their own, bundled into a template, kit, theme or paid course, or ported to another framework.",
+    "Don't republish them. No mirrors, no re-uploads, no listing them as your own work.",
+    "Don't repackage the registry as a competing component library.",
+    "Don't claim authorship of a component or of Pixel UI itself.",
+    "The LICENSE file in the repository is the full text and governs. Ask first if your use doesn't fit these rules.",
+  ],
+} as const;
+
+export const components: ComponentItem[] = [
+  {
+    name: "Toast",
+    href: "/components/toast",
+    category: "feedback",
+    isNew: true,
+    registry: "toast",
+    description:
+      "A toast notification whose status lands with a rippling pulse and whose text morphs word by word.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/toast.tsx`,
+    preview: "/componentdemos/toast.mp4",
+    dependencies: [
+      {
+        name: "motion",
+        icon: createElement(MotionIcon, { className: "h-4 w-4" }),
+      },
+      { name: "lucide-react" },
+    ],
+    interaction:
+      "Toasts stack in a corner and fan out when you hover them. When a toast lands on success, error, warning or info, its badge pops and a ripple washes across the card and its text. Updating a toast in place morphs its words into the new message. Hover it to show the close button. Honors prefers-reduced-motion.",
+    props: [
+      {
+        name: "toast(title, options)",
+        type: "(title: ReactNode, options?: ToastOptions) => string | number",
+        description:
+          "Shows a plain toast and returns its id. toast.success, toast.error, toast.warning, toast.info and toast.loading take the same arguments and add a status badge.",
+      },
+      {
+        name: "toast.promise",
+        type: "(task: Promise<T> | (() => Promise<T>), messages, options?) => Promise<T>",
+        description:
+          "Shows messages.loading until the task settles, then swaps to messages.success or messages.error in the same toast. Either can be a function of the result.",
+      },
+      {
+        name: "description",
+        type: "ReactNode",
+        description:
+          "Muted text under the title. A line break in a string starts a new line.",
+      },
+      {
+        name: "icon",
+        type: "ReactNode",
+        description:
+          "Fills the round tile the status badge sits on. Defaults to a bell.",
+      },
+      {
+        name: "action",
+        type: "{ label: string; onClick: () => void }",
+        description:
+          "A button on the right. Clicking it runs onClick and closes the toast.",
+      },
+      {
+        name: "duration",
+        type: "number",
+        default: "5000",
+        description:
+          "Milliseconds before the toast closes. Loading toasts stay until updated or dismissed.",
+      },
+      {
+        name: "id",
+        type: "string | number",
+        description:
+          "Reuse an id to update a toast that is already showing instead of adding a new one. String text morphs into the new message.",
+      },
+      {
+        name: "dismissible",
+        type: "boolean",
+        default: "true",
+        description: "Shows the close button on hover.",
+      },
+      {
+        name: "position",
+        type: '"top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"',
+        default: '"bottom-right"',
+        description:
+          "On Toaster, where the stack sits. Up to 3 toasts show at once. Dark mode follows your .dark class.",
+      },
+      {
+        name: "gap",
+        type: "number",
+        default: "12",
+        description: "On Toaster, the space in pixels between expanded toasts.",
+      },
+    ],
+    usage: `"use client"
+
+import { Toaster, toast } from "@/components/ui/toast"
+
+const save = () => fetch("/api/save", { method: "POST" })
+
+// mount Toaster once, in your root layout
+export function Demo() {
+  return (
+    <>
+      <button
+        onClick={() =>
+          toast.promise(save(), {
+            loading: "Saving",
+            success: "Saved",
+            error: "Couldn't save",
+          })
+        }
+      >
+        Save
+      </button>
+      <Toaster />
+    </>
+  )
+}`,
+    credits: ["Ripple inspired by morphin.dev"],
+  },
+];
+
+export type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
+
+const PM_EXECUTORS: Record<PackageManager, string> = {
+  npm: "npx",
+  pnpm: "pnpm dlx",
+  yarn: "yarn dlx",
+  bun: "bunx --bun",
+};
+
+export const PACKAGE_MANAGERS = Object.keys(PM_EXECUTORS) as PackageManager[];
+
+export function installCommand(
+  item: ComponentItem,
+  pm: PackageManager = "npm",
+): string | null {
+  if (!item.registry) return null;
+  // @latest matters: npx otherwise picks a stale local shadcn, and github registries need 4.16+
+  return `${PM_EXECUTORS[pm]} shadcn@latest add ${REGISTRY_REPO}/${item.registry}`;
+}
+
+export type ComponentSection = {
+  id: string;
+  label: string;
+  items: ComponentItem[];
+};
+
+// gallery sections: New repeats its members so they still appear under their own category
+export const gallerySections: ComponentSection[] = [
+  {
+    id: "new",
+    label: "New releases",
+    items: components
+      .filter((c) => c.isNew)
+      .reverse()
+      .sort(
+        (a, b) =>
+          Number(b.href === "/components/toast") -
+          Number(a.href === "/components/toast"),
+      ),
+  },
+  ...CATEGORY_ORDER.map((id) => ({
+    id,
+    label: CATEGORY_LABELS[id],
+    items: components.filter((c) => c.category === id),
+  })),
+].filter((section) => section.items.length > 0);
+
+export function activeComponent(pathname: string): ComponentItem | undefined {
+  return components.find((c) => c.href === pathname);
+}
+
+export function registryComponent(name: string): ComponentItem | undefined {
+  return components.find((c) => c.registry === name);
+}
+
+export function swatchProp(item?: ComponentItem): ComponentProp | undefined {
+  return item?.props?.find((p) => p.control === "swatch" && p.optionColors);
+}
+
+export function cleanDefault(prop?: ComponentProp): string | undefined {
+  return prop?.default?.replace(/^["']|["']$/g, "");
+}
