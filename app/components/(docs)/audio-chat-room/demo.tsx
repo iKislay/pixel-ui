@@ -10,7 +10,7 @@ const photo = (id: string) =>
   `https://images.unsplash.com/photo-${id}?w=160&h=160&fit=crop&crop=faces&auto=format&q=80`;
 
 export const PARTICIPANTS: AudioChatParticipant[] = [
-  { id: "1", name: "Lena", avatar: photo("1494790108755-2616b612b786") },
+  { id: "1", name: "Lena", avatar: photo("1494790108377-be9c29b29330") },
   { id: "2", name: "Kai", avatar: photo("1507003211169-0a1dd7228f2d") },
   { id: "3", name: "Priya", avatar: photo("1438761681033-6461ffad8d80") },
   { id: "4", name: "Mateo", avatar: photo("1500648767791-00dcc994a43e") },
