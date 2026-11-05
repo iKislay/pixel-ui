@@ -31,6 +31,8 @@ export type CodeBlockProps = Omit<React.ComponentProps<'div'>, 'children'> & {
     showLineNumbers?: boolean
     /** Show the copy-to-clipboard button. */
     showCopyButton?: boolean
+    /** Optional code string to copy instead of displayed code. */
+    copyCode?: string
     /** Optional 1-based line numbers to highlight with an accent wash. Off when omitted. */
     highlightLines?: number[]
 }
@@ -298,6 +300,7 @@ export function CodeBlock({
     showHeader = true,
     showLineNumbers = true,
     showCopyButton = true,
+    copyCode,
     highlightLines,
     className,
     style,
@@ -312,6 +315,10 @@ export function CodeBlock({
         const source = typeof code === 'string' ? code : String(code ?? '')
         return source.replace(/^\n+/, '').trimEnd()
     }, [code])
+    const copySource = useMemo(() => {
+        if (typeof copyCode === 'string') return copyCode.replace(/^\n+/, '').trimEnd()
+        return trimmed
+    }, [copyCode, trimmed])
     const highlighted = useMemo(
         () => new Set(Array.isArray(highlightLines) ? highlightLines : []),
         [highlightLines],
@@ -350,11 +357,11 @@ export function CodeBlock({
                     <span className='min-w-0 flex-1 truncate font-mono text-xs text-(--cb-muted)'>
                         {filename ?? safeLanguage}
                     </span>
-                    {showCopyButton && <CopyButton code={trimmed} />}
+                    {showCopyButton && <CopyButton code={copySource} />}
                 </div>
             )}
 
-            {!(showFrame && showHeader) && showCopyButton && <CopyButton code={trimmed} floating />}
+            {!(showFrame && showHeader) && showCopyButton && <CopyButton code={copySource} floating />}
 
             <div
                 data-slot='code-block-viewport'

@@ -75,7 +75,7 @@ export default function DescriptionContent({
       {item?.usage && (
         <div className="flex flex-col gap-3">
           <SectionLabel as="h2">How to use</SectionLabel>
-          <PanelCode code={item.usage} className="rounded-lg p-4" />
+          <PanelCode code={item.usage} maxLines={15} />
         </div>
       )}
 
