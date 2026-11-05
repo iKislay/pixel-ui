@@ -41,12 +41,7 @@ export default async function ComponentsIndexPage() {
             >
               MCP
             </a>
-            .{" "}
-            <span className="hidden [@media(hover:hover)]:inline">
-              <span className="text-brand">[</span>
-              Hover to play video
-              <span className="text-brand">]</span>
-            </span>
+            .
           </p>
         </header>
 
