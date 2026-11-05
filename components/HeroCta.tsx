@@ -9,7 +9,7 @@ import CopyButton from "@/components/CopyButton";
 import { REGISTRY_REPO } from "@/lib/components";
 import { cn } from "@/lib/utils";
 
-const INSTALL_COMMAND = `npx shadcn@latest add ${REGISTRY_REPO}/fluid-orb`;
+const INSTALL_COMMAND = `npx shadcn@latest add ${REGISTRY_REPO}/toast`;
 
 const spring = { type: "spring", stiffness: 300, damping: 22 } as const;
 
@@ -73,7 +73,7 @@ export default function HeroCta() {
         >
           <code className="min-w-0 flex-1 truncate font-mono text-xs font-semibold text-white sm:flex-none sm:text-sm">
             npx shadcn@latest add {REGISTRY_REPO}
-            <span className="font-normal text-white/50">/fluid-orb</span>
+            <span className="font-normal text-white/50">/toast</span>
           </code>
         </CopyButton>
       </motion.div>
