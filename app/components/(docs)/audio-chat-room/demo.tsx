@@ -5,20 +5,23 @@ import {
   type AudioChatParticipant,
 } from "@/components/ui/audio-chat-room";
 
+const photo = (id: string) =>
+  `https://images.unsplash.com/photo-${id}?w=160&h=160&fit=crop&crop=faces&auto=format&q=80`;
+
 const PARTICIPANTS: AudioChatParticipant[] = [
-  { id: "1", name: "Lena", avatar: "https://i.pravatar.cc/150?img=47", speaking: true },
-  { id: "2", name: "Kai", avatar: "https://i.pravatar.cc/150?img=15" },
-  { id: "3", name: "Priya", avatar: "https://i.pravatar.cc/150?img=44" },
-  { id: "4", name: "Mateo", avatar: "https://i.pravatar.cc/150?img=60" },
-  { id: "5", name: "Zoe", avatar: "https://i.pravatar.cc/150?img=25" },
-  { id: "6", name: "Ravi", avatar: "https://i.pravatar.cc/150?img=68", speaking: true },
-  { id: "7", name: "Iris", avatar: "https://i.pravatar.cc/150?img=36" },
+  { id: "1", name: "Lena", avatar: photo("1494790108755-2616b612b786"), speaking: true },
+  { id: "2", name: "Kai", avatar: photo("1507003211169-0a1dd7228f2d") },
+  { id: "3", name: "Priya", avatar: photo("1438761681033-6461ffad8d80") },
+  { id: "4", name: "Mateo", avatar: photo("1500648767791-00dcc994a43e") },
+  { id: "5", name: "Zoe", avatar: photo("1534528741775-53994a69daeb") },
+  { id: "6", name: "Ravi", avatar: photo("1506794778202-cad84cf45f1d"), speaking: true },
+  { id: "7", name: "Iris", avatar: photo("1544005313-94ddf0286df2") },
 ];
 
 const YOU: AudioChatParticipant = {
   id: "you",
   name: "You",
-  avatar: "https://i.pravatar.cc/150?img=59",
+  avatar: photo("1472099645785-5658abf4ff4e"),
 };
 
 export default function AudioChatRoomPage() {
