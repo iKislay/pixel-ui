@@ -1,24 +1,22 @@
-export const OpenIcon = () => (
+export const OpenIcon = ({ className = "size-6" }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24px"
-    height="24px"
     viewBox="0 0 24 24"
+    className={className}
   >
     <path
       d="m20,3H4c-1.654,0-3,1.346-3,3v12c0,1.654,1.346,3,3,3h16c1.654,0,3-1.346,3-3V6c0-1.654-1.346-3-3-3ZM3,18V6c0-.551.449-1,1-1h11v14H4c-.551,0-1-.449-1-1Z"
       strokeWidth="0"
-      fill="#7A7A7A"
+      fill="currentColor"
     />
   </svg>
 );
 
-export const ClosedIcon = () => (
+export const ClosedIcon = ({ className = "size-6" }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24px"
-    height="24px"
     viewBox="0 0 24 24"
+    className={className}
   >
     <line
       x1="15"
@@ -26,7 +24,7 @@ export const ClosedIcon = () => (
       x2="15"
       y2="20"
       fill="none"
-      stroke="#7A7A7A"
+      stroke="currentColor"
       strokeMiterlimit="10"
       strokeWidth="2"
     />
@@ -39,7 +37,7 @@ export const ClosedIcon = () => (
       ry="2"
       transform="translate(24) rotate(90)"
       fill="none"
-      stroke="#7A7A7A"
+      stroke="currentColor"
       strokeLinecap="square"
       strokeMiterlimit="10"
       strokeWidth="2"

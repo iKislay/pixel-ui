@@ -17,7 +17,7 @@ export default function HeroIntro({
   badge,
   children,
 }: {
-  headline: string;
+  headline: React.ReactNode;
   sub: React.ReactNode;
   badge?: React.ReactNode;
   children: React.ReactNode;
@@ -44,7 +44,7 @@ export default function HeroIntro({
         initial={reduceMotion ? false : rise.hidden}
         animate={rise.shown}
         transition={step(badge ? 1 : 0)}
-        className="max-w-4xl text-balance font-runde text-4xl font-bold tracking-tight text-black dark:text-white sm:text-5xl md:text-6xl lg:text-7xl"
+        className="max-w-5xl text-balance font-runde text-3xl font-bold tracking-tight text-black dark:text-white sm:text-5xl md:text-6xl lg:text-7xl"
       >
         {headline}
       </motion.h1>

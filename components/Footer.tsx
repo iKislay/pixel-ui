@@ -1,13 +1,10 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import { SUPPORT_EMAIL } from "@/lib/legal";
-import { SITE_URL } from "@/lib/site";
 import { GithubLogo, PixelUILogo, XLogo, type LogoProps } from "./logos";
 
 const GITHUB_URL = "https://github.com/ikislay/pixel-ui";
 const X_URL = "https://x.com/pixeluiHQ";
-const DMCA_ID = "ee2a2636-6919-4dcc-a846-c70b066419b8";
-const DMCA_STATUS_URL = `https://www.dmca.com/Protection/Status.aspx?ID=${DMCA_ID}&refurl=${SITE_URL}`;
 
 type FooterLink = {
   label: string;
@@ -65,29 +62,10 @@ function NavLink({ label, href, external, icon: Icon }: FooterLink) {
   );
 }
 
-function DmcaBadge() {
-  return (
-    <a
-      href={DMCA_STATUS_URL}
-      target="_blank"
-      rel="noreferrer"
-      title="DMCA.com Protection Status"
-      className="flex h-4.25 w-fit overflow-hidden rounded-[3px] font-runde text-[9px] font-bold uppercase leading-none tracking-[0.06em] shadow-[0_0_3px_rgba(0,0,0,0.16)] dark:shadow-[0_0_3px_rgba(0,0,0,0.55)]"
-    >
-      <span className="flex items-center bg-[#ff3300] px-1.5 text-[#282828]">
-        DMCA
-      </span>
-      <span className="flex items-center bg-[#282828] px-1.5 text-[#ff3300]">
-        Protected
-      </span>
-    </a>
-  );
-}
-
 export default function Footer() {
   return (
     <footer className="relative w-full overflow-hidden bg-white text-black dark:bg-black dark:text-white">
-      <PixelUILogo className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[min(140vw,100rem)] w-[min(140vw,100rem)] min-h-[36rem] min-w-[36rem] max-w-none select-none opacity-5 dark:opacity-[0.07]" />
+      <PixelUILogo className="pointer-events-none absolute -bottom-14 -right-14 size-[22rem] select-none opacity-5 sm:-bottom-20 sm:-right-20 sm:size-[30rem] lg:-bottom-24 lg:-right-24 lg:size-[38rem] dark:opacity-[0.07]" />
 
       <div className="relative mx-auto flex min-h-[min(40svh,50rem)] w-full max-w-[96rem] flex-col px-6 pt-10 sm:min-h-[min(85svh,50rem)] sm:px-10 sm:pt-24 md:pt-32">
         <div className="h-px w-full bg-white/10" />
@@ -154,13 +132,6 @@ export default function Footer() {
                 </a>
               </Fragment>
             ))}
-            <span
-              aria-hidden="true"
-              className="text-black/25 dark:text-white/25"
-            >
-              &middot;
-            </span>
-            <DmcaBadge />
           </span>
         </div>
       </div>

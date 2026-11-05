@@ -13,27 +13,22 @@ import {
 import { cn } from "@/lib/utils";
 import { SCROLL_FADE, SCROLL_SELECTOR } from "./SidebarScroll";
 
-const ACTIVE_COLOR = "#FC4C01";
 const CORNER = 6;
-const DASH =
-  "repeating-linear-gradient(to top, transparent 0 2px, currentColor 2px 4px)";
 
 const Rail = ({
   from = 0,
   y,
   visible,
-  color,
   className,
 }: {
   from?: number;
   y: number | null;
   visible: boolean;
-  color?: string;
   className?: string;
 }) => (
   <span
     aria-hidden
-    style={{ opacity: visible && y !== null ? 1 : 0, color }}
+    style={{ opacity: visible && y !== null ? 1 : 0 }}
     className={cn(
       "pointer-events-none absolute inset-0 transition-opacity duration-200 motion-reduce:transition-none",
       className,
@@ -43,9 +38,8 @@ const Rail = ({
       style={{
         top: from,
         height: Math.max(0, (y ?? 0) - CORNER - from),
-        backgroundImage: DASH,
       }}
-      className="absolute left-0.5 w-px transition-[top,height] duration-200 motion-reduce:transition-none"
+      className="absolute left-0.5 w-px bg-current transition-[top,height] duration-200 motion-reduce:transition-none"
     />
     <svg
       width="12"
@@ -55,11 +49,7 @@ const Rail = ({
       style={{ top: (y ?? 0) - CORNER }}
       className="absolute left-0.5 transition-[top] duration-200 motion-reduce:transition-none"
     >
-      <path
-        d="M0.5 0a6 6 0 0 0 6 6H12"
-        stroke="currentColor"
-        strokeDasharray="2 2"
-      />
+      <path d="M0.5 0a6 6 0 0 0 6 6H12" stroke="currentColor" />
     </svg>
   </span>
 );
@@ -138,14 +128,7 @@ const SidebarGroup = ({
 
   const activeY = activeIndex === -1 ? null : (centers[activeIndex] ?? null);
   const hoverY = hoverIndex === null ? null : (centers[hoverIndex] ?? null);
-
-  // starts the neutral line where the orange one ends, so the two never overlap
-  const hoverFrom =
-    activeY === null
-      ? 0
-      : hoverY !== null && hoverY > activeY
-        ? activeY
-        : Math.max(0, (hoverY ?? 0) - CORNER);
+  const currentY = hovering && hoverY !== null ? hoverY : activeY;
 
   return (
     <div className="flex flex-col">
@@ -159,12 +142,13 @@ const SidebarGroup = ({
         className="relative flex flex-col gap-0.5"
       >
         <Rail
-          from={hoverFrom}
-          y={hoverY}
-          visible={hovering && hoverIndex !== activeIndex}
-          className="text-foreground/30"
+          y={currentY}
+          visible={currentY !== null}
+          className={cn(
+            "text-foreground/25 transition-colors duration-200",
+            hovering && "text-foreground/40",
+          )}
         />
-        <Rail y={activeY} visible={activeY !== null} color={ACTIVE_COLOR} />
 
         {items.map((item, index) => {
           const isActive = item.href === activeHref;

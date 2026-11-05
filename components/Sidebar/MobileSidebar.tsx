@@ -6,7 +6,7 @@ import SidebarNav from "./SidebarNav";
 import SidebarHeader from "./SidebarHeader";
 import SidebarScroll from "./SidebarScroll";
 import { ClosedIcon, OpenIcon } from "./icons";
-import { CommandMenuTrigger } from "../CommandMenuTrigger";
+import { NavbarActions } from "../NavbarActions";
 
 export default function MobileSidebar() {
   const [open, setOpen] = useState(false);
@@ -22,14 +22,16 @@ export default function MobileSidebar() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-label={open ? "Close sidebar" : "Open sidebar"}
-        className="absolute left-4 top-4 z-60 cursor-pointer rounded-lg bg-[#F4F4F9] p-2 dark:bg-popover"
-      >
-        {open ? <OpenIcon /> : <ClosedIcon />}
-      </button>
+      {!open && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Open sidebar"
+          className="absolute left-4 top-4 z-60 cursor-pointer rounded-lg bg-[#F4F4F9] p-2 text-[#868593] dark:bg-popover dark:text-[#A1A0AB]"
+        >
+          <ClosedIcon className="size-5" />
+        </button>
+      )}
 
       <AnimatePresence>
         {open && (
@@ -50,13 +52,24 @@ export default function MobileSidebar() {
               transition={{ type: "spring", stiffness: 320, damping: 34 }}
               className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col rounded-r-3xl bg-card p-4 pl-6"
             >
-              <div className="mt-18 flex items-center justify-between gap-3">
+              <div className="flex items-center justify-between gap-3 pt-2">
                 <SidebarHeader onNavigate={() => setOpen(false)} />
-                <CommandMenuTrigger onClick={() => setOpen(false)} />
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close sidebar"
+                  className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-[#F4F4F9] text-[#868593] transition-[color,transform] hover:text-black dark:bg-popover dark:hover:text-white"
+                >
+                  <OpenIcon className="size-4" />
+                </button>
               </div>
               <SidebarScroll className="mt-4 min-h-0 flex-1">
                 <SidebarNav onNavigate={() => setOpen(false)} />
               </SidebarScroll>
+
+              <div className="mt-4 shrink-0">
+                <NavbarActions />
+              </div>
             </motion.div>
           </>
         )}

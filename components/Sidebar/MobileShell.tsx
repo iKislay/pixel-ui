@@ -7,6 +7,7 @@ import MobileSidebar from "./MobileSidebar";
 import DescriptionContent from "../Description/DescriptionContent";
 import SourceSection from "../Description/SourceSection";
 import CarbonAds from "../CarbonAds";
+import { CommandSearchBar } from "../CommandSearchBar";
 
 const CARD = "rounded-[32px] bg-card";
 
@@ -23,6 +24,7 @@ export default function MobileShell({
       <div className="flex flex-col gap-2 pb-2">
         <div className={cn(CARD, "relative h-[88svh] shrink-0 p-4")}>
           <MobileSidebar />
+          <CommandSearchBar />
           {children}
         </div>
 
