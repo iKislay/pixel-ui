@@ -396,7 +396,7 @@ export default function SidebarControls({
             onClick={onOpenCode}
             className="flex w-full items-center justify-between rounded-xl border border-black/[0.06] bg-muted/40 px-3.5 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground dark:border-white/10"
           >
-            <span>View complete code</span>
+            <span>View full code</span>
             <span className="text-xs text-foreground/40">↗</span>
           </button>
         )}

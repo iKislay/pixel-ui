@@ -68,19 +68,16 @@ export default function MobileShell({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               onClick={() => setCodeDrawerOpen(false)}
-              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs"
+              className="fixed inset-0 z-50 touch-none bg-black/60 backdrop-blur-xs"
             />
-            <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 h-[85svh] p-2">
-              <div className="pointer-events-auto relative h-full overflow-hidden rounded-3xl bg-card shadow-2xl">
-                <CodeDrawer
-                  open={codeDrawerOpen}
-                  onClose={() => setCodeDrawerOpen(false)}
-                  item={item}
-                />
-              </div>
-            </div>
+            <CodeDrawer
+              open={codeDrawerOpen}
+              onClose={() => setCodeDrawerOpen(false)}
+              item={item}
+              variant="modal"
+            />
           </>
         )}
       </AnimatePresence>

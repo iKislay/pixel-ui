@@ -76,7 +76,7 @@ export default function PanelCode({
             className="pointer-events-auto inline-flex items-center gap-2 rounded-xl border border-black/[0.08] bg-background/95 px-4 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur-md transition-all hover:border-black/20 hover:bg-background dark:border-white/15 dark:hover:border-white/30"
           >
             <CodeXml className="size-3.5 text-foreground/70" />
-            <span>See complete code</span>
+            <span>View full code</span>
           </button>
         </div>
       )}
