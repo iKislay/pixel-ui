@@ -91,7 +91,7 @@ export const components: ComponentItem[] = [
       "A voice chat pill that morphs into a card showing everyone in the room.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/audio-chat-room.tsx`,
     interaction:
-      "Click the pill to open the room. The avatars glide out into a grid, the names fade in and anyone speaking gets a live level badge. Press Join now to enter, or close it with the X button or Escape. Honors prefers-reduced-motion: the layout snaps and content cross-fades, and the level bars stop moving.",
+      "Click the pill to open the room. The avatars glide out into a grid, the names fade in and anyone speaking gets a live level badge. Press Join now and your avatar pops into the grid, while the button turns into a mic toggle and a Leave button. Unmute to show your own level badge. Close it with the X button or Escape. Honors prefers-reduced-motion: the layout snaps and content cross-fades, and the level bars stop moving.",
     props: [
       {
         name: "participants",
@@ -116,12 +116,46 @@ export const components: ComponentItem[] = [
         name: "helperText",
         type: "string",
         default: '"Mic will be muted initially."',
-        description: "Muted line under the join button.",
+        description: "Muted line under the join button, before you join.",
+      },
+      {
+        name: "you",
+        type: "{ id: string; name: string; avatar?: string }",
+        default: '{ id: "you", name: "You" }',
+        description: "The avatar added to the grid when you join.",
+      },
+      {
+        name: "defaultMuted",
+        type: "boolean",
+        default: "true",
+        description: "Whether your mic starts muted on join. Leaving resets it.",
+      },
+      {
+        name: "mutedText",
+        type: "string",
+        default: '"You\'re in. Your mic is muted."',
+        description: "The line under the controls while you are muted.",
+      },
+      {
+        name: "liveText",
+        type: "string",
+        default: '"You\'re live. Everyone can hear you."',
+        description: "The line under the controls while your mic is on.",
       },
       {
         name: "onJoin",
         type: "() => void",
         description: "Runs when the join button is pressed.",
+      },
+      {
+        name: "onLeave",
+        type: "() => void",
+        description: "Runs when the Leave button is pressed.",
+      },
+      {
+        name: "onMutedChange",
+        type: "(muted: boolean) => void",
+        description: "Runs when the mic toggle is pressed.",
       },
       {
         name: "expanded",
@@ -148,7 +182,12 @@ const people = [
 ]
 
 export function Demo() {
-  return <AudioChatRoom participants={people} onJoin={() => {}} />
+  return <AudioChatRoom
+      participants={people}
+      onJoin={() => {}}
+      onLeave={() => {}}
+      onMutedChange={(muted) => {}}
+    />
 }`,
     credits: ["Inspired by morphin.dev"],
   },
