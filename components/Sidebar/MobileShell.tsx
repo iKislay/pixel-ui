@@ -5,7 +5,6 @@ import { activeComponent } from "@/lib/components";
 import { cn } from "@/lib/utils";
 import MobileSidebar from "./MobileSidebar";
 import DescriptionContent from "../Description/DescriptionContent";
-import CarbonAds from "../CarbonAds";
 import { CommandSearchBar } from "../CommandSearchBar";
 
 const CARD = "rounded-[32px] bg-card";
@@ -25,10 +24,6 @@ export default function MobileShell({
           <MobileSidebar />
           <CommandSearchBar />
           {children}
-        </div>
-
-        <div className={cn(CARD, "p-4")}>
-          <CarbonAds />
         </div>
 
         <div className={cn(CARD, "p-6")}>

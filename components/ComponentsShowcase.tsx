@@ -3,7 +3,7 @@ import ComponentCard from "./gallery/ComponentCard";
 import ViewAllCard from "./gallery/ViewAllCard";
 
 export default function ComponentsShowcase() {
-  const latest = components.slice(0, 3);
+  const latest = components.slice(0, 5);
   if (latest.length === 0) return null;
 
   return (
@@ -17,9 +17,9 @@ export default function ComponentsShowcase() {
         </h2>
       </header>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {latest.map((item) => (
-          <ComponentCard key={item.href} item={item} autoPlay />
+          <ComponentCard key={item.href} item={item} autoPlay overlay />
         ))}
         <ViewAllCard count={components.length} />
       </div>

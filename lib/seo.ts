@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { components } from "@/lib/components";
+import { type ComponentItem, components } from "@/lib/components";
 import {
   SITE_ALT_NAMES,
   SITE_DESCRIPTION,
@@ -26,25 +26,69 @@ export const SITE_KEYWORDS = [
   "microinteractions",
 ];
 
+const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
+  "/components/audio-chat-room":
+    "Click to open, join with live voice badges, and toggle mic controls.",
+  "/components/toast":
+    "Stack in a corner, fan out on hover, and morph in place.",
+  "/components/member-selector":
+    "Tap avatars to select, or search and filter members with keyboard navigation.",
+  "/components/ascii-jellyfish":
+    "Swims away from pointers and ripples on click.",
+  "/components/ascii-butterflies":
+    "Flits away on pointer proximity and scatters on click.",
+};
+
+export function componentMetaDescription(item: ComponentItem): string {
+  const snippet = COMPONENT_INTERACTION_SNIPPETS[item.href];
+  if (snippet && item.description) {
+    return `${item.description} ${snippet}`;
+  }
+  if (!item.interaction || !item.description) {
+    return item.description ?? "";
+  }
+  const firstSentence = item.interaction.split(". ")[0]?.trim();
+  if (firstSentence) {
+    const candidate = `${item.description} ${firstSentence}.`;
+    if (candidate.length <= 160) return candidate;
+  }
+  return item.description;
+}
+
 export function componentPageMetadata(href: string): Metadata {
   const item = components.find((c) => c.href === href);
   if (!item) return {};
 
   const name = item.name.toLowerCase();
+  const description = componentMetaDescription(item);
+  const title = `${item.name}: Animated React Component`;
 
   return {
-    title: `${item.name} — Animated React Component`,
-    description: item.description,
+    title,
+    description,
     keywords: [
       name,
       `${name} react`,
       `${name} component`,
       `animated ${name}`,
       `${name} shadcn`,
+      `${name} interaction`,
       ...SITE_KEYWORDS,
     ],
     alternates: {
       canonical: item.href,
+    },
+    openGraph: {
+      title: `${title} | ${SITE_NAME}`,
+      description,
+      url: item.href,
+      siteName: SITE_NAME,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | ${SITE_NAME}`,
+      description,
     },
   };
 }
@@ -54,6 +98,7 @@ export function componentJsonLd(href: string) {
   if (!item) return null;
 
   const url = `${SITE_URL}${item.href}`;
+  const description = componentMetaDescription(item);
 
   return {
     "@context": "https://schema.org",
@@ -74,7 +119,7 @@ export function componentJsonLd(href: string) {
       {
         "@type": "SoftwareSourceCode",
         name: item.name,
-        description: item.description,
+        description,
         url,
         codeRepository: item.source ?? SITE_REPO,
         programmingLanguage: "TypeScript",
@@ -140,7 +185,7 @@ export function componentsJsonLd() {
         "@type": "ListItem",
         position: index + 1,
         name: item.name,
-        description: item.description,
+        description: componentMetaDescription(item),
         url: `${SITE_URL}${item.href}`,
       })),
     },

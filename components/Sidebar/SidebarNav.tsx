@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,47 +12,6 @@ import {
 } from "@/lib/components";
 import { cn } from "@/lib/utils";
 import { SCROLL_FADE, SCROLL_SELECTOR } from "./SidebarScroll";
-
-const CORNER = 6;
-
-const Rail = ({
-  from = 0,
-  y,
-  visible,
-  className,
-}: {
-  from?: number;
-  y: number | null;
-  visible: boolean;
-  className?: string;
-}) => (
-  <span
-    aria-hidden
-    style={{ opacity: visible && y !== null ? 1 : 0 }}
-    className={cn(
-      "pointer-events-none absolute inset-0 transition-opacity duration-200 motion-reduce:transition-none",
-      className,
-    )}
-  >
-    <span
-      style={{
-        top: from,
-        height: Math.max(0, (y ?? 0) - CORNER - from),
-      }}
-      className="absolute left-0.5 w-px bg-current transition-[top,height] duration-200 motion-reduce:transition-none"
-    />
-    <svg
-      width="12"
-      height="7"
-      viewBox="0 0 12 7"
-      fill="none"
-      style={{ top: (y ?? 0) - CORNER }}
-      className="absolute left-0.5 transition-[top] duration-200 motion-reduce:transition-none"
-    >
-      <path d="M0.5 0a6 6 0 0 0 6 6H12" stroke="currentColor" />
-    </svg>
-  </span>
-);
 
 // bucketing keeps a category that is missing from CATEGORY_ORDER in the nav
 const buckets = new Map<ComponentCategory, ComponentItem[]>();
@@ -86,29 +45,7 @@ const SidebarGroup = ({
   activeHref: string;
   onNavigate?: () => void;
 }) => {
-  const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLAnchorElement | null)[]>([]);
-  const [centers, setCenters] = useState<number[]>([]);
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const [pointerInside, setPointerInside] = useState(false);
-  const [focusInside, setFocusInside] = useState(false);
-  const hovering = pointerInside || focusInside;
-
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-
-    const observer = new ResizeObserver(() => {
-      setCenters(
-        itemRefs.current.map((el) =>
-          el ? el.offsetTop + el.offsetHeight / 2 : 0,
-        ),
-      );
-    });
-    observer.observe(list);
-    return () => observer.disconnect();
-  }, []);
-
   const activeIndex = items.findIndex((item) => item.href === activeHref);
 
   // reveals the active row when landing straight on a page whose entry sits off-screen
@@ -126,30 +63,13 @@ const SidebarGroup = ({
     else if (below > 0) scroller.scrollTop += below;
   }, [activeIndex]);
 
-  const activeY = activeIndex === -1 ? null : (centers[activeIndex] ?? null);
-  const hoverY = hoverIndex === null ? null : (centers[hoverIndex] ?? null);
-  const currentY = hovering && hoverY !== null ? hoverY : activeY;
-
   return (
     <div className="flex flex-col">
-      <span className="pb-2 pl-0.5 pr-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/40">
+      <span className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/40 select-none">
         {label}
       </span>
 
-      <div
-        ref={listRef}
-        onMouseLeave={() => setPointerInside(false)}
-        className="relative flex flex-col gap-0.5"
-      >
-        <Rail
-          y={currentY}
-          visible={currentY !== null}
-          className={cn(
-            "text-foreground/25 transition-colors duration-200",
-            hovering && "text-foreground/40",
-          )}
-        />
-
+      <div className="flex flex-col gap-1">
         {items.map((item, index) => {
           const isActive = item.href === activeHref;
 
@@ -157,30 +77,22 @@ const SidebarGroup = ({
             <Link
               key={item.href}
               href={item.href}
-              prefetch={hoverIndex === index ? null : false}
+              prefetch={false}
               ref={(el) => {
                 itemRefs.current[index] = el;
               }}
               onClick={onNavigate}
-              onMouseEnter={() => {
-                setHoverIndex(index);
-                setPointerInside(true);
-              }}
-              onFocus={() => {
-                setHoverIndex(index);
-                setFocusInside(true);
-              }}
-              onBlur={() => setFocusInside(false)}
               data-active={isActive}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "rounded-lg py-1.5 pl-5 pr-2 text-sm transition-colors duration-200",
+                "group flex items-center rounded-xl px-3.5 py-2 text-[13.5px] font-medium transition-all duration-150 outline-none select-none",
                 isActive
-                  ? "text-foreground"
-                  : "text-foreground/50 hover:text-foreground/80",
+                  ? "border border-foreground/10 bg-foreground/[0.07] text-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_1px_2px_rgba(0,0,0,0.06)] dark:border-white/12 dark:bg-gradient-to-b dark:from-white/[0.12] dark:to-white/[0.05] dark:text-white dark:hover:from-white/[0.14] dark:hover:to-white/[0.07] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.16),0_1px_2px_rgba(0,0,0,0.15)]"
+                  : "border border-transparent text-foreground/50 hover:border-foreground/[0.06] hover:bg-foreground/[0.04] hover:text-foreground active:scale-[0.985] dark:text-zinc-400 dark:hover:border-white/[0.08] dark:hover:bg-white/[0.06] dark:hover:text-zinc-100 motion-reduce:transform-none",
+                "focus-visible:ring-1 focus-visible:ring-brand/60",
               )}
             >
-              {item.name}
+              <span className="truncate">{item.name}</span>
             </Link>
           );
         })}
@@ -202,7 +114,7 @@ const SidebarNav = ({
     <nav
       aria-label="Components"
       data-slot="sidebar-nav"
-      className={cn("flex flex-col gap-5", className)}
+      className={cn("flex flex-col gap-6 p-0.5", className)}
     >
       {groups.map((group) => (
         <SidebarGroup

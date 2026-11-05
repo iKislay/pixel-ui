@@ -61,24 +61,6 @@ export type ComponentItem = {
 export const REGISTRY_HOMEPAGE = "https://github.com/ikislay/pixel-ui";
 export const REGISTRY_REPO = "ikislay/pixel-ui";
 
-export const PANEL_INFO = {
-  sourceHint:
-    "Click the code icon in the top-right corner to view the source code.",
-  keepInMind:
-    "Most components here are recreations of great work from around the web. I don't claim to be the original creator - this is my attempt to reverse-engineer, replicate, and often add a few extra features. I've tried to credit everyone; if I missed someone, let me know.",
-  contactEmail: "hello@pixelui.dev",
-  contactNote: "Found a bug or issue? Feel free to drop a DM.",
-  license: [
-    "MIT with the Commons Clause and an attribution requirement. Free to use, modify and ship in personal and commercial projects, closed source included. You own the code once it is in your project.",
-    "Credit is required. Any project shipping a Pixel UI component must credit Pixel UI with a visible link back to pixelui.dev, in a footer, an about page, a credits screen or a README.",
-    "Don't strip the credit or the copyright notice from the source you copied.",
-    "Don't sell, sublicense or redistribute the components themselves, on their own, bundled into a template, kit, theme or paid course, or ported to another framework.",
-    "Don't republish them. No mirrors, no re-uploads, no listing them as your own work.",
-    "Don't repackage the registry as a competing component library.",
-    "Don't claim authorship of a component or of Pixel UI itself.",
-    "The LICENSE file in the repository is the full text and governs. Ask first if your use doesn't fit these rules.",
-  ],
-} as const;
 
 export const components: ComponentItem[] = [
   {

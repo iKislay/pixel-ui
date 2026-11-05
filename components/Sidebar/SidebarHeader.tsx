@@ -10,28 +10,18 @@ export default function SidebarHeader({
   className?: string;
 }) {
   return (
-    <nav
-      aria-label="Breadcrumb"
-      className={cn("flex items-center gap-2", className)}
-    >
+    <div className={cn("flex items-center min-w-0", className)}>
       <Link
         href="/"
         onClick={onNavigate}
-        className="flex items-center gap-1.5 text-foreground/50 transition-colors duration-200 hover:text-foreground"
+        className="group flex items-center gap-2.5 rounded-lg transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand/60"
       >
-        <PixelUILogo className="size-3.5" />
-        Pixel UI
+        <PixelUILogo className="size-6 shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none" />
+        <span className="font-runde text-[17px] font-semibold tracking-tight text-foreground truncate">
+          Pixel UI
+        </span>
       </Link>
-      <span aria-hidden className="text-foreground/25">
-        /
-      </span>
-      <Link
-        href="/components"
-        onClick={onNavigate}
-        className="text-foreground"
-      >
-        Components
-      </Link>
-    </nav>
+    </div>
   );
 }
+

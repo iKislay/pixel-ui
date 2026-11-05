@@ -1,24 +1,98 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "motion/react";
 import SidebarNav from "./SidebarNav";
 import SidebarHeader from "./SidebarHeader";
 import SidebarScroll from "./SidebarScroll";
 import { ClosedIcon, OpenIcon } from "./icons";
 import { Squircle } from "@squircle-js/react";
-import CarbonAds from "../CarbonAds";
 import Tooltip from "../Tooltip";
 import { NavbarActions } from "../NavbarActions";
+import { cn } from "@/lib/utils";
 
 const PANEL_SHIFT = 320;
+const MIN_NAV_WIDTH = 200;
+const MAX_NAV_WIDTH = 288;
+const COLLAPSE_THRESHOLD = 50;
+
+type SidebarProps = {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  width?: number;
+  onWidthChange?: (width: number) => void;
+  isResizing?: boolean;
+  setIsResizing?: (resizing: boolean) => void;
+};
 
 const Sidebar = ({
   open,
   setOpen,
-}: {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+  width = MAX_NAV_WIDTH,
+  onWidthChange,
+  isResizing = false,
+  setIsResizing,
+}: SidebarProps) => {
+  useEffect(() => {
+    return () => {
+      document.body.style.removeProperty("cursor");
+      document.body.style.removeProperty("user-select");
+    };
+  }, []);
+
+  const handleDragStart = (e: React.PointerEvent) => {
+    e.preventDefault();
+    if (!onWidthChange || !setIsResizing) return;
+
+    setIsResizing(true);
+    const startX = e.clientX;
+    const startWidth = width;
+
+    const onPointerMove = (moveEvent: PointerEvent) => {
+      const delta = moveEvent.clientX - startX;
+      const nextWidth = startWidth + delta;
+
+      if (nextWidth > MAX_NAV_WIDTH) {
+        onWidthChange(MAX_NAV_WIDTH);
+      } else if (nextWidth < MIN_NAV_WIDTH) {
+        const underdrag = MIN_NAV_WIDTH - nextWidth;
+        if (underdrag >= COLLAPSE_THRESHOLD) {
+          cleanup();
+          setIsResizing(false);
+          setOpen(false);
+          onWidthChange(MAX_NAV_WIDTH);
+          return;
+        }
+        onWidthChange(MIN_NAV_WIDTH - underdrag * 0.2);
+      } else {
+        onWidthChange(nextWidth);
+      }
+    };
+
+    const cleanup = () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+      document.body.style.removeProperty("cursor");
+      document.body.style.removeProperty("user-select");
+    };
+
+    const onPointerUp = () => {
+      cleanup();
+      setIsResizing(false);
+      if (width < MIN_NAV_WIDTH) {
+        if (MIN_NAV_WIDTH - width >= 15) {
+          setOpen(false);
+        }
+        onWidthChange(MIN_NAV_WIDTH);
+      }
+    };
+
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+  };
+
   return (
     <div className="pointer-events-none absolute left-0 top-0 z-40 h-full">
       {!open && (
@@ -39,9 +113,31 @@ const Sidebar = ({
         <motion.div
           initial={false}
           animate={{ x: open ? 0 : -PANEL_SHIFT }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="pointer-events-auto flex h-full w-72 flex-col bg-background p-4 pl-6"
+          transition={
+            isResizing
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 300, damping: 30 }
+          }
+          style={{ width }}
+          className="pointer-events-auto relative flex h-full flex-col bg-background p-4"
         >
+          {open && onWidthChange && (
+            <div
+              onPointerDown={handleDragStart}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize left sidebar"
+              className="group absolute -right-2 inset-y-0 z-50 flex w-4 cursor-col-resize items-center justify-center select-none"
+            >
+              <div
+                className={cn(
+                  "h-8 w-1 rounded-full bg-foreground/25 transition-opacity duration-150",
+                  isResizing ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+                )}
+              />
+            </div>
+          )}
+
           <div className="flex items-center justify-between gap-3 pt-1">
             <SidebarHeader />
             <Tooltip label="Collapse sidebar" align="end">
@@ -60,8 +156,6 @@ const Sidebar = ({
           <SidebarScroll className="mt-4 min-h-0 flex-1">
             <SidebarNav />
           </SidebarScroll>
-
-          <CarbonAds className="mt-4 shrink-0" />
 
           <div className="mt-4 shrink-0">
             <NavbarActions />

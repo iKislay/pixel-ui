@@ -1,15 +1,12 @@
 "use client";
 
-import { type ComponentItem, PANEL_INFO } from "@/lib/components";
+import { type ComponentItem } from "@/lib/components";
 import { cn } from "@/lib/utils";
-import CopyButton from "../CopyButton";
-import Tooltip from "../Tooltip";
 import PanelCode from "./PanelCode";
 import InstallCommand from "./InstallCommand";
 import SourceCodePreview from "./SourceCodePreview";
 import DependencyPill from "./DependencyPill";
 import PropsTable from "./PropsTable";
-import { MailIcon, XIcon } from "./icons";
 
 type DescriptionContentProps = {
   item?: ComponentItem;
@@ -56,15 +53,6 @@ export default function DescriptionContent({
         </div>
       )}
 
-      {item?.interaction && (
-        <div className="flex flex-col gap-3">
-          <SectionLabel as="h2">Interaction Type</SectionLabel>
-          <p className="text-sm leading-relaxed text-foreground/70">
-            {item.interaction}
-          </p>
-        </div>
-      )}
-
       {item?.registry && (
         <div className="flex flex-col gap-3">
           <SectionLabel as="h2">Installation</SectionLabel>
@@ -96,13 +84,6 @@ export default function DescriptionContent({
         </div>
       )}
 
-      <div className="flex flex-col gap-3">
-        <SectionLabel as="h2">Keep in mind</SectionLabel>
-        <p className="text-sm leading-relaxed text-foreground/70">
-          {PANEL_INFO.keepInMind}
-        </p>
-      </div>
-
       {item?.credits && item.credits.length > 0 && (
         <div className="flex flex-col gap-3">
           <SectionLabel as="h2">Credits</SectionLabel>
@@ -117,48 +98,6 @@ export default function DescriptionContent({
           </ul>
         </div>
       )}
-
-      <div className="flex flex-col gap-3">
-        <SectionLabel as="h2">Contact</SectionLabel>
-        <p className="text-sm leading-relaxed text-foreground/70">
-          {PANEL_INFO.contactNote}
-        </p>
-        <div className="flex items-center gap-2">
-          <Tooltip label={PANEL_INFO.contactEmail} align="start">
-            <CopyButton
-              value={PANEL_INFO.contactEmail}
-              label={`Copy email (${PANEL_INFO.contactEmail})`}
-              title=""
-              idleIcon={<MailIcon />}
-              iconClassName="size-5"
-              className="size-8 hover:text-foreground"
-            />
-          </Tooltip>
-          <Tooltip label="@whykislay">
-            <a
-              href="https://x.com/whykislay"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="X: @whykislay"
-              className="inline-flex size-8 items-center justify-center text-foreground/60 transition-colors hover:text-foreground"
-            >
-              <XIcon className="size-5" />
-            </a>
-          </Tooltip>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <SectionLabel as="h2">License &amp; Usage</SectionLabel>
-        <ul className="flex flex-col gap-2 text-sm leading-relaxed text-foreground/70">
-          {PANEL_INFO.license.map((line) => (
-            <li key={line} className="flex gap-2">
-              <span className="text-foreground/40">•</span>
-              <span>{line}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }

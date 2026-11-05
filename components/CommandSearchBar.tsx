@@ -44,8 +44,8 @@ export function CommandSearchBar({ className }: { className?: string }) {
     <div
       data-chrome
       className={cn(
-        "pointer-events-none absolute inset-x-0 top-4 z-40 flex justify-center px-4",
-        className,
+        "pointer-events-none flex justify-center",
+        className ?? "absolute inset-x-0 top-4 z-40 px-4",
       )}
     >
       <button

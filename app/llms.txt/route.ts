@@ -15,6 +15,7 @@ export function GET() {
       `- Page: ${SITE_URL}${item.href}`,
     ];
     if (item.description) lines.push(`- Description: ${item.description}`);
+    if (item.interaction) lines.push(`- Interaction: ${item.interaction}`);
     const install = installCommand(item);
     if (install) lines.push(`- Install: \`${install}\``);
     if (item.source) lines.push(`- Source: ${item.source}`);
