@@ -38,7 +38,7 @@ npx shadcn@latest add ikislay/pixel-ui/{component-name}
 For example:
 
 ```bash
-npx shadcn@latest add ikislay/pixel-ui/fluid-orb
+npx shadcn@latest add ikislay/pixel-ui/toast
 ```
 
 Browse every component, with live previews and props, at [pixelui.dev/components](https://pixelui.dev/components).
@@ -62,11 +62,11 @@ npx shadcn@latest mcp init --client claude
 # or: --client cursor | vscode
 ```
 
-Ask: `add @pixel-ui/fluid-orb`
+Ask: `add @pixel-ui/toast`
 
-Or just: `Add the fluid orb from Pixel UI`
+Or just: `Add the toast from Pixel UI`
 
-Not `add fluid-orb` on its own. That looks in the default shadcn registry.
+Not `add toast` on its own. That looks in the default shadcn registry.
 
 Full steps: [pixelui.dev/mcp](https://pixelui.dev/mcp).
 

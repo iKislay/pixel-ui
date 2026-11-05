@@ -3,51 +3,29 @@
 import { useEffect, useRef, type ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
-const COLS = 120;
-const ROWS = 26;
-const RAMP = " .:-=+*#%@";
+const COLS = 240;
+const ROWS = 18;
 
 const SKYLINE: string[] = [
-  "                                                         -                            :                                 ",
-  "                                                         +                            #-                                ",
-  "                                                        .#                            %+                                ",
-  "                                                       .#@*                          .@+                                ",
-  "            .:                 :                      -%@@@*                         :@#                                ",
-  "            **                 %-                    -@@@@@@%.                       +@@.                               ",
-  "            **                 @-                   .%@@@@@@@%                       :@@                                ",
-  "            #*                 @-     .             +@@@@@@@@@:                      =@@.                               ",
-  "            #*                 @-    =@:           :#@@@@@@@@@=:                     #@@:  #-==+-:==-                   ",
-  "            ##.*             + @-   .@@%          -#%@@@@@@@@@*%:              ..    %@@= .%#####*##=                   ",
-  "            %%:#            .#.@=   -@@@.     .  :@@@@@@@@@@@@@@%  :          =%#%%: %@@- -@@@@@@@@@*  =       =        ",
-  "            #%-#  +.     -: .#.@-   :@@%    - *:-%@@@@@@@@@@@@@@@# +- +      =@@@@@%.@@@=  @@@@@@@@@=  %-     .@.       ",
-  "    ......  ##-# -@*    .@# .#.@+ .+%@@@*= :%:@%%@@@@@@@@@@@@@@@@@%%*-@.    -@@@@@@@%@@@=  @@@@@@@@@-  %*=====+@        ",
-  "   :@@@@@@+ %@-# =@@####%@% .#-@* #@@@@@@@+-@:@@@@@@@@@@@%@@@@@@@@@@*-@.  .:%@@@@@@@@@@@* -@@@@@@@@@*  @@@@@@@@@        ",
-  "  .%@@@@@@%-@@-% +@@@@@@@@@ .#.@+ @@@@@@@@#-@.@#@@%%@@@%: +@@@@*%@%%*-@. =%@@@@@@@@@@@@@@:=@@@@@@@@@#  @@@@@@@@@:.....  ",
-  " .*@@@@@@@@%%@#@*%@@@@@@@@@**%*@#@@@@@@@@@#-@.% *% .@@%.   +@@* :@-:*-@##@@@@@@@@@@@@@@@@=+@@@@@@@@@@@@@@@@@@@@@@@@@@+  ",
-  "  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-@:# ** .@@*    .@@+ .@-.*=@@@@@@@@@@@@@@@@@@@@%@@@@@@@@@@@@@@@@@@@@@@@@@@+  ",
-  "  @@@%::#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+@=%.**.-@@*    .@@*.:@=-*-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+  ",
-  "  @@@*  -@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%@=@*@@#%@@*    .@@@%%@%#*-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#@@@@@@@@@+  ",
-  "  @@@=  -@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-% *%  @@*    .@@% :@=:*=@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%: .%@@@@@@@+  ",
-  "  @@@-  -@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-# **  @@*    .@@+ .@-.*=@@%+#@@@@#=+#@@@@%%@@@@@@@@@@@@@@@@=   =@@@@@@@+  ",
-  "  @@@=  -@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+#.**..@@#:.::=@@#-=@=-#*@#---%@@+:  :*@@*..-%@@@@@@@@%#@@@@     @@@@#@@+  ",
-  "  @@@-  -@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@# .@@@@@@@@@@@@@@@@@+ %@@@     @@@@ +@+  ",
-  "  @@@-  -@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@# .@@@@@@@@@@@@@@@@@= #@@@     @@@@ -@*  ",
-  "##@@@%##%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%##@@@@@@@@@@@@@@@@@%#%@@@#####@@@@#%@@##",
-  "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+  "                                       \\\\/                 \\\\/                                                                                                                                                                                  ",
+  "                                       =+*                .&X-                                                                                                                                                                                  ",
+  "                                      |Z%~.               |Z%+/                                                                                                   \\\\\\                                                                           ",
+  "                                       &XO|               |&XO                                       \\/                                             |/         \\\\O%HZ%\\\\               /                                                        ",
+  "                                       %B#|               |M@#                  \\/                  \\8W                                             H8/    |@8HZ%~=+*:-8=#&#         \\\\*/                              \\                        ",
+  "            \\            /            .&XO:               :&X-.      \\     \\    X/          \\        \\:                 \\         \\                 \\*    \\|%B/&/\\\\\\\\\\\\S\\&8O\\     \\\\/O8&Z|//                           ||                       ",
+  "           #&/          &%/           .8W%/               |#&#      HM%    ||\\=Z*:S~\\\\|    #&*      .#S.               \\W/       \\B/                -Z^   &XO8HZ%#S*&XO8HZ%#S^    |Z|#|8|XO|/                        \\&8W8/                     ",
+  "           O8|\\\\\\\\\\\\\\\\\\\\Z%|            B#&\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\@8|      \\\\/    \\\\*|&||8H://    \\\\/       O8                .::       |+/                +*   \\M@8W%B#&M@8W%B#&M@8W/   \\&\\O8B\\%#S/   |H/                \\8W%B#&M&\\                \\*/",
+  "           #B|&M@8W%B#&*&8|            Z@8W%B#&M@8W%B#&M@8W%B/     \\HZ%|   %B8&M@8W%&#&    +S*       #S                |@#   \\   |W|                -~  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\/  \\H%B#&M@8W%/   \\*/               |%B#&M@8W%B|               8H|",
+  " \\\\\\\\\\\\\\\\\\/OMH8|      |H%B/\\\\\\\\\\\\\\\\\\/ ~&XO8HM@8W%B#&M@8W%S*&XO8    \\*&8|\\\\\\%#S*&XO8HZ%#\\./ O8@      |O8.               |%| \\Z@#\\/|#|               .*&: |BZ%M@*&%*::~=#W:B#O8@8  |*&:O8HZ%#S*   8B|    \\X/      \\/.O8HZ%#S*&X.\\/      \\O/    S8|",
+  "\\M@8W%B#&M/#W%B#&M@8W%B*&MO8W%B#&M@8W.H#&M@8^%^8&+@:W%=X^M@8W%B    .H%B#S*&8O8HZ%#S*&XO8HZ%8W%      |#S          \\/    .&M@8W%B#&M@|    \\/          :|| |*&XO8H:.      ~\\M%#S~B  ||| + *||\\ *   SM|    |&|    /8&M%#W%B#&M@8/%B#//    |#|    8B|",
+  "|W%B\\\\\\\\\\|XB#&Z@8S*&XO8@8W#B/\\\\\\\\\\%B# *&XO%H~=+S*-~=8H:-~S*&XO8    S*&XO8HZ%#S*&XO8HZ%#S*&XO8HZ.    |O8|       \\\\HZ%\\  .8W%B#&M@8W%|  \\\\#S*\\        :|| |HZ%#-*&       S:&XO8*Z  |/|\\O\\\\\\/|\\|   8WZ    &8| | \\#\\\\//B#&M@8W%B#||\\/|/|| |@|    &M&",
+  "|#S*&XO8HZ%#S*W%B#HZ%8W%&XO8HZ%#S*&XO+*Z%#&*&|W%BZ%M@8WXO8&Z%#*    +@Z^^S^\\:-8=Z*:S^=8W%B#&M@8^     \\#S/      |:S||MO: .B#&*-^=+H#&| ||X||HZ:      \\\\\\/ S*&MO8H%       8\\Z%#S*W \\\\H\\\\/\\\\&X\\\\H\\/ B#&    ZB| |=XO8-Z%MS \\X\\\\ M@#=+B\\O8| |%|    8WZ",
+  "|@8WZB#&M&XO8|#%+^  ^O#&|||S%BX&M=8W# |&XO8-~|#S*@8O8H#%~\\8*XO     |%BXOM\\~=+*:^~|8\\/B#=*&:W%B      |O8H\\\\\\\\\\\\\\O8HZ%#/\\\\M@/     \\@8O\\\\Z%#S*&/\\\\\\\\\\\\S+&| |H^^^-*&       S:&^^^*# |=+*:-~=+%:-~& \\M@Z    &M| | |#|\\ 8W8H#%#@*W%O\\/Z%||| |&8   \\B#&",
+  "|%B#|~  ^Z%#S|@X     |S*||||H  .S\\B#O |Z%\\B+*|/8W%B#&M&X*:B|%#      HM%8W :^^:^.:|B~=M@8HZ%#&*    \\ |~|*W%B#&M@8W*B#OM@8W#  \\\\/  |B#&M@8W%B#&M@8W%B#\\Z| |*   |H8       8=Z   |@ |\\\\\\\\\\\\\\\\%\\\\\\Z |W%B    8W| |\\XO8HZB#SM@XO%H#&MS*WXO8| |8S    M@Z",
+  "|&M@|W%B#&XO8|%/      \\B||||8W%B#|M@# |&X\\M\\Z||B#&M@8WZ%#=M|XO\\B/  S*&%B#HZ%. \\&XOM@8W%=+*:@8HZ  |M||*|B~=#S:-X=+&:-#=+B#O \\8W%/ |M@:-Z=+S:-X=+*Z-~@\\&| |H   |*B       S:&   |% |S.^8W~ Z&# \\W |#&M    B#| | |#|\\.M@8W%*#&*@8O /Z%||| XB8   |W%B",
+  "|8W%|#&M@Z%#S*&|      |M&XO8B#&M@|W%O |Z%#W\\\\||M@8W%B#&X\\:W|%\\\\*   \\\\Z&M@8W%/ |M@8W%B#O    #S*/  \\H/|#SM/ O8 Z&.\\8 ^B^|M@# |B#&8 |W%^.&/ 8/ %# \\& \\%\\Z| |*\\\\\\\\HM       8=Z\\\\\\\\& ||  %#  \\8   Z \\@8W\\\\\\\\M@#\\*\\X&8HZW%S#&XO8W%B#S*@8O8H\\&M@\\\\\\O#&M",
+  "|B#H|@8W%&X&M@8|      |W%B#SM@8W%|#&# |&X*#HM%|W%B#&M@|%%S#|X-|WZ%#&M&XO8HZ%MS8&XO8HZ%#S*BXO8@8%#S#|X@8WZ%#S*&8O8BZ%MS*W%| |M@8S |#&8H8%#S*&XO8HZ%#&M@X |H   |*&       S:&   |Z |S\\\\XO\\\\\\B\\\\\\& O%B#&M@8W%B#&M@8W%B#&M@8W%B#&M@8W%B#&M@8W%B#&M@8W"
 ];
-
-type Particle = {
-  col: number;
-  row: number;
-  char: string;
-  density: number;
-  hx: number;
-  hy: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-};
 
 export default function AsciiSkyline({ className, ...props }: ComponentProps<"div">) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -58,204 +36,82 @@ export default function AsciiSkyline({ className, ...props }: ComponentProps<"di
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const pointer = { x: -1000, y: -1000, active: false };
-    let rafId = 0;
-    let running = false;
-    let visible = true;
-    let cssW = 0;
-    let cssH = 0;
-    let fontSize = 10;
-    let particles: Particle[] = [];
-
-    // build initial particle list from grid
-    const baseParticles: { col: number; row: number; char: string; density: number }[] = [];
-    for (let r = 0; r < ROWS; r++) {
-      const line = SKYLINE[r] || "";
-      for (let c = 0; c < COLS; c++) {
-        const ch = line[c] || " ";
-        if (ch === " ") continue;
-        const d = RAMP.indexOf(ch) / (RAMP.length - 1);
-        baseParticles.push({ col: c, row: r, char: ch, density: Math.max(0.1, d) });
-      }
-    }
-
-    const layout = () => {
+    const render = () => {
+      const rect = canvas.getBoundingClientRect();
+      const cssW = rect.width;
+      const cssH = rect.height;
       if (cssW <= 0 || cssH <= 0) return;
-      const targetH = Math.min(cssH, cssW / 4.4);
-      const cw = cssW / COLS;
-      const ch = targetH / ROWS;
-      fontSize = Math.max(7, Math.min(cw * 1.55, ch * 0.95));
-      const offsetY = cssH - targetH;
 
-      if (particles.length === 0) {
-        particles = baseParticles.map((b) => {
-          const hx = b.col * cw + cw / 2;
-          const hy = offsetY + b.row * ch + ch / 2;
-          return { ...b, hx, hy, x: hx, y: hy, vx: 0, vy: 0 };
-        });
-      } else {
-        for (let i = 0; i < particles.length; i++) {
-          const pt = particles[i];
-          pt.hx = pt.col * cw + cw / 2;
-          pt.hy = offsetY + pt.row * ch + ch / 2;
-          if (!running) {
-            pt.x = pt.hx;
-            pt.y = pt.hy;
-            pt.vx = 0;
-            pt.vy = 0;
-          }
-        }
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const widthPx = Math.floor(cssW * dpr);
+      const heightPx = Math.floor(cssH * dpr);
+
+      if (canvas.width !== widthPx || canvas.height !== heightPx) {
+        canvas.width = widthPx;
+        canvas.height = heightPx;
       }
-    };
 
-    const draw = (interactive: boolean) => {
+      ctx.save();
+      ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, cssW, cssH);
-      ctx.font = `${fontSize}px monospace`;
+
+      const isDark = document.documentElement.classList.contains("dark");
+      const baseRgb = isDark ? "255, 255, 255" : "0, 0, 0";
+
+      const cw = cssW / COLS;
+      const ch = cssH / ROWS;
+      const fontSize = Math.max(5, Math.min(cw * 1.6, ch * 0.95));
+
+      ctx.font = `${fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      const isDark = document.documentElement.classList.contains("dark");
-      const radius = Math.max(90, Math.min(160, cssW * 0.15));
-      let moving = false;
+      for (let r = 0; r < ROWS; r++) {
+        const line = SKYLINE[r] || "";
+        const y = r * ch + ch / 2;
+        for (let c = 0; c < COLS; c++) {
+          const char = line[c] || " ";
+          if (char === " ") continue;
 
-      for (let i = 0; i < particles.length; i++) {
-        const pt = particles[i];
+          let alpha = 0.55;
+          if ("@#WMB8%&".includes(char)) alpha = 0.8;
+          else if ("S*XOHZ".includes(char)) alpha = 0.65;
+          else if ("|/\\_^~-+=".includes(char)) alpha = 0.45;
+          else if (":.".includes(char)) alpha = 0.3;
 
-        if (interactive && pointer.active) {
-          const dx = pointer.x - pt.x;
-          const dy = pointer.y - pt.y;
-          const dist = Math.hypot(dx, dy);
-
-          if (dist < radius && dist > 1) {
-            const t = 1 - dist / radius;
-            const pull = t * t * 3.4;
-            pt.vx += (dx / dist) * pull;
-            pt.vy += (dy / dist) * pull;
-
-            if (dist < 16) {
-              const push = (16 - dist) * 0.35;
-              pt.vx -= (dx / dist) * push;
-              pt.vy -= (dy / dist) * push;
-            }
-          }
+          ctx.fillStyle = `rgba(${baseRgb}, ${alpha})`;
+          ctx.fillText(char, c * cw + cw / 2, y);
         }
-
-        if (interactive) {
-          pt.vx += (pt.hx - pt.x) * 0.085;
-          pt.vy += (pt.hy - pt.y) * 0.085;
-          pt.vx *= 0.82;
-          pt.vy *= 0.82;
-          pt.x += pt.vx;
-          pt.y += pt.vy;
-
-          const disp = Math.hypot(pt.x - pt.hx, pt.y - pt.hy);
-          if (Math.abs(pt.vx) > 0.03 || Math.abs(pt.vy) > 0.03 || disp > 0.25) {
-            moving = true;
-          }
-        }
-
-        const disp = Math.hypot(pt.x - pt.hx, pt.y - pt.hy);
-        const magnetRatio = Math.min(1, disp / 24);
-        const baseAlpha = 0.25 + pt.density * 0.5;
-        const alpha = Math.min(1, baseAlpha * (1 - magnetRatio * 0.2) + magnetRatio * 0.65);
-
-        if (isDark) {
-          if (magnetRatio > 0.12) {
-            ctx.fillStyle = `rgba(252, 76, 1, ${alpha.toFixed(3)})`;
-          } else {
-            ctx.fillStyle = `rgba(240, 240, 245, ${alpha.toFixed(3)})`;
-          }
-        } else {
-          if (magnetRatio > 0.12) {
-            ctx.fillStyle = `rgba(224, 67, 0, ${alpha.toFixed(3)})`;
-          } else {
-            ctx.fillStyle = `rgba(25, 25, 30, ${alpha.toFixed(3)})`;
-          }
-        }
-
-        ctx.fillText(pt.char, pt.x, pt.y);
       }
 
-      return moving;
+      ctx.restore();
     };
 
-    const loop = () => {
-      if (!visible || reduceMotion.matches) return;
-      const active = draw(true);
-      if (active || pointer.active) {
-        rafId = requestAnimationFrame(loop);
-      } else {
-        running = false;
-        draw(false);
-      }
-    };
+    render();
 
-    const wake = () => {
-      if (reduceMotion.matches || !visible) return;
-      if (!running) {
-        running = true;
-        cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(loop);
-      }
-    };
-
-    const resize = () => {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) return;
-      cssW = rect.width;
-      cssH = rect.height;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.round(cssW * dpr);
-      canvas.height = Math.round(cssH * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      layout();
-      draw(false);
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      pointer.x = e.clientX - rect.left;
-      pointer.y = e.clientY - rect.top;
-      pointer.active = true;
-      wake();
-    };
-
-    const onPointerLeave = () => {
-      pointer.active = false;
-      wake();
-    };
-
-    const resizeObserver = new ResizeObserver(resize);
+    const resizeObserver = new ResizeObserver(render);
     resizeObserver.observe(canvas);
 
-    const intersectionObserver = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      if (visible) wake();
-      else cancelAnimationFrame(rafId);
+    const themeObserver = new MutationObserver(render);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
     });
-    intersectionObserver.observe(canvas);
-
-    canvas.addEventListener("pointermove", onPointerMove);
-    canvas.addEventListener("pointerleave", onPointerLeave);
-
-    resize();
 
     return () => {
-      cancelAnimationFrame(rafId);
       resizeObserver.disconnect();
-      intersectionObserver.disconnect();
-      canvas.removeEventListener("pointermove", onPointerMove);
-      canvas.removeEventListener("pointerleave", onPointerLeave);
+      themeObserver.disconnect();
     };
   }, []);
 
   return (
     <div
-      className={cn("relative w-full overflow-hidden select-none touch-none", className)}
+      role="img"
+      aria-label="Indian monuments skyline ascii art: Gateway of India, Charminar, Golden Temple, Jama Masjid, India Gate, Lotus Temple, Taj Mahal"
+      className={cn("relative w-full select-none overflow-hidden", className)}
       {...props}
     >
-      <canvas ref={canvasRef} aria-hidden="true" className="block h-full w-full" />
+      <canvas ref={canvasRef} className="block h-full w-full" />
     </div>
   );
 }

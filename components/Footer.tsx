@@ -70,6 +70,8 @@ export default function Footer() {
         className="relative flex w-full flex-col justify-between overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F5F5F7] px-6 pt-8 pb-0 text-black sm:px-10 sm:pt-10 lg:px-12 lg:pt-12 dark:border-transparent dark:border-apple dark:bg-[#121212] dark:text-white"
         style={{ cornerShape: "squircle" } as React.CSSProperties}
       >
+        <PixelUILogo className="pointer-events-none absolute -bottom-10 -right-10 size-64 select-none opacity-5 sm:-bottom-14 sm:-right-14 sm:size-80 lg:-bottom-16 lg:-right-16 lg:size-[24rem] dark:opacity-[0.07]" />
+
         <div className="relative mx-auto flex w-full max-w-[96rem] flex-col">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <Link href="/" className="flex h-fit w-fit items-center gap-2.5">
@@ -96,15 +98,15 @@ export default function Footer() {
             </nav>
           </div>
 
-          <div className="pt-6 sm:pt-10">
-            <h2 className="selection-contrast font-runde text-[clamp(1.5rem,6.25vw,5.25rem)] font-bold leading-[0.92] tracking-tight">
+          <div className="pt-4 sm:pt-6">
+            <h2 className="selection-contrast font-runde text-[clamp(0.75rem,3.125vw,2.625rem)] font-bold leading-[0.95] tracking-tight">
               Pixel-Perfect Components
             </h2>
           </div>
         </div>
 
         <div className="relative -mx-6 -mb-px mt-6 sm:-mx-10 sm:mt-8 lg:-mx-12">
-          <AsciiSkyline className="h-36 w-full sm:h-48 md:h-56 lg:h-64" />
+          <AsciiSkyline className="h-14 w-full sm:h-16 md:h-20 lg:h-24" />
         </div>
       </div>
 

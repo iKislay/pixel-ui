@@ -56,11 +56,11 @@ export const MCP_CLIENTS: McpClient[] = [
   },
 ];
 
-export const MCP_PROMPT_DIRECT = "add fluid-orb";
+export const MCP_PROMPT_DIRECT = "add toast";
 
-export const MCP_PROMPT = "add @pixel-ui/fluid-orb";
+export const MCP_PROMPT = "add @pixel-ui/toast";
 
-export const MCP_ASK = "Add the fluid orb from Pixel UI";
+export const MCP_ASK = "Add the toast from Pixel UI";
 
 export const MCP_CLI =
-  "npx shadcn@latest add ikislay/pixel-ui/fluid-orb";
+  "npx shadcn@latest add ikislay/pixel-ui/toast";
