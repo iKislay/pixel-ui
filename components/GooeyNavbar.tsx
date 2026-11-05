@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { PixelUILogo } from "@/components/logos";
+import { BrandLogo } from "@/components/BrandLogo";
 import { NavbarActions } from "@/components/NavbarActions";
 import { cn } from "@/lib/utils";
 
@@ -66,12 +66,9 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
         >
           <Link
             href="/"
-            className={cn(pill, inPill, "flex h-12 items-center gap-2 px-4")}
+            className={cn(pill, inPill, "group flex h-12 items-center px-4")}
           >
-            <PixelUILogo className="size-5 text-foreground shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none" />
-            <span className="font-runde text-md font-semibold text-foreground">
-              Pixel UI
-            </span>
+            <BrandLogo />
           </Link>
         </motion.div>
 

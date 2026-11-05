@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
-import { PixelUILogo } from "@/components/logos";
+import { BrandLogo } from "@/components/BrandLogo";
 
 const LINKS = [
   { label: "Components", href: "/components" },
@@ -65,13 +65,9 @@ export default function Navbar() {
       >
         <Link
           href="/"
-          className={cn(
-            pill,
-            "gap-2 px-4 font-[family-name:var(--font-open-runde)] text-sm font-semibold text-foreground",
-          )}
+          className={cn(pill, "group px-4")}
         >
-          <PixelUILogo className="h-5 w-5" />
-          Pixel UI
+          <BrandLogo />
         </Link>
 
         <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2">

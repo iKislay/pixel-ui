@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import Link from "next/link";
 import { SUPPORT_EMAIL } from "@/lib/legal";
 import AsciiSkyline from "./AsciiSkyline";
+import { BrandLogo } from "./BrandLogo";
 import { GithubLogo, PixelUILogo, XLogo, type LogoProps } from "./logos";
 
 const GITHUB_URL = "https://github.com/ikislay/pixel-ui";
@@ -74,11 +75,8 @@ export default function Footer() {
 
         <div className="relative mx-auto flex w-full max-w-[96rem] flex-col">
           <div className="flex flex-wrap items-center justify-between gap-6">
-            <Link href="/" className="flex h-fit w-fit items-center gap-2.5">
-              <PixelUILogo className="h-8 w-8" />
-              <span className="font-runde text-2xl font-bold tracking-tight">
-                Pixel UI
-              </span>
+            <Link href="/" className="group flex h-fit w-fit items-center">
+              <BrandLogo />
             </Link>
 
             <nav className="flex flex-wrap items-center gap-x-7 gap-y-2">
