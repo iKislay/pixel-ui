@@ -13,7 +13,7 @@ export default function ViewAllCard({
     <Link
       href="/components"
       className={cn(
-        "group relative flex min-h-45 flex-col justify-between overflow-hidden rounded-[32px] bg-brand p-6 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] transition-colors duration-200 ease-out hover:bg-brand-hover",
+        "group relative flex h-full min-h-45 flex-col justify-between overflow-hidden rounded-[32px] bg-brand p-6 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] transition-colors duration-200 ease-out hover:bg-brand-hover",
         className,
       )}
       style={{ cornerShape: "squircle" } as React.CSSProperties}
