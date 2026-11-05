@@ -145,8 +145,8 @@ export function NavbarActions({
     );
   }
 
-  const pill = "rounded-full border-apple bg-neutral-900";
-  const inPill = inNavbar ? "md:bg-transparent md:shadow-none" : "";
+  const pill = "rounded-full liquid-glass";
+  const inPill = inNavbar ? "md:bg-transparent md:border-transparent md:shadow-none md:backdrop-blur-none" : "";
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -162,7 +162,7 @@ export function NavbarActions({
         className={cn(
           pill,
           inPill,
-          "flex h-12 items-center transition-colors duration-200 ease-out hover:bg-neutral-800 md:hover:bg-neutral-800",
+          "flex h-12 items-center transition-colors duration-200 ease-out hover:bg-black/[0.04] active:bg-black/[0.08] dark:hover:bg-white/10 dark:active:bg-white/15",
         )}
       >
         <span className="relative flex h-12 w-12 items-center justify-center">
@@ -177,7 +177,7 @@ export function NavbarActions({
             transition={reduceMotion ? { duration: 0 } : morphTransition}
             className="flex items-center justify-center"
           >
-            <GithubIcon className="h-6 w-6 text-white" />
+            <GithubIcon className="h-6 w-6 text-foreground" />
           </motion.span>
           <motion.span
             initial={false}
@@ -245,7 +245,7 @@ export function NavbarActions({
         </span>
 
         {liveStars != null && (
-          <span className="pr-4 font-runde text-sm font-medium tabular-nums text-white/80">
+          <span className="pr-4 font-runde text-sm font-medium tabular-nums text-foreground/80">
             {liveStars}
           </span>
         )}
@@ -255,7 +255,7 @@ export function NavbarActions({
         className={cn(
           pill,
           inPill,
-          "flex h-12 w-12 items-center justify-center p-0 text-white/80 hover:bg-neutral-800 hover:text-white md:hover:bg-neutral-800 [&_svg]:h-6 [&_svg]:w-6",
+          "flex h-12 w-12 items-center justify-center p-0 text-foreground/80 hover:bg-black/[0.04] hover:text-foreground active:bg-black/[0.08] dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white dark:active:bg-white/15 [&_svg]:h-6 [&_svg]:w-6",
         )}
       />
     </div>

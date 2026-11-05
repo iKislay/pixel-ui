@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -9,12 +9,12 @@ import { NavbarActions } from "@/components/NavbarActions";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { label: "Home", href: "/" },
   { label: "Components", href: "/components" },
+  { label: "MCP", href: "/mcp" },
 ];
 
-const pill = "rounded-full border-apple bg-neutral-900";
-const inPill = "md:bg-transparent md:shadow-none";
+const pill = "rounded-full liquid-glass";
+const inPill = "md:bg-transparent md:border-transparent md:shadow-none md:backdrop-blur-none";
 
 export default function GooeyNavbar({ stars }: { stars?: number | null }) {
   const pathname = usePathname();
@@ -49,13 +49,13 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
   const animateLayout = !reduceMotion;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-5 md:top-4 z-50 flex justify-center px-5  sm:px-6 md:top-7.5">
+    <div className="pointer-events-none fixed inset-x-0 top-5 md:top-4 z-50 flex justify-center px-5 sm:px-6 md:top-7.5">
       <motion.nav
         layout={animateLayout}
         transition={spring}
         style={{ borderRadius: 9999 }}
         className={cn(
-          "relative z-10 flex w-full max-w-3xl items-center justify-between md:bg-neutral-900 md:border-apple",
+          "relative z-10 flex w-full max-w-3xl items-center justify-between md:liquid-glass",
           !scrolled && "md:w-auto md:gap-2",
         )}
       >
@@ -68,8 +68,8 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
             href="/"
             className={cn(pill, inPill, "flex h-12 items-center gap-2 px-4")}
           >
-            <PixelUILogo className="size-5 text-white dark:text-white shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none" />
-            <span className="font-runde text-md font-semibold text-white">
+            <PixelUILogo className="size-5 text-foreground shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none" />
+            <span className="font-runde text-md font-semibold text-foreground">
               Pixel UI
             </span>
           </Link>
@@ -80,28 +80,26 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
           transition={spring}
           className="pointer-events-auto hidden h-12 items-center rounded-full px-2 md:flex"
         >
-          {LINKS.map((link, i) => (
-            <Fragment key={link.href}>
-              {i > 0 && <span className="h-4 w-px bg-white/15" />}
-              <Link
-                href={link.href}
-                className={cn(
-                  "px-3.5 text-sm",
-                  pathname === link.href
-                    ? "text-white"
-                    : "text-white/60 transition-colors duration-150 ease-out hover:text-white",
-                )}
-              >
-                {link.label}
-              </Link>
-            </Fragment>
+          {LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "rounded-full px-3.5 py-1.5 text-sm transition-all duration-150 ease-out",
+                pathname === link.href
+                  ? "bg-black/[0.08] text-foreground shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] dark:bg-white/15 dark:text-white dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]"
+                  : "text-foreground/65 hover:bg-black/[0.04] hover:text-foreground dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white",
+              )}
+            >
+              {link.label}
+            </Link>
           ))}
         </motion.div>
 
         <motion.div
           layout={animateLayout}
           transition={spring}
-          className="pointer-events-auto hidden items-center gap-2 md:flex"
+          className="pointer-events-auto hidden items-center gap-2 md:flex md:pr-1"
         >
           <NavbarActions stars={stars} inNavbar variant="default" />
         </motion.div>
@@ -115,7 +113,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
           aria-expanded={menuOpen}
           className={cn(
             pill,
-            "pointer-events-auto flex h-12 w-12 items-center justify-center md:hidden",
+            "pointer-events-auto flex h-12 w-12 items-center justify-center md:hidden transition-colors duration-200 hover:bg-black/[0.04] active:bg-black/[0.08] dark:hover:bg-white/10 dark:active:bg-white/15",
           )}
         >
           <span className="flex h-4 w-5 flex-col justify-between">
@@ -129,7 +127,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
                   opacity: menuOpen && i === 1 ? 0 : 1,
                 }}
                 transition={reduceMotion ? { duration: 0 } : spring}
-                className="h-0.5 w-full bg-white"
+                className="h-0.5 w-full bg-foreground"
               />
             ))}
           </span>
@@ -143,7 +141,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduceMotion ? 0 : 0.25, ease: "easeOut" }}
-            className="pointer-events-auto fixed inset-0 z-0 bg-neutral-950/85 backdrop-blur-2xl md:hidden"
+            className="pointer-events-auto fixed inset-0 z-0 bg-white/85 dark:bg-neutral-950/75 backdrop-blur-2xl backdrop-saturate-190 md:hidden"
           >
             <div className="flex h-full flex-col items-center justify-center gap-7 px-6">
               {LINKS.map((link, i) => (
@@ -163,7 +161,9 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
                     onClick={() => setMenuOpen(false)}
                     className={cn(
                       "font-runde text-3xl font-semibold transition-colors duration-150 ease-out",
-                      pathname === link.href ? "text-white" : "text-white/50",
+                      pathname === link.href
+                        ? "text-foreground"
+                        : "text-foreground/50",
                     )}
                   >
                     {link.label}

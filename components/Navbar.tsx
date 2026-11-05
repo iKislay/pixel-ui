@@ -10,6 +10,7 @@ import { PixelUILogo } from "@/components/logos";
 
 const LINKS = [
   { label: "Components", href: "/components" },
+  { label: "MCP", href: "/mcp" },
 ];
 
 const GITHUB_URL = "https://github.com/ikislay/pixel-ui";
@@ -51,9 +52,7 @@ export default function Navbar() {
   }, [pressed]);
 
   const pill = cn(
-    "pointer-events-auto flex h-10 items-center rounded-full",
-    "bg-white/60 backdrop-blur-2xl backdrop-saturate-150 dark:bg-white/[0.07]",
-    "shadow-[0_12px_32px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_12px_32px_-12px_rgba(0,0,0,0.5)]",
+    "pointer-events-auto flex h-10 items-center rounded-full liquid-glass",
   );
 
   return (
@@ -77,66 +76,66 @@ export default function Navbar() {
 
         <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2">
           {LINKS.map((link) => {
-          const active = pathname === link.href;
-          const bumped = hovered ? hovered === link.href : active;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              draggable={false}
-              onMouseEnter={() => setHovered(link.href)}
-              onPointerDown={() => {
-                setPressed(link.href);
-                setHovered(link.href);
-              }}
-              onPointerUp={() => {
-                if (pressed && pressed !== link.href) router.push(link.href);
-              }}
-              className={cn(
-                pill,
-                "relative select-none px-4 text-sm transition-colors duration-200",
-                active || hovered === link.href
-                  ? "text-foreground"
-                  : "text-muted-foreground",
-              )}
-            >
-              <AnimatePresence>
-                {bumped && (
-                  <motion.span
-                    layoutId="nav-glass-bump"
-                    initial={{ opacity: 0 }}
-                    animate={{
-                      opacity: 1,
-                      scaleX: pressed ? 1.22 : 1,
-                      scaleY: pressed ? 1.28 : 1,
-                    }}
-                    exit={{ opacity: 0 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 30,
-                    }}
-                    className={cn(
-                      "absolute inset-0 rounded-full",
-                      "bg-black/[0.05] dark:bg-white/[0.08]",
-                      "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.55),inset_0_-1px_2px_0_rgba(0,0,0,0.05)]",
-                      "dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.14),inset_0_-1px_2px_0_rgba(0,0,0,0.3)]",
-                      pressed &&
-                        "bg-black/[0.08] backdrop-blur-sm dark:bg-white/[0.12]",
-                    )}
-                  />
+            const active = pathname === link.href;
+            const bumped = hovered ? hovered === link.href : active;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                draggable={false}
+                onMouseEnter={() => setHovered(link.href)}
+                onPointerDown={() => {
+                  setPressed(link.href);
+                  setHovered(link.href);
+                }}
+                onPointerUp={() => {
+                  if (pressed && pressed !== link.href) router.push(link.href);
+                }}
+                className={cn(
+                  pill,
+                  "relative select-none px-4 text-sm transition-colors duration-200",
+                  active || hovered === link.href
+                    ? "text-foreground"
+                    : "text-muted-foreground",
                 )}
-              </AnimatePresence>
-              <motion.span
-                animate={{ scale: bumped && pressed ? 1.08 : 1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                className="relative inline-block"
               >
-                {link.label}
-              </motion.span>
-            </Link>
-          );
-        })}
+                <AnimatePresence>
+                  {bumped && (
+                    <motion.span
+                      layoutId="nav-glass-bump"
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: 1,
+                        scaleX: pressed ? 1.22 : 1,
+                        scaleY: pressed ? 1.28 : 1,
+                      }}
+                      exit={{ opacity: 0 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
+                      }}
+                      className={cn(
+                        "absolute inset-0 rounded-full",
+                        "bg-black/[0.05] dark:bg-white/[0.08]",
+                        "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.55),inset_0_-1px_2px_0_rgba(0,0,0,0.05)]",
+                        "dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.14),inset_0_-1px_2px_0_rgba(0,0,0,0.3)]",
+                        pressed &&
+                          "bg-black/[0.08] backdrop-blur-sm dark:bg-white/[0.12]",
+                      )}
+                    />
+                  )}
+                </AnimatePresence>
+                <motion.span
+                  animate={{ scale: bumped && pressed ? 1.08 : 1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className="relative inline-block"
+                >
+                  {link.label}
+                </motion.span>
+              </Link>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-2">
