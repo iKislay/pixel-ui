@@ -84,6 +84,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [{ url: "/logos/Pixelui.svg", type: "image/svg+xml" }],
+    apple: "/apple-touch-icon.png",
   },
   openGraph: {
     title: SITE_TAGLINE,
