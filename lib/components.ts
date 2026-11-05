@@ -400,7 +400,7 @@ export function Demo() {
       "Translucent jellyfish drawn as ASCII glyphs, pulsing through the water with trailing tentacles.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/ascii-jellyfish.tsx`,
     interaction:
-      "Jellyfish squeeze their glowing bells, glide, and drift while their tentacles sway behind. Light shimmers across each bell and every pulse pushes the plankton aside. Move the pointer near one and it swims away. Click to send a ripple and startle the ones close by. Honors prefers-reduced-motion.",
+      "Jellyfish squeeze their glowing bells, glide, and drift while their tentacles sway behind. Light shimmers across each bell and every pulse pushes the plankton aside. They wander anywhere inside their container but never leave it. Move the pointer near one and it swims away. Click to send a ripple and startle the ones close by. Honors prefers-reduced-motion.",
     props: [
       {
         name: "variant",
@@ -435,7 +435,7 @@ export function Demo() {
       "A few butterflies drawn as ASCII glyphs, flapping on wandering paths and landing now and then.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/ascii-butterflies.tsx`,
     interaction:
-      "Butterflies drift sideways on slow, wandering paths, beating their wings up and down and turning to face where they go. Now and then one lands and slowly opens and closes its wings. Move the pointer near one and it flits away. Click to scatter the ones close by. Honors prefers-reduced-motion.",
+      "Butterflies drift slowly from one side of their container to the other, beating their wings up and down and turning to face where they go. They never leave the container. Now and then one lands and slowly opens and closes its wings. Move the pointer near one and it flits away. Click to scatter the ones close by. Honors prefers-reduced-motion.",
     props: [
       {
         name: "variant",

@@ -67,12 +67,6 @@ const look = (scheme: Scheme, variant: AsciiButterfliesVariant, kind: number): L
 const clamp = (v: number, lo: number, hi: number) =>
   v < lo ? lo : v > hi ? hi : v;
 const rand = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
-const angleDiff = (a: number, b: number) => {
-  let d = (b - a) % TAU;
-  if (d > Math.PI) d -= TAU;
-  if (d < -Math.PI) d += TAU;
-  return d;
-};
 const hash = (x: number, y: number) => {
   let h = Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 668265263);
   h = Math.imul(h ^ (h >>> 13), 1274126177);
@@ -110,7 +104,8 @@ type Butterfly = {
   x: number;
   y: number;
   heading: number;
-  speed: number;
+  vx: number;
+  vy: number;
   scale: number;
   size: number;
   depth: number;
@@ -147,8 +142,10 @@ class Meadow {
     const base = clamp(Math.min(width, height) * 0.18, 60, 130);
     for (const b of this.flies) {
       b.size = base * b.scale;
-      b.x = clamp(b.x, 0, width);
-      b.y = clamp(b.y, 0, height);
+      const r = this.bounds(b);
+      b.x = clamp(b.x, r.x0, r.x1);
+      b.y = clamp(b.y, r.y0, r.y1);
+      this.pickGoal(b);
     }
   }
 
@@ -163,7 +160,8 @@ class Meadow {
         x: ((i + 0.5) / this.count) * W,
         y: rand(H * 0.25, H * 0.75),
         heading,
-        speed: 30,
+        vx: Math.cos(heading) * 12,
+        vy: Math.sin(heading) * 12,
         scale: 0.75 + depth * 0.35,
         size: 60,
         depth,
@@ -183,11 +181,36 @@ class Meadow {
     this.flies.sort((a, b) => a.depth - b.depth);
   }
 
+  // keeps the raised wings and antennae inside the container
+  private bounds(b: Butterfly) {
+    const { width: W, height: H } = this;
+    let x0 = b.size * 1.05;
+    let x1 = W - b.size * 1.05;
+    let y0 = b.size * 1.05;
+    let y1 = H - b.size * 0.7;
+    if (x0 > x1) x0 = x1 = W / 2;
+    if (y0 > y1) y0 = y1 = H / 2;
+    return { x0, x1, y0, y1 };
+  }
+
+  // far goals give long drifting paths instead of circling in place
+  private pickGoal(b: Butterfly) {
+    const r = this.bounds(b);
+    for (let i = 0; i < 8; i++) {
+      b.goalX = rand(r.x0, r.x1);
+      b.goalY = rand(r.y0, r.y1);
+      if (Math.hypot(b.goalX - b.x, b.goalY - b.y) > Math.min(this.width, this.height) * 0.4) break;
+    }
+    b.retarget = this.time + rand(10, 18);
+  }
+
   scare(x: number, y: number) {
     for (const b of this.flies) {
       const d = Math.hypot(b.x - x, b.y - y);
       if (d > 260) continue;
-      b.heading = Math.atan2(b.y - y, b.x - x);
+      const away = Math.atan2(b.y - y, b.x - x);
+      b.vx = Math.cos(away) * 60;
+      b.vy = Math.sin(away) * 60;
       b.fright = 1;
       b.resting = false;
       b.until = this.time + rand(4, 7);
@@ -196,74 +219,85 @@ class Meadow {
 
   step(dt: number) {
     this.time += dt;
-    const { width: W, height: H, time: t, pointer, flies } = this;
+    const { time: t, pointer, flies } = this;
     for (const b of flies) {
-      b.fright = Math.max(0, b.fright - dt * 0.7);
+      b.fright = Math.max(0, b.fright - dt * 0.6);
 
       if (b.resting) {
-        b.speed += (0 - b.speed) * Math.min(1, dt * 5);
-        b.flap += dt * 0.9;
+        const stop = Math.exp(-dt * 5);
+        b.vx *= stop;
+        b.vy *= stop;
+        b.flap += dt * 0.7;
         if (t > b.until) {
           b.resting = false;
-          b.until = t + rand(7, 13);
-          b.heading = (b.facing === 1 ? 0 : Math.PI) + rand(-0.6, 0.2) * b.facing;
+          b.until = t + rand(8, 14);
+          this.pickGoal(b);
         }
       } else {
-        b.flap += dt * (10 + b.fright * 8);
-        if (t > b.retarget) {
-          b.goalX = rand(W * 0.12, W * 0.88);
-          b.goalY = rand(H * 0.2, H * 0.8);
-          b.retarget = t + rand(4, 8);
+        b.flap += dt * (7 + b.fright * 8);
+        if (t > b.retarget || Math.hypot(b.goalX - b.x, b.goalY - b.y) < b.size) {
+          this.pickGoal(b);
         }
-        const toGoal = Math.atan2(b.goalY - b.y, b.goalX - b.x);
-        b.wobble += dt * 1.1;
-        const flutter = Math.sin(b.wobble) * 0.6 + Math.sin(b.wobble * 2.3 + 1.3) * 0.4;
-        b.heading += (clamp(angleDiff(b.heading, toGoal), -1, 1) * 0.8 + flutter * 0.7) * dt;
+        const gx = b.goalX - b.x;
+        const gy = b.goalY - b.y;
+        const gd = Math.hypot(gx, gy) || 1;
+        // a gentle sideways weave on the way to a far goal
+        b.wobble += dt * 0.8;
+        const weave = Math.sin(b.wobble) * 0.35 + Math.sin(b.wobble * 2.1 + 1) * 0.15;
+        const dirX = gx / gd - (gy / gd) * weave;
+        const dirY = gy / gd + (gx / gd) * weave;
+        const beat = 0.5 + 0.5 * Math.sin(b.flap);
+        const speed = (9 + 6 * beat) * (1 + b.fright * 2.5);
+        const steer = Math.min(1, dt * (0.9 + b.fright * 2));
+        b.vx += (dirX * speed - b.vx) * steer;
+        b.vy += (dirY * speed - b.vy) * steer;
 
         if (pointer.active) {
           const dx = b.x - pointer.x;
           const dy = b.y - pointer.y;
-          const d = Math.hypot(dx, dy);
+          const d = Math.hypot(dx, dy) || 1;
           if (d < 150) {
-            b.heading += angleDiff(b.heading, Math.atan2(dy, dx)) * dt * 5;
-            b.fright = Math.max(b.fright, 1 - d / 150);
+            const w = 1 - d / 150;
+            b.vx += (dx / d) * 120 * w * dt;
+            b.vy += (dy / d) * 120 * w * dt;
+            b.fright = Math.max(b.fright, w);
           }
         }
         for (const o of flies) {
           if (o === b) continue;
           const dx = b.x - o.x;
           const dy = b.y - o.y;
-          if (Math.hypot(dx, dy) < (b.size + o.size) * 1.3) {
-            b.heading += angleDiff(b.heading, Math.atan2(dy, dx)) * dt * 1.5;
+          const d = Math.hypot(dx, dy) || 1;
+          const reach = (b.size + o.size) * 1.2;
+          if (d < reach) {
+            b.vx += (dx / d) * 20 * (1 - d / reach) * dt;
+            b.vy += (dy / d) * 20 * (1 - d / reach) * dt;
           }
         }
 
-        // each downstroke gives a small burst of speed
-        const beat = 0.5 + 0.5 * Math.sin(b.flap);
-        const target = (15 + 11 * beat) * (1 + b.fright * 2);
-        b.speed += (target - b.speed) * Math.min(1, dt * 4);
-
-        if (t > b.until && b.fright < 0.05 && Math.hypot(b.goalX - b.x, b.goalY - b.y) < 120) {
+        if (t > b.until && b.fright < 0.05 && gd < b.size * 1.5) {
           b.resting = true;
-          b.until = t + rand(2.5, 5);
+          b.until = t + rand(3, 6);
         }
       }
 
-      b.x += Math.cos(b.heading) * b.speed * dt;
-      b.y += Math.sin(b.heading) * b.speed * dt;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+      const bx = this.bounds(b);
+      if (b.x < bx.x0) b.vx += (bx.x0 - b.x) * 2 * dt;
+      if (b.x > bx.x1) b.vx -= (b.x - bx.x1) * 2 * dt;
+      if (b.y < bx.y0) b.vy += (bx.y0 - b.y) * 2 * dt;
+      if (b.y > bx.y1) b.vy -= (b.y - bx.y1) * 2 * dt;
+      const slack = b.size * 0.15;
+      b.x = clamp(b.x, bx.x0 - slack, bx.x1 + slack);
+      b.y = clamp(b.y, bx.y0 - slack, bx.y1 + slack);
 
-      const m = b.size * 1.2;
-      if (b.x < m) b.x += (m - b.x) * dt * 2;
-      if (b.x > W - m) b.x -= (b.x - (W - m)) * dt * 2;
-      if (b.y < m) b.y += (m - b.y) * dt * 2;
-      if (b.y > H - m) b.y -= (b.y - (H - m)) * dt * 2;
-
-      const cos = Math.cos(b.heading);
-      if (cos > 0.25) b.facing = 1;
-      else if (cos < -0.25) b.facing = -1;
+      if (Math.hypot(b.vx, b.vy) > 1) b.heading = Math.atan2(b.vy, b.vx);
+      if (b.vx > 3) b.facing = 1;
+      else if (b.vx < -3) b.facing = -1;
       // nose follows the climb or dive
       const lean = b.resting ? 0 : clamp(Math.sin(b.heading) * 0.4 * b.facing, -0.4, 0.4);
-      b.tilt += (lean - b.tilt) * Math.min(1, dt * 3);
+      b.tilt += (lean - b.tilt) * Math.min(1, dt * 2);
     }
   }
 }

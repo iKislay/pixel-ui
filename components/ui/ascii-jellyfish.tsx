@@ -153,8 +153,10 @@ class Sea {
     const base = clamp(Math.min(width, height) * 0.13, 40, 100);
     for (const j of this.jellies) {
       j.size = base * j.scale;
-      j.x = clamp(j.x, 0, width);
-      j.y = clamp(j.y, 0, height);
+      const b = this.bounds(j);
+      j.x = clamp(j.x, b.x0, b.x1);
+      j.y = clamp(j.y, b.y0, b.y1);
+      this.pickGoal(j);
       this.hang(j);
     }
     const motes = clamp(Math.round((width * height) / 7000), 30, 140);
@@ -198,6 +200,27 @@ class Sea {
       });
     }
     this.jellies.sort((a, b) => a.depth - b.depth);
+  }
+
+  // where the bell can sit with the bell and tentacles still inside the container
+  private bounds(j: Jelly) {
+    const { width: W, height: H } = this;
+    let x0 = j.size * 1.15;
+    let x1 = W - j.size * 1.15;
+    let y0 = j.size * 1.2;
+    let y1 = H - j.size * 2.6;
+    if (x0 > x1) x0 = x1 = W / 2;
+    if (y0 > y1) y0 = y1 = H / 2;
+    return { x0, x1, y0, y1 };
+  }
+
+  private pickGoal(j: Jelly) {
+    const b = this.bounds(j);
+    for (let i = 0; i < 6; i++) {
+      j.goalX = rand(b.x0, b.x1);
+      j.goalY = rand(b.y0, b.y1);
+      if (Math.hypot(j.goalX - j.x, j.goalY - j.y) > Math.min(this.width, this.height) * 0.3) break;
+    }
   }
 
   chainLength(j: Jelly, k: number) {
@@ -267,12 +290,11 @@ class Sea {
   }
 
   private stepJellies(dt: number) {
-    const { width: W, height: H, time: t, pointer, jellies } = this;
+    const { time: t, pointer, jellies } = this;
     const root = { x: 0, y: 0 };
     for (const j of jellies) {
       if (t > j.retarget || Math.hypot(j.goalX - j.x, j.goalY - j.y) < j.size) {
-        j.goalX = rand(W * 0.15, W * 0.85);
-        j.goalY = rand(H * 0.1, H * 0.9);
+        this.pickGoal(j);
         j.retarget = t + rand(8, 14);
       }
       const toGoal = Math.atan2(j.goalY - j.y, j.goalX - j.x);
@@ -314,25 +336,25 @@ class Sea {
       j.squeeze = Math.max(0, c - j.c) / dt;
       j.c = c;
 
-      const thrust = j.squeeze * j.size * 0.9;
+      // a goal below means resting between pulses and sinking toward it
+      const sinking = j.goalY > j.y + j.size * 0.5;
+      const thrust = j.squeeze * j.size * (sinking ? 0.25 : 0.9);
       j.vx += Math.cos(j.axis) * thrust * dt;
-      j.vy += Math.sin(j.axis) * thrust * dt + 4 * dt;
+      j.vy += Math.sin(j.axis) * thrust * dt + (sinking ? 14 : 4) * dt;
       const drag = Math.exp(-dt * 1.2);
       j.vx *= drag;
       j.vy *= drag;
       j.x += j.vx * dt;
       j.y += j.vy * dt;
 
-      if (j.x < j.size) j.vx += (j.size - j.x) * dt;
-      if (j.x > W - j.size) j.vx -= (j.x - (W - j.size)) * dt;
-      if (j.y > H + j.size) j.vy -= (j.y - (H + j.size)) * dt;
-      // drifted out the top: come back up from below
-      if (j.y < -j.size * 4) {
-        j.y = H + j.size * 1.2;
-        j.x = rand(W * 0.15, W * 0.85);
-        j.vx = j.vy = 0;
-        this.hang(j);
-      }
+      const b = this.bounds(j);
+      if (j.x < b.x0) j.vx += (b.x0 - j.x) * 4 * dt;
+      if (j.x > b.x1) j.vx -= (j.x - b.x1) * 4 * dt;
+      if (j.y < b.y0) j.vy += (b.y0 - j.y) * 4 * dt;
+      if (j.y > b.y1) j.vy -= (j.y - b.y1) * 4 * dt;
+      const slack = j.size * 0.25;
+      j.x = clamp(j.x, b.x0 - slack, b.x1 + slack);
+      j.y = clamp(j.y, b.y0 - slack, b.y1 + slack);
 
       this.stepChains(j, dt, root);
     }
