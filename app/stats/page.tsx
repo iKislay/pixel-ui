@@ -92,7 +92,7 @@ export default async function StatsPage() {
     <>
       <section className="relative w-full p-1.5 md:p-2.5">
         <div
-          className="relative flex min-h-[min(78svh,50rem)] w-full items-center justify-center overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F5F5F7] dark:border-transparent dark:border-apple dark:bg-[#121212]"
+          className="relative flex min-h-[min(78svh,50rem)] w-full items-center justify-center overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F4F5F8] dark:border-transparent dark:border-apple dark:bg-[#0F1011]"
           style={{ cornerShape: "squircle" } as React.CSSProperties}
         >
           <GooeyNavbar stars={stars} />

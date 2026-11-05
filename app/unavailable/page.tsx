@@ -13,7 +13,7 @@ export default function Unavailable() {
   return (
     <section className="relative w-full p-1.5 md:p-2.5">
       <div
-        className="relative flex min-h-[calc(100svh_-_0.75rem)] w-full items-center justify-center overflow-hidden rounded-[45px] border border-black/4 bg-[#F5F5F7] dark:border-transparent dark:border-apple dark:bg-[#121212] md:min-h-[calc(100svh_-_1.25rem)]"
+        className="relative flex min-h-[calc(100svh_-_0.75rem)] w-full items-center justify-center overflow-hidden rounded-[45px] border border-black/4 bg-[#F4F5F8] dark:border-transparent dark:border-apple dark:bg-[#0F1011] md:min-h-[calc(100svh_-_1.25rem)]"
         style={{ cornerShape: "squircle" } as React.CSSProperties}
       >
         <PixelUILogo className="pointer-events-none absolute left-1/2 top-[68%] w-[860px] max-w-none -translate-x-1/2 -translate-y-1/2 select-none opacity-5 dark:opacity-[0.07]" />

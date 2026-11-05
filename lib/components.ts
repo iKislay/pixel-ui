@@ -309,7 +309,6 @@ export function Demo() {
     </>
   )
 }`,
-    credits: ["Ripple inspired by morphin.dev"],
   },
   {
     name: "Member Selector",

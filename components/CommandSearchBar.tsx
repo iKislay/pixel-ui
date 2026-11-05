@@ -64,9 +64,9 @@ export function CommandSearchBar({
         onFocus={preloadCommandMenu}
         onClick={handleClick}
         className={cn(
-          "pointer-events-auto group flex h-11 w-full max-w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border border-black/[0.06] bg-muted px-3.5 shadow-sm transition-[border-color,background-color,opacity,transform] duration-200 hover:border-black/10 active:scale-[0.98] sm:max-w-sm dark:border-transparent dark:border-apple dark:hover:border-apple/80",
+          "pointer-events-auto group flex h-11 w-full max-w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border border-black/[0.06] bg-muted px-3.5 shadow-sm transition-[border-color,background-color,opacity,transform] duration-200 hover:border-black/10 active:scale-[0.98] sm:max-w-[260px] dark:border-transparent dark:border-apple dark:hover:border-apple/80",
           buttonClassName,
-          isOpen && "pointer-events-none scale-95 opacity-0",
+          isOpen && "pointer-events-none opacity-0 duration-100",
         )}
       >
         <span className="flex min-w-0 items-center gap-2 text-muted-foreground transition-colors group-hover:text-foreground">

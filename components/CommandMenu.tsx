@@ -1,9 +1,13 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Squircle } from "@squircle-js/react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  type Variants,
+} from "motion/react";
 import PreviewFallback from "@/components/gallery/PreviewFallback";
 import PreviewVideo from "@/components/gallery/PreviewVideo";
 import {
@@ -13,7 +17,6 @@ import {
   type ComponentItem,
 } from "@/lib/components";
 import { cn } from "@/lib/utils";
-import { PixelUILogo } from "@/components/logos";
 import {
   CLOSE_EVENT,
   getCommandMenuOrigin,
@@ -23,28 +26,37 @@ import {
   type CommandMenuOrigin,
 } from "./CommandMenuTrigger";
 
-// card radius = field radius + padding, so the corners stay concentric
-const PADDING = 8;
-const FIELD_RADIUS = 16;
-const CARD_RADIUS = FIELD_RADIUS + PADDING;
+type Category = ComponentItem["category"];
 
-const FADE = 28;
-const VIDEO_DELAY = 150;
+const PANEL_WIDTH = 760;
+const PILL_HEIGHT = 52;
+const GAP = 10;
+const EDGE = 16;
+const FADE = 40;
 
 const morphSpring = {
   type: "spring",
-  stiffness: 360,
-  damping: 32,
-  mass: 0.85,
+  stiffness: 380,
+  damping: 34,
+  mass: 0.8,
 } as const;
+
+const softSpring = { type: "spring", stiffness: 420, damping: 30 } as const;
 
 const rankCategory = (item: ComponentItem) => {
   const index = CATEGORY_ORDER.indexOf(item.category);
   return index === -1 ? CATEGORY_ORDER.length : index;
 };
 
-const browseOrder = [...components].sort(
-  (a, b) => rankCategory(a) - rankCategory(b),
+const promote = (item: ComponentItem) =>
+  (item.isNew ? 2 : 0) + (item.featured ? 1 : 0);
+
+const suggestOrder = [...components]
+  .sort((a, b) => rankCategory(a) - rankCategory(b))
+  .sort((a, b) => promote(b) - promote(a));
+
+const categories = CATEGORY_ORDER.filter((c) =>
+  components.some((item) => item.category === c),
 );
 
 const haystacks = new Map(
@@ -56,7 +68,7 @@ const haystacks = new Map(
 
 const search = (query: string): ComponentItem[] => {
   const q = query.trim().toLowerCase();
-  if (!q) return browseOrder;
+  if (!q) return suggestOrder;
 
   const terms = q.split(/\s+/);
   const rank = (item: ComponentItem) => {
@@ -66,7 +78,7 @@ const search = (query: string): ComponentItem[] => {
     return 2;
   };
 
-  return browseOrder
+  return suggestOrder
     .filter((item) => terms.every((t) => haystacks.get(item)!.includes(t)))
     .sort((a, b) => rank(a) - rank(b));
 };
@@ -87,78 +99,10 @@ const Highlight = ({ text, query }: { text: string; query: string }) => {
   );
 };
 
-const Key = ({ children }: { children: React.ReactNode }) => (
-  <kbd className="grid h-5 min-w-5 place-items-center rounded-[6px] bg-[#F7F7FA] px-1 text-[10px] font-semibold text-[#868593] dark:bg-[#121212]">
-    {children}
-  </kbd>
-);
-
-const ArrowIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2.5}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden
-    className="size-4"
-  >
-    <path d="M7 17 17 7M8 7h9v9" />
-  </svg>
-);
-
-const Preview = ({ item }: { item: ComponentItem }) => {
-  const [settled, setSettled] = useState(false);
-
-  // skips fetching videos for rows the highlight only passes through
-  useEffect(() => {
-    const timer = setTimeout(() => setSettled(true), VIDEO_DELAY);
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.15, ease: "easeOut" }}
-      className="flex h-full flex-col"
-    >
-      <div
-        className="relative min-h-0 w-full flex-1 overflow-hidden rounded-[18px] border border-black/[0.06] bg-white dark:border-neutral-500/15 dark:bg-neutral-950"
-        style={{ cornerShape: "squircle" } as React.CSSProperties}
-      >
-        {!item.preview ? (
-          <PreviewFallback />
-        ) : (
-          settled && (
-            <PreviewVideo
-              src={item.preview}
-              scale={item.previewScale}
-              playing
-            />
-          )
-        )}
-      </div>
-
-      <div className="mt-3.5 shrink-0 px-1 pb-1">
-        <h3 className="flex items-center gap-2 text-[15px] font-semibold leading-5 tracking-[-0.01em] text-black dark:text-white">
-          {item.name}
-          {item.isNew && (
-            <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-brand">
-              New
-            </span>
-          )}
-        </h3>
-        {item.description && (
-          <p className="mt-1 line-clamp-3 text-[13px] font-medium leading-[18px] text-[#868593]">
-            {item.description}
-          </p>
-        )}
-      </div>
-    </motion.div>
-  );
-};
+const readViewport = () =>
+  typeof window === "undefined"
+    ? { w: 1024, h: 768 }
+    : { w: window.innerWidth, h: window.innerHeight };
 
 export default function CommandMenu({
   initialOpen = false,
@@ -169,52 +113,95 @@ export default function CommandMenu({
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(initialOpen);
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<Category | null>(null);
   const [active, setActive] = useState(0);
-  const [modalHeight, setModalHeight] = useState(480);
+  const [viewport, setViewport] = useState(readViewport);
   const [origin, setOrigin] = useState<CommandMenuOrigin | null>(() =>
     typeof window !== "undefined"
       ? (getCommandMenuOrigin() ?? getSearchBarRect())
       : null,
   );
-  const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const shelfRef = useRef<HTMLDivElement>(null);
   const returnFocus = useRef<HTMLElement | null>(
     initialOpen && typeof document !== "undefined"
       ? (document.activeElement as HTMLElement | null)
       : null,
   );
   const openRef = useRef(initialOpen);
-  const [edges, setEdges] = useState({ top: false, bottom: false });
+  const [edges, setEdges] = useState({ start: false, end: false });
 
-  const results = useMemo(() => search(query), [query]);
-  const browsing = !query.trim();
+  const matches = useMemo(() => search(query), [query]);
+  const results = category
+    ? matches.filter((item) => item.category === category)
+    : matches;
   const activeItem = results[active];
+  const searching = !!query.trim();
 
   useEffect(() => {
     openRef.current = open;
   }, [open]);
 
   useEffect(() => {
-    const updateHeight = () => {
-      setModalHeight(Math.min(480, Math.round(window.innerHeight * 0.72)));
-    };
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    return () => window.removeEventListener("resize", updateHeight);
+    const update = () => setViewport(readViewport());
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
-  const morph = useMemo(() => {
-    if (!origin || typeof window === "undefined") {
-      return { deltaX: 0, deltaY: -20, initialWidth: 384 };
+  // the pill grows out of the search bar: same top edge, widened around its center
+  const frame = useMemo(() => {
+    const width = Math.min(PANEL_WIDTH, viewport.w - EDGE * 2);
+    if (!origin) {
+      return {
+        top: Math.round(viewport.h * 0.12),
+        left: Math.round((viewport.w - width) / 2),
+        width,
+        collapsed: null,
+      };
     }
-    const targetTop = window.innerHeight * 0.12;
-    const targetCenterX = window.innerWidth / 2;
-    const searchBarCenterX = origin.left + origin.width / 2;
+    const center = origin.left + origin.width / 2;
+    const left = Math.round(
+      Math.min(Math.max(center - width / 2, EDGE), viewport.w - width - EDGE),
+    );
     return {
-      deltaX: Math.round(searchBarCenterX - targetCenterX),
-      deltaY: Math.round(origin.top - targetTop),
-      initialWidth: Math.round(origin.width),
+      top: Math.round(origin.top),
+      left,
+      width,
+      collapsed: {
+        x: Math.round(origin.left - left),
+        width: Math.round(origin.width),
+        height: Math.round(origin.height),
+        borderRadius: 16,
+      },
     };
-  }, [origin]);
+  }, [origin, viewport]);
+
+  const collapsed =
+    reduceMotion || !frame.collapsed
+      ? { opacity: 0, y: reduceMotion ? 0 : -8 }
+      : { ...frame.collapsed, opacity: 1 };
+
+  const rise: Variants = reduceMotion
+    ? { hidden: { opacity: 0 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 12, filter: "blur(6px)" },
+        show: {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          transition: softSpring,
+        },
+      };
+
+  const stagger: Variants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: reduceMotion ? 0 : 0.035,
+        delayChildren: reduceMotion ? 0 : 0.12,
+      },
+    },
+  };
 
   useEffect(() => {
     const show = (e?: Event) => {
@@ -222,15 +209,16 @@ export default function CommandMenu({
       returnFocus.current = document.activeElement as HTMLElement | null;
       const customOrigin = (e as CustomEvent<{ origin?: CommandMenuOrigin }>)
         ?.detail?.origin;
-      const resolved =
-        customOrigin ?? getCommandMenuOrigin() ?? getSearchBarRect();
-      setOrigin(resolved);
+      setOrigin(customOrigin ?? getCommandMenuOrigin() ?? getSearchBarRect());
+      setViewport(readViewport());
       setQuery("");
+      setCategory(null);
       setActive(0);
       setOpen(true);
     };
     const hide = () => {
       setOpen(false);
+      window.dispatchEvent(new Event(CLOSE_EVENT));
       returnFocus.current?.focus();
     };
     const onKeyDown = (e: KeyboardEvent) => {
@@ -254,25 +242,26 @@ export default function CommandMenu({
   }, []);
 
   const measureEdges = () => {
-    const list = listRef.current;
-    if (!list) return;
-    const top = list.scrollTop > 0;
-    const bottom = list.scrollTop + list.clientHeight < list.scrollHeight - 1;
+    const shelf = shelfRef.current;
+    if (!shelf) return;
+    const start = shelf.scrollLeft > 0;
+    const end = shelf.scrollLeft + shelf.clientWidth < shelf.scrollWidth - 1;
     setEdges((prev) =>
-      prev.top === top && prev.bottom === bottom ? prev : { top, bottom },
+      prev.start === start && prev.end === end ? prev : { start, end },
     );
   };
 
-  useEffect(measureEdges, [open, results]);
+  useEffect(measureEdges, [open, results.length, viewport]);
 
   useEffect(() => {
-    listRef.current
+    shelfRef.current
       ?.querySelector(`[data-index="${active}"]`)
-      ?.scrollIntoView({ block: "nearest" });
+      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [active]);
 
   const close = () => {
     setOpen(false);
+    window.dispatchEvent(new Event(CLOSE_EVENT));
     returnFocus.current?.focus();
   };
 
@@ -283,271 +272,306 @@ export default function CommandMenu({
     router.push(item.href);
   };
 
+  const pickCategory = (next: Category | null) => {
+    setCategory(next);
+    setActive(0);
+    inputRef.current?.focus();
+  };
+
+  // ←/→ walk the shelf, ↑/↓ walk the category chips
   const onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const count = results.length;
-    if (e.key === "ArrowDown") {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       e.preventDefault();
-      setActive((i) => (count ? (i + 1) % count : 0));
-    } else if (e.key === "ArrowUp") {
+      const step = e.key === "ArrowRight" ? 1 : -1;
+      setActive((i) => (count ? (i + step + count) % count : 0));
+    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
-      setActive((i) => (count ? (i - 1 + count) % count : 0));
+      const cycle = [null, ...categories];
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      const next = cycle.indexOf(category) + step;
+      pickCategory(cycle[(next + cycle.length) % cycle.length]);
     } else if (e.key === "Enter" && !e.nativeEvent.isComposing) {
       e.preventDefault();
       go(activeItem);
     }
   };
 
+  const panelTop = PILL_HEIGHT + GAP;
+  const shelfTitle = searching
+    ? "Results"
+    : category
+      ? CATEGORY_LABELS[category]
+      : "Suggestions";
+
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-100 flex items-start justify-center px-4 pt-[12vh]">
+        <div className="fixed inset-0 z-100">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            exit={{ opacity: 0, transition: { duration: 0.25, delay: 0.05 } }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={close}
-            className="absolute inset-0 bg-black/30 backdrop-blur-[2px] dark:bg-black/60"
+            className="absolute inset-0 bg-black/25 backdrop-blur-lg dark:bg-black/55"
           />
 
-          <motion.div
+          <div
             role="dialog"
             aria-modal="true"
             aria-label="Search components"
             data-slot="command-menu"
-            initial={
-              reduceMotion
-                ? { opacity: 0 }
-                : {
-                    opacity: 0.85,
-                    x: morph.deltaX,
-                    y: morph.deltaY,
-                    maxWidth: morph.initialWidth,
-                  }
-            }
-            animate={{
-              opacity: 1,
-              x: 0,
-              y: 0,
-              maxWidth: 760,
-            }}
-            exit={
-              reduceMotion
-                ? { opacity: 0 }
-                : {
-                    opacity: 0,
-                    x: morph.deltaX,
-                    y: morph.deltaY,
-                    maxWidth: morph.initialWidth,
-                  }
-            }
-            transition={reduceMotion ? { duration: 0.15 } : morphSpring}
-            onAnimationComplete={() => {
-              if (!open) {
-                window.dispatchEvent(new Event(CLOSE_EVENT));
-              }
-            }}
-            // drop-shadow, since a box-shadow would be cut off by the squircle clip
-            className="relative w-full [filter:drop-shadow(0_2px_4px_rgba(0,0,0,0.05))_drop-shadow(0_12px_32px_rgba(0,0,0,0.12))] dark:[filter:drop-shadow(0_2px_4px_rgba(0,0,0,0.35))_drop-shadow(0_16px_40px_rgba(0,0,0,0.5))]"
+            className="absolute"
+            style={{ top: frame.top, left: frame.left, width: frame.width }}
           >
-            {/* the outer squircle shows through the 1px gap as a hairline, which a border can't do on a clipped shape */}
-            <Squircle
-              asChild
-              cornerRadius={CARD_RADIUS + 1}
-              cornerSmoothing={1}
+            <motion.label
+              initial={collapsed}
+              animate={{
+                opacity: 1,
+                x: 0,
+                y: 0,
+                width: frame.width,
+                height: PILL_HEIGHT,
+                borderRadius: 26,
+              }}
+              exit={{
+                ...collapsed,
+                opacity: 0,
+                transition: reduceMotion
+                  ? { duration: 0.15 }
+                  : {
+                      ...morphSpring,
+                      opacity: { duration: 0.12, delay: 0.16 },
+                    },
+              }}
+              transition={reduceMotion ? { duration: 0.15 } : morphSpring}
+              className="flex cursor-text items-center gap-3 overflow-hidden border border-black/[0.08] bg-white pl-4 pr-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-[#1C1C1E] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
             >
-              <div className="bg-black/[0.07] p-px dark:bg-white/10">
-                <Squircle
-                  asChild
-                  cornerRadius={CARD_RADIUS}
-                  cornerSmoothing={1}
+              <SearchIcon className="size-[18px] shrink-0 text-[#868593]" />
+              <input
+                ref={inputRef}
+                autoFocus
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActive(0);
+                }}
+                onKeyDown={onInputKeyDown}
+                placeholder="Search components..."
+                role="combobox"
+                aria-expanded="true"
+                aria-controls="command-menu-shelf"
+                aria-activedescendant={
+                  activeItem ? `command-item-${activeItem.href}` : undefined
+                }
+                className="h-full min-w-0 flex-1 bg-transparent text-[15px] font-medium text-black caret-brand outline-none placeholder:text-[#868593] dark:text-white dark:placeholder:text-[#A1A0AB]"
+              />
+              <button
+                type="button"
+                aria-label="Close"
+                onClick={close}
+                className="grid h-8 min-w-8 shrink-0 cursor-pointer place-items-center rounded-full bg-[#F4F4F9] px-3 text-[11px] font-semibold text-[#868593] outline-none transition-colors duration-150 hover:text-black focus-visible:ring-2 focus-visible:ring-brand/60 motion-reduce:transition-none dark:bg-[#2C2C2E] dark:hover:text-white"
+              >
+                esc
+              </button>
+            </motion.label>
+
+            <motion.div
+              initial={
+                reduceMotion ? { opacity: 0 } : { opacity: 0, y: -16, scale: 0.97 }
+              }
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={
+                reduceMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: -10, scale: 0.98, transition: { duration: 0.14 } }
+              }
+              transition={
+                reduceMotion ? { duration: 0.15 } : { ...morphSpring, delay: 0.05 }
+              }
+              style={{
+                top: panelTop,
+                maxHeight: viewport.h - frame.top - panelTop - EDGE,
+                transformOrigin: "top center",
+              }}
+              className="no-scrollbar absolute inset-x-0 overflow-y-auto overscroll-contain rounded-[30px] border border-black/[0.08] bg-white p-5 shadow-[0_2px_4px_rgba(0,0,0,0.04),0_24px_64px_rgba(0,0,0,0.18)] sm:p-6 dark:border-white/10 dark:bg-[#1C1C1E] dark:shadow-[0_2px_4px_rgba(0,0,0,0.35),0_24px_64px_rgba(0,0,0,0.6)]"
+            >
+              <motion.div variants={stagger} initial="hidden" animate="show">
+                <motion.p
+                  variants={rise}
+                  className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#A1A0AB] dark:text-[#6E6D78]"
                 >
-                  <motion.div
-                    style={{ padding: PADDING }}
-                    initial={
-                      reduceMotion ? false : { height: 48 + PADDING * 2 }
-                    }
-                    animate={{ height: modalHeight }}
-                    exit={
-                      reduceMotion ? undefined : { height: 48 + PADDING * 2 }
-                    }
-                    transition={reduceMotion ? { duration: 0.15 } : morphSpring}
-                    className="flex flex-col overflow-hidden bg-white dark:bg-[#1C1C1E]"
-                  >
-                    <Squircle
-                      asChild
-                      cornerRadius={FIELD_RADIUS}
-                      cornerSmoothing={1}
-                    >
-                      <label className="flex h-12 shrink-0 cursor-text items-center gap-3 bg-[#F7F7FA] pl-4 pr-3 dark:bg-[#121212]">
-                        <SearchIcon className="size-4 shrink-0 text-[#868593]" />
-                        <input
-                          autoFocus
-                          value={query}
-                          onChange={(e) => {
-                            setQuery(e.target.value);
-                            setActive(0);
-                          }}
-                          onKeyDown={onInputKeyDown}
-                          placeholder="Search components"
-                          role="combobox"
-                          aria-expanded="true"
-                          aria-controls="command-menu-list"
-                          aria-activedescendant={
-                            activeItem
-                              ? `command-item-${activeItem.href}`
-                              : undefined
-                          }
-                          className="h-full w-full bg-transparent text-[15px] font-medium text-black caret-brand outline-none placeholder:text-[#A1A0AB] dark:text-white dark:placeholder:text-[#6E6D78]"
-                        />
-                        <button
-                          type="button"
-                          aria-label="Close"
-                          onClick={close}
-                          className="group grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-[8px] bg-white text-[12px] font-semibold text-[#868593] outline-none transition-colors duration-150 hover:text-black focus-visible:ring-2 focus-visible:ring-brand/60 motion-reduce:transition-none sm:w-10 dark:bg-[#2C2C2E] dark:hover:text-white"
-                        >
-                          <span className="col-start-1 row-start-1 hidden transition-[opacity,filter,scale] duration-200 ease-out group-hover:scale-75 group-hover:opacity-0 group-hover:blur-[2px] group-focus-visible:scale-75 group-focus-visible:opacity-0 group-focus-visible:blur-[2px] motion-reduce:transition-none sm:inline">
-                            esc
-                          </span>
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth={2.5}
-                            strokeLinecap="round"
-                            aria-hidden
-                            className="col-start-1 row-start-1 size-3.5 transition-[opacity,filter,scale] duration-200 ease-out motion-reduce:transition-none sm:scale-75 sm:opacity-0 sm:blur-[2px] sm:group-hover:scale-100 sm:group-hover:opacity-100 sm:group-hover:blur-none sm:group-focus-visible:scale-100 sm:group-focus-visible:opacity-100 sm:group-focus-visible:blur-none"
-                          >
-                            <path d="M7 7l10 10M17 7L7 17" />
-                          </svg>
-                        </button>
-                      </label>
-                    </Squircle>
-
-                    <motion.div
-                      initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={reduceMotion ? undefined : { opacity: 0 }}
-                      transition={{
-                        duration: 0.2,
-                        delay: reduceMotion ? 0 : 0.05,
-                        ease: "easeOut",
-                      }}
-                      className="mt-2 flex min-h-0 flex-1 gap-2"
-                    >
-                      <div
-                        ref={listRef}
-                        id="command-menu-list"
-                        role="listbox"
-                        onScroll={measureEdges}
-                        style={{
-                          scrollPaddingBlock: FADE,
-                          maskImage: `linear-gradient(to bottom, ${
-                            edges.top ? "transparent" : "#000"
-                          } 0, #000 ${FADE}px, #000 calc(100% - ${FADE}px), ${
-                            edges.bottom ? "transparent" : "#000"
-                          } 100%)`,
-                        }}
-                        className="no-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-1 pb-1"
+                  Browse
+                </motion.p>
+                <div className="no-scrollbar -mx-1 mt-3 flex gap-2 overflow-x-auto px-1">
+                  {[null, ...categories].map((c) => {
+                    const count = c
+                      ? matches.filter((item) => item.category === c).length
+                      : matches.length;
+                    const selected = category === c;
+                    return (
+                      <motion.button
+                        key={c ?? "all"}
+                        variants={rise}
+                        type="button"
+                        aria-pressed={selected}
+                        onClick={() => pickCategory(selected ? null : c)}
+                        className={cn(
+                          "relative flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-full px-4 text-[14px] font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand/60 transition-[color,opacity] duration-200",
+                          selected
+                            ? "text-white dark:text-black"
+                            : "bg-[#F4F4F9] text-[#5E5D6B] hover:text-black dark:bg-[#2C2C2E] dark:text-[#C4C3CC] dark:hover:text-white",
+                          !count && !selected && "opacity-40",
+                        )}
                       >
-                        {results.length === 0 ? (
-                          <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
-                            <p className="text-[13px] font-semibold text-black dark:text-white">
-                              Nothing found
-                            </p>
-                            <p className="text-[13px] font-medium text-[#868593]">
-                              No components match &ldquo;{query.trim()}&rdquo;
-                            </p>
-                          </div>
-                        ) : (
-                          results.map((item, index) => {
-                            const selected = index === active;
-                            const header =
-                              browsing &&
-                              item.category !== results[index - 1]?.category;
-
-                            return (
-                              <Fragment key={item.href}>
-                                {header && (
-                                  <p className="px-3 pb-1.5 pt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#A1A0AB] first:pt-2 dark:text-[#6E6D78]">
-                                    {CATEGORY_LABELS[item.category]}
-                                  </p>
-                                )}
-                                <div
-                                  id={`command-item-${item.href}`}
-                                  role="option"
-                                  aria-selected={selected}
-                                  data-index={index}
-                                  onMouseMove={() => setActive(index)}
-                                  onClick={() => go(item)}
-                                  className={cn(
-                                    "flex h-10 cursor-pointer items-center gap-2 rounded-[14px] px-3 text-[14px] font-semibold",
-                                    selected
-                                      ? "bg-[#F4F4F9] text-black dark:bg-[#2C2C2E] dark:text-white"
-                                      : "text-[#868593]",
-                                  )}
-                                  style={
-                                    {
-                                      cornerShape: "squircle",
-                                    } as React.CSSProperties
-                                  }
-                                >
-                                  <span className="min-w-0 flex-1 truncate">
-                                    <Highlight text={item.name} query={query} />
-                                  </span>
-                                  {!browsing && (
-                                    <span className="shrink-0 text-[11px] font-medium text-[#A1A0AB] dark:text-[#6E6D78]">
-                                      {CATEGORY_LABELS[item.category]}
-                                    </span>
-                                  )}
-                                  {selected && (
-                                    <span className="shrink-0 text-brand">
-                                      <ArrowIcon />
-                                    </span>
-                                  )}
-                                </div>
-                              </Fragment>
-                            );
-                          })
+                        {selected && (
+                          <motion.span
+                            layoutId="command-chip"
+                            transition={reduceMotion ? { duration: 0 } : softSpring}
+                            className="absolute inset-0 rounded-full bg-black dark:bg-white"
+                          />
                         )}
-                      </div>
+                        <span className="relative">
+                          {c ? CATEGORY_LABELS[c] : "All"}
+                        </span>
+                        <span className="relative text-[12px] tabular-nums opacity-60">
+                          {count}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
 
-                      <div className="hidden w-[300px] shrink-0 p-1 sm:block">
-                        {activeItem && (
-                          <Preview key={activeItem.href} item={activeItem} />
-                        )}
-                      </div>
-                    </motion.div>
+                <motion.p
+                  variants={rise}
+                  className="mt-7 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#A1A0AB] dark:text-[#6E6D78]"
+                >
+                  {shelfTitle}
+                </motion.p>
 
-                    <motion.div
-                      initial={reduceMotion ? false : { opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={reduceMotion ? undefined : { opacity: 0 }}
-                      transition={{
-                        duration: 0.15,
-                        delay: reduceMotion ? 0 : 0.08,
-                      }}
-                      className="hidden shrink-0 items-center gap-4 px-3 pb-1 pt-2.5 text-[12px] font-medium text-[#868593] sm:flex"
-                    >
-                      <span className="flex items-center gap-1.5">
-                        <Key>↑</Key>
-                        <Key>↓</Key>
-                        navigate
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Key>↵</Key>
-                        open
-                      </span>
-                      <span className="ml-auto flex items-center gap-1.5">
-                        <PixelUILogo className="size-3.5" />
-                        {results.length} of {components.length}
-                      </span>
-                    </motion.div>
+                {results.length === 0 ? (
+                  <motion.div
+                    variants={rise}
+                    className="mt-3 flex h-[150px] flex-col items-center justify-center gap-1 rounded-[20px] bg-[#F4F4F9] text-center sm:h-[168px] dark:bg-[#121212]"
+                  >
+                    <p className="text-[14px] font-semibold text-black dark:text-white">
+                      Nothing found
+                    </p>
+                    <p className="text-[13px] font-medium text-[#868593]">
+                      Try another word or category
+                    </p>
                   </motion.div>
-                </Squircle>
-              </div>
-            </Squircle>
-          </motion.div>
+                ) : (
+                  <div
+                    ref={shelfRef}
+                    id="command-menu-shelf"
+                    role="listbox"
+                    aria-orientation="horizontal"
+                    aria-label={shelfTitle}
+                    onScroll={measureEdges}
+                    style={{
+                      scrollPaddingInline: FADE,
+                      maskImage: `linear-gradient(to right, ${
+                        edges.start ? "transparent" : "#000"
+                      } 0, #000 ${FADE}px, #000 calc(100% - ${FADE}px), ${
+                        edges.end ? "transparent" : "#000"
+                      } 100%)`,
+                    }}
+                    className="no-scrollbar -mx-1 mt-3 flex gap-3 overflow-x-auto px-1 pb-1 pt-2"
+                  >
+                    <AnimatePresence mode="popLayout">
+                      {results.map((item, index) => {
+                        const selected = index === active;
+                        return (
+                          <motion.div
+                            key={item.href}
+                            layout={!reduceMotion}
+                            variants={rise}
+                            exit={{
+                              opacity: 0,
+                              scale: 0.9,
+                              transition: { duration: 0.15 },
+                            }}
+                            id={`command-item-${item.href}`}
+                            role="option"
+                            aria-selected={selected}
+                            data-index={index}
+                            onMouseEnter={() => setActive(index)}
+                            onClick={() => go(item)}
+                            className="w-[150px] shrink-0 cursor-pointer sm:w-[168px]"
+                          >
+                            <motion.div
+                              animate={
+                                reduceMotion
+                                  ? undefined
+                                  : { y: selected ? -4 : 0, scale: selected ? 1 : 0.97 }
+                              }
+                              transition={softSpring}
+                              className={cn(
+                                "relative aspect-square overflow-hidden rounded-[20px] bg-[#F4F4F9] ring-offset-2 ring-offset-white transition-shadow duration-200 dark:bg-[#121212] dark:ring-offset-[#1C1C1E]",
+                                selected && "ring-2 ring-brand",
+                              )}
+                            >
+                              {item.preview ? (
+                                <PreviewVideo
+                                  src={item.preview}
+                                  scale={item.previewScale}
+                                  playing={selected}
+                                />
+                              ) : (
+                                <PreviewFallback />
+                              )}
+                              {item.isNew && (
+                                <span className="absolute left-2.5 top-2.5 rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                                  New
+                                </span>
+                              )}
+                            </motion.div>
+                            <p
+                              className={cn(
+                                "mt-3 truncate px-1 text-[14px] font-semibold transition-colors duration-200",
+                                selected
+                                  ? "text-black dark:text-white"
+                                  : "text-[#868593]",
+                              )}
+                            >
+                              <Highlight text={item.name} query={query} />
+                            </p>
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </div>
+                )}
+
+                <div className="mt-4 h-5 overflow-hidden px-1">
+                  <AnimatePresence mode="wait" initial={false}>
+                    {activeItem?.description && (
+                      <motion.p
+                        key={activeItem.href}
+                        initial={
+                          reduceMotion
+                            ? { opacity: 0 }
+                            : { opacity: 0, y: 6, filter: "blur(4px)" }
+                        }
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={
+                          reduceMotion
+                            ? { opacity: 0 }
+                            : { opacity: 0, y: -6, filter: "blur(4px)" }
+                        }
+                        transition={{ duration: 0.16, ease: "easeOut" }}
+                        className="truncate text-[13px] font-medium text-[#868593]"
+                      >
+                        {activeItem.description}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       )}
     </AnimatePresence>

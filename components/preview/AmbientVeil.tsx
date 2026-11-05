@@ -15,7 +15,7 @@ export default function AmbientVeil({ className }: { className?: string }) {
     <div
       aria-hidden="true"
       className={cn(
-        "pointer-events-none absolute inset-0 -z-10 [--veil:#F5F5F7] dark:[--veil:#121212]",
+        "pointer-events-none absolute inset-0 -z-10 [--veil:#F4F5F8] dark:[--veil:#0F1011]",
         className,
       )}
     >

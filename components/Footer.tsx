@@ -68,7 +68,7 @@ export default function Footer() {
   return (
     <footer className="relative w-full p-1.5 md:p-2.5">
       <div
-        className="relative flex w-full flex-col justify-between overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F5F5F7] px-6 pt-8 pb-0 text-black sm:px-10 sm:pt-10 lg:px-12 lg:pt-12 dark:border-transparent dark:border-apple dark:bg-[#121212] dark:text-white"
+        className="relative flex w-full flex-col justify-between overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F4F5F8] px-6 pt-8 pb-0 text-black sm:px-10 sm:pt-10 lg:px-12 lg:pt-12 dark:border-transparent dark:border-apple dark:bg-[#0F1011] dark:text-white"
         style={{ cornerShape: "squircle" } as React.CSSProperties}
       >
         <PixelUILogo className="pointer-events-none absolute -bottom-10 -right-10 size-64 select-none opacity-5 sm:-bottom-14 sm:-right-14 sm:size-80 lg:-bottom-16 lg:-right-16 lg:size-[24rem] dark:opacity-[0.07]" />
