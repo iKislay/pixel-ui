@@ -19,7 +19,7 @@ export default function ComponentsShowcase() {
 
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {latest.map((item) => (
-          <ComponentCard key={item.href} item={item} autoPlay overlay />
+          <ComponentCard key={item.href} item={item} autoPlay />
         ))}
         <ViewAllCard count={components.length} />
       </div>
