@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono, Cal_Sans } from "next/font/google";
+import { Nunito_Sans, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/theme-provider";
 import { StarPrompt } from "@/components/StarPrompt";
@@ -14,8 +14,8 @@ import {
 import { SITE_KEYWORDS, siteJsonLd } from "@/lib/seo";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const nunitoSans = Nunito_Sans({
+  variable: "--font-nunito-sans",
   subsets: ["latin"],
 });
 
@@ -24,32 +24,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const calSans = Cal_Sans({
-  variable: "--font-cal-sans",
-  subsets: ["latin"],
-  weight: "400",
-});
-
-const openRunde = localFont({
-  variable: "--font-open-runde",
+const volteRounded = localFont({
+  variable: "--font-volte-rounded",
   src: [
     {
-      path: "../public/fonts/OpenRunde-Regular.woff2",
+      path: "../public/fonts/VolteRounded-Regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../public/fonts/OpenRunde-Medium.woff2",
+      path: "../public/fonts/VolteRounded-Medium.woff2",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../public/fonts/OpenRunde-Semibold.woff2",
+      path: "../public/fonts/VolteRounded-Semibold.woff2",
       weight: "600",
       style: "normal",
     },
     {
-      path: "../public/fonts/OpenRunde-Bold.woff2",
+      path: "../public/fonts/VolteRounded-Bold.woff2",
       weight: "700",
       style: "normal",
     },
@@ -120,7 +114,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${geistMono.variable} ${openRunde.variable} ${calSans.variable} h-full antialiased`}
+      className={`${nunitoSans.variable} ${geistMono.variable} ${volteRounded.variable} h-full antialiased`}
     >
       <head>
         <script
