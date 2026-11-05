@@ -9,7 +9,7 @@ import { usePreviewControl } from "@/components/preview/PreviewControls";
 const photo = (id: string) =>
   `https://images.unsplash.com/photo-${id}?w=160&h=160&fit=crop&crop=faces&auto=format&q=80`;
 
-const PARTICIPANTS: AudioChatParticipant[] = [
+export const PARTICIPANTS: AudioChatParticipant[] = [
   { id: "1", name: "Lena", avatar: photo("1494790108755-2616b612b786") },
   { id: "2", name: "Kai", avatar: photo("1507003211169-0a1dd7228f2d") },
   { id: "3", name: "Priya", avatar: photo("1438761681033-6461ffad8d80") },
@@ -19,7 +19,7 @@ const PARTICIPANTS: AudioChatParticipant[] = [
   { id: "7", name: "Iris", avatar: photo("1544005313-94ddf0286df2") },
 ];
 
-const YOU: AudioChatParticipant = {
+export const YOU: AudioChatParticipant = {
   id: "you",
   name: "You",
   avatar: photo("1472099645785-5658abf4ff4e"),

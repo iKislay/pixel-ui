@@ -6,7 +6,7 @@ import { usePreviewControl } from "@/components/preview/PreviewControls";
 const photo = (id: string) =>
   `https://images.unsplash.com/photo-${id}?w=160&h=160&fit=crop&crop=faces&auto=format&q=80`;
 
-const MEMBERS: Member[] = [
+export const MEMBERS: Member[] = [
   ["1", "Yuki Tanaka", "yuki.tanaka", "1544005313-94ddf0286df2"],
   ["2", "Matt Cooper", "matt.cooper", "1507003211169-0a1dd7228f2d"],
   ["3", "Sofia Martinez", "sofia.martinez", "1534528741775-53994a69daeb"],

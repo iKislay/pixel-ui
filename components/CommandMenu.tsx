@@ -8,8 +8,7 @@ import {
   useReducedMotion,
   type Variants,
 } from "motion/react";
-import PreviewFallback from "@/components/gallery/PreviewFallback";
-import PreviewVideo from "@/components/gallery/PreviewVideo";
+import Recording from "@/components/recordings";
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -513,15 +512,7 @@ export default function CommandMenu({
                                 selected && "ring-2 ring-brand",
                               )}
                             >
-                              {item.preview ? (
-                                <PreviewVideo
-                                  src={item.preview}
-                                  scale={item.previewScale}
-                                  playing={selected}
-                                />
-                              ) : (
-                                <PreviewFallback />
-                              )}
+                              <Recording slug={item.registry} playing={selected} />
                               {item.isNew && (
                                 <span className="absolute left-2.5 top-2.5 rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
                                   New

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { activeComponent } from "@/lib/components";
@@ -36,15 +36,6 @@ export default function DesktopShell({
     }
     setCodeDrawerOpen(true);
   };
-
-  // ?record hides the floating controls so a demo can be screen recorded clean
-  useEffect(() => {
-    if (!new URLSearchParams(window.location.search).has("record")) return;
-    document.documentElement.dataset.record = "";
-    return () => {
-      delete document.documentElement.dataset.record;
-    };
-  }, []);
 
   return (
     <div className="relative h-full">

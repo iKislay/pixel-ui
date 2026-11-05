@@ -1,4 +1,4 @@
-export default function PreviewFallback() {
+export default function Fallback() {
   return (
     <div className="relative flex h-full w-full items-center justify-center">
       <div className="pointer-events-none absolute inset-x-[-25%] bottom-[-40%] top-1/4 bg-[radial-gradient(circle_at_50%_100%,color-mix(in_srgb,var(--brand)_22%,transparent),transparent_65%)] dark:bg-[radial-gradient(circle_at_50%_100%,color-mix(in_srgb,var(--brand)_40%,transparent),transparent_65%)]" />

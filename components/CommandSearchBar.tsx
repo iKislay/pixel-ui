@@ -38,7 +38,6 @@ export function CommandSearchBar({
 
   return (
     <div
-      data-chrome
       className={cn(
         "pointer-events-none flex justify-center",
         className ?? "absolute inset-x-0 top-4 z-40 px-4",

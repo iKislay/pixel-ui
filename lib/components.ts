@@ -48,8 +48,6 @@ export type ComponentItem = {
   description?: string;
   registry?: string;
   source?: string;
-  preview?: string;
-  previewScale?: number;
   featured?: boolean;
   dependencies?: Dependency[];
   interaction?: string;
@@ -209,7 +207,6 @@ export function Demo() {
     description:
       "A toast notification whose status lands with a rippling pulse and whose text morphs word by word.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/toast.tsx`,
-    preview: "/componentdemos/toast.mp4",
     dependencies: [
       {
         name: "motion",
