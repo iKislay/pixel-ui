@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Squircle } from "@squircle-js/react";
 import { cn } from "@/lib/utils";
 import {
   CLOSE_EVENT,
@@ -55,7 +54,7 @@ export function CommandSearchBar({
         onFocus={preloadCommandMenu}
         onClick={handleClick}
         className={cn(
-          "pointer-events-auto group flex h-11 w-full max-w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border border-black/[0.06] bg-muted px-3.5 shadow-sm transition-[border-color,background-color,opacity,transform] duration-200 hover:border-black/10 active:scale-[0.98] sm:max-w-[260px] dark:border-transparent dark:border-apple dark:hover:border-apple/80",
+          "pointer-events-auto group flex h-10 w-full max-w-full cursor-pointer items-center justify-between gap-2 rounded-full border border-black/[0.06] bg-muted pl-3.5 pr-1.5 shadow-sm transition-[border-color,background-color,opacity,transform] duration-200 hover:border-black/10 active:scale-[0.98] sm:max-w-60 dark:border-transparent dark:border-apple dark:hover:border-apple/80",
           buttonClassName,
           isOpen && "pointer-events-none opacity-0 duration-100",
         )}
@@ -68,11 +67,9 @@ export function CommandSearchBar({
           </span>
         </span>
 
-        <Squircle asChild cornerRadius={8} cornerSmoothing={1}>
-          <kbd className="flex h-7 min-w-7 shrink-0 items-center justify-center bg-popover px-2 text-[11px] font-semibold text-[#868593] shadow-xs transition-colors group-hover:text-black dark:text-[#A1A0AB] dark:group-hover:text-white">
-            ⌘K
-          </kbd>
-        </Squircle>
+        <kbd className="flex h-7 shrink-0 items-center justify-center rounded-full bg-popover px-2.5 text-[11px] font-semibold text-[#868593] shadow-xs transition-colors group-hover:text-black dark:text-[#A1A0AB] dark:group-hover:text-white">
+          ⌘K
+        </kbd>
       </button>
     </div>
   );

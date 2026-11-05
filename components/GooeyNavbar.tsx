@@ -155,13 +155,13 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
           layout={animateLayout}
           transition={spring}
           className={cn(
-            "mx-3 min-w-0 flex-1 transition-opacity duration-150 md:mx-0 md:w-64",
+            "mx-3 min-w-0 flex-1 transition-opacity duration-150 md:mx-0 md:w-60",
             menuOpen && "opacity-0 [&_button]:pointer-events-none",
           )}
         >
           <CommandSearchBar
             className="w-full"
-            buttonClassName="h-12 rounded-full border-(--glass-border) bg-(--glass-bg) shadow-(--glass-shadow) backdrop-blur-[24px] backdrop-saturate-[1.9] dark:border-(--glass-border) max-md:[&_kbd]:hidden md:h-10 md:max-w-none md:border-transparent md:bg-black/[0.04] md:shadow-none md:backdrop-blur-none dark:md:border-transparent dark:md:bg-white/[0.06]"
+            buttonClassName="border-(--glass-border) bg-(--glass-bg) shadow-(--glass-shadow) backdrop-blur-[24px] backdrop-saturate-[1.9] dark:border-(--glass-border) max-md:[&_kbd]:hidden md:max-w-none md:border-transparent md:bg-black/[0.04] md:shadow-none md:backdrop-blur-none dark:md:border-transparent dark:md:bg-white/[0.06]"
           />
         </motion.div>
 
