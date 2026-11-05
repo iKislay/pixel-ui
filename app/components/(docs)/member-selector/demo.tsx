@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { MemberSelector, type Member } from "@/components/ui/member-selector";
+import { usePreviewControl } from "@/components/preview/PreviewControls";
 
 const photo = (id: string) =>
   `https://images.unsplash.com/photo-${id}?w=160&h=160&fit=crop&crop=faces&auto=format&q=80`;
@@ -23,15 +23,20 @@ const MEMBERS: Member[] = [
 }));
 
 export default function MemberSelectorPage() {
-  const [selected, setSelected] = useState(["1", "2"]);
+  const [maxStr] = usePreviewControl("maxVisible", "5");
+  const [selectedStr, setSelectedStr] = usePreviewControl("selected", "1,2");
+
+  const selected = selectedStr ? selectedStr.split(",").filter(Boolean) : [];
+  const setSelected = (next: string[]) => setSelectedStr(next.join(","));
+  const maxVisible = Number(maxStr) || 5;
 
   return (
-    <div className="relative flex h-full items-center justify-center px-6 pb-64 font-runde">
+    <div className="relative flex h-full min-h-[500px] items-center justify-center px-6 pb-24 font-runde">
       <MemberSelector
         members={MEMBERS}
         selected={selected}
         onChange={setSelected}
-        maxVisible={5}
+        maxVisible={maxVisible}
         label="Participants"
       />
     </div>

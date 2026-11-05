@@ -5,13 +5,13 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { activeComponent } from "@/lib/components";
 import { cn } from "@/lib/utils";
+import SidebarControls from "./SidebarControls";
 import CodeDrawer from "./CodeDrawer";
-import DescriptionContent from "./DescriptionContent";
 
-const MIN_PANEL_WIDTH = 380;
-const MAX_PANEL_WIDTH = 840;
-const COLLAPSE_THRESHOLD = 70;
-const SNAP_OPEN_THRESHOLD = 75;
+const MIN_PANEL_WIDTH = 260;
+const MAX_PANEL_WIDTH = 560;
+const COLLAPSE_THRESHOLD = 60;
+const SNAP_OPEN_THRESHOLD = 70;
 
 type DescriptionPanelProps = {
   open: boolean;
@@ -20,15 +20,19 @@ type DescriptionPanelProps = {
   onWidthChange?: (width: number) => void;
   isResizing?: boolean;
   setIsResizing?: (resizing: boolean) => void;
+  codeOpen?: boolean;
+  onCodeOpenChange?: (open: boolean) => void;
 };
 
-export function DescriptionPanel({
+export default function DescriptionPanel({
   open,
   setOpen,
-  width = 560,
+  width = 300,
   onWidthChange,
   isResizing = false,
   setIsResizing,
+  codeOpen: externalCodeOpen,
+  onCodeOpenChange,
 }: DescriptionPanelProps) {
   const pathname = usePathname();
   const item = activeComponent(pathname);
@@ -37,8 +41,20 @@ export function DescriptionPanel({
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerHeight, setContainerHeight] = useState(900);
 
-  const [rawCodeOpen, setCodeOpen] = useState(false);
-  const codeOpen = open && rawCodeOpen;
+  const [internalCodeOpen, setInternalCodeOpen] = useState(false);
+  const codeOpen = externalCodeOpen !== undefined ? externalCodeOpen : internalCodeOpen;
+  const setCodeOpen = (next: boolean) => {
+    setInternalCodeOpen(next);
+    onCodeOpenChange?.(next);
+  };
+
+  const handleOpenCode = () => {
+    setOpen(true);
+    if (onWidthChange && width < 420) {
+      onWidthChange(440);
+    }
+    setCodeOpen(true);
+  };
 
   const [isHovered, setIsHovered] = useState(false);
   const [pullOffset, setPullOffset] = useState(0);
@@ -61,11 +77,6 @@ export function DescriptionPanel({
       document.body.style.removeProperty("user-select");
     };
   }, []);
-
-  const handleOpenCode = () => {
-    setOpen(true);
-    setCodeOpen(true);
-  };
 
   const animateSnapBack = (startPull: number) => {
     const startTime = performance.now();
@@ -186,7 +197,7 @@ export function DescriptionPanel({
             setPullOffset(0);
             setIsResizing(false);
             setOpen(true);
-            onWidthChange(560);
+            onWidthChange(300);
           } else {
             setIsResizing(false);
             animateSnapBack(pullOffset);
@@ -271,8 +282,8 @@ export function DescriptionPanel({
           role="button"
           aria-label={
             open
-              ? "Drag to resize or collapse description panel"
-              : "Drag to open description panel"
+              ? "Drag to resize or collapse controls panel"
+              : "Drag to open controls panel"
           }
           className="group pointer-events-auto absolute -left-3.5 top-1/2 -translate-y-1/2 z-50 flex h-24 w-7 cursor-col-resize items-center justify-center select-none"
         >
@@ -336,7 +347,7 @@ export function DescriptionPanel({
               onPointerDown={handleButtonDragStart}
               role="separator"
               aria-orientation="vertical"
-              aria-label="Resize or collapse description panel"
+              aria-label="Resize or collapse controls panel"
               className="group absolute -left-2.5 inset-y-0 z-40 flex w-5 cursor-col-resize select-none"
             />
           )}
@@ -350,15 +361,15 @@ export function DescriptionPanel({
             }}
             className="no-scrollbar flex flex-1 flex-col overflow-y-auto"
           >
-            <DescriptionContent
+            <SidebarControls
               item={item}
               onOpenCode={handleOpenCode}
-              className="p-8 pb-16"
+              className="p-6 pb-16"
             />
           </div>
 
           <CodeDrawer
-            open={codeOpen}
+            open={open && codeOpen}
             onClose={() => setCodeOpen(false)}
             item={item}
           />
@@ -367,3 +378,4 @@ export function DescriptionPanel({
     </div>
   );
 }
+export { DescriptionPanel };

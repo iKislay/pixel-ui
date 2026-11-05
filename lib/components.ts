@@ -64,6 +64,34 @@ export const REGISTRY_REPO = "ikislay/pixel-ui";
 
 export const components: ComponentItem[] = [
   {
+    name: "Theme Toggle",
+    href: "/components/theme-toggle",
+    category: "inputs",
+    isNew: true,
+    registry: "theme-toggle",
+    description:
+      "A toggle button that flips between light and dark mode with an expanding circular reveal.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/theme-toggle.tsx`,
+    dependencies: [
+      { name: "next-themes" },
+      { name: "lucide-react" },
+    ],
+    interaction:
+      "Click the button to switch themes. The sun and moon icons rotate into place while the new theme radiates outward across the screen. Honors prefers-reduced-motion: the theme switches instantly without the expanding circle.",
+    usage: `import { ThemeToggle } from "@/components/ui/theme-toggle";
+
+export default function Demo() {
+  return <ThemeToggle />;
+}`,
+    props: [
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root button element.",
+      },
+    ],
+  },
+  {
     name: "Audio Chat Room",
     href: "/components/audio-chat-room",
     category: "display",

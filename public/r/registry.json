@@ -20,6 +20,25 @@
       ]
     },
     {
+      "name": "theme-toggle",
+      "type": "registry:ui",
+      "title": "Theme Toggle",
+      "description": "A toggle button that flips between light and dark mode with an expanding circular reveal.",
+      "dependencies": [
+        "next-themes",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/theme-toggle.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "toast",
       "type": "registry:ui",
       "title": "Toast",
