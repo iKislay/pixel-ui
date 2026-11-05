@@ -3,26 +3,86 @@
 import { useEffect, useRef, type ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
+export type AsciiJellyfishVariant = "color" | "mono";
+
+type RGB = [number, number, number];
+
 const TAU = Math.PI * 2;
+const UP = -Math.PI / 2;
 const STEP = 1 / 60;
 const MAX_STEPS = 4;
-const SEGMENTS = 16;
-const LEVELS = 8;
+const SEGMENTS = 22;
+const PULSE = 0.35;
 const RAMP = ".:-=+*#%@";
-const EDGE = ".'`:";
-const PULSE_SHARE = 0.3;
+const TENTACLES = [-0.8, -0.52, -0.22, 0.22, 0.52, 0.8];
+const ARMS = [-0.1, 0.1];
+const CHAINS = TENTACLES.length + ARMS.length;
+const CHARS = Array.from({ length: 128 }, (_, i) => String.fromCharCode(i));
 
-const PALETTES: [number, number, number][] = [
-  [110, 220, 255],
-  [255, 120, 215],
-  [165, 140, 255],
-  [105, 255, 200],
-  [255, 170, 115],
-];
+type Scheme = "dark" | "light";
+type Palette = { tints: RGB[]; hi: RGB; mote: RGB };
 
-const TENTACLE_ROOTS = [-0.9, -0.675, -0.45, -0.225, 0, 0.225, 0.45, 0.675, 0.9];
-const ARM_ROOTS = [-0.28, 0, 0.28];
-const CHAINS = TENTACLE_ROOTS.length + ARM_ROOTS.length;
+// on dark pages the rim glows pale; on light pages it inks in deep blue
+const PALETTES: Record<Scheme, Record<AsciiJellyfishVariant, Palette>> = {
+  dark: {
+    color: {
+      tints: [
+        [150, 205, 255],
+        [95, 145, 255],
+        [195, 222, 255],
+        [120, 195, 245],
+      ],
+      hi: [236, 245, 255],
+      mote: [150, 195, 255],
+    },
+    mono: {
+      tints: [
+        [200, 200, 200],
+        [170, 170, 170],
+        [220, 220, 220],
+      ],
+      hi: [245, 245, 245],
+      mote: [200, 200, 200],
+    },
+  },
+  light: {
+    color: {
+      tints: [
+        [60, 120, 210],
+        [40, 80, 200],
+        [80, 130, 190],
+        [40, 125, 185],
+      ],
+      hi: [15, 35, 95],
+      mote: [70, 120, 200],
+    },
+    mono: {
+      tints: [
+        [90, 90, 90],
+        [70, 70, 70],
+        [110, 110, 110],
+      ],
+      hi: [20, 20, 20],
+      mote: [110, 110, 110],
+    },
+  },
+};
+
+// ascii stroke for an outline whose outward normal is (nx, ny)
+const outline = (nx: number, ny: number) => {
+  const deg = (Math.atan2(ny, nx) * 180) / Math.PI;
+  if (deg < -67.5 && deg > -112.5) return "-";
+  if (deg > 67.5 && deg < 112.5) return "_";
+  if (Math.abs(deg) <= 22.5) return ")";
+  if (Math.abs(deg) >= 157.5) return "(";
+  return (deg < 0) === (Math.abs(deg) < 90) ? "\\" : "/";
+};
+
+const isDark = (el: Element) => {
+  const m = getComputedStyle(el).color.match(/[\d.]+/g);
+  if (!m) return true;
+  return 0.299 * +m[0] + 0.587 * +m[1] + 0.114 * +m[2] > 128;
+};
 
 const clamp = (v: number, lo: number, hi: number) =>
   v < lo ? lo : v > hi ? hi : v;
@@ -37,18 +97,17 @@ const angleDiff = (a: number, b: number) => {
   if (d < -Math.PI) d += TAU;
   return d;
 };
-const hash = (x: number, y: number) => {
-  let h = Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 668265263);
-  h = Math.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-};
+const ramp = (deep: RGB, tint: RGB, hi: RGB, t: number, k: 0 | 1 | 2) =>
+  t < 0.5
+    ? deep[k] + (tint[k] - deep[k]) * t * 2
+    : tint[k] + (hi[k] - tint[k]) * (t - 0.5) * 2;
 
-// 0 at rest, 1 fully contracted: a fast squeeze, then a slow recovery
+// eased squeeze and slow cosine release, so the bell never snaps
 const contraction = (clock: number) => {
   const p = clock - Math.floor(clock);
-  return p < PULSE_SHARE
-    ? Math.sin((p / PULSE_SHARE) * (Math.PI / 2))
-    : (1 - (p - PULSE_SHARE) / (1 - PULSE_SHARE)) ** 2;
+  return p < PULSE
+    ? smoothstep(0, 1, p / PULSE)
+    : 0.5 + 0.5 * Math.cos((Math.PI * (p - PULSE)) / (1 - PULSE));
 };
 
 type Jelly = {
@@ -56,14 +115,16 @@ type Jelly = {
   y: number;
   vx: number;
   vy: number;
-  heading: number;
   axis: number;
   scale: number;
   size: number;
   depth: number;
-  color: number;
+  tint: number;
   period: number;
   clock: number;
+  c: number;
+  squeeze: number;
+  rush: number;
   goalX: number;
   goalY: number;
   retarget: number;
@@ -71,33 +132,8 @@ type Jelly = {
   prev: Float32Array;
 };
 
-type Ring = { x: number; y: number; r: number; age: number; depth: number };
-type Plankton = { x: number; y: number; vx: number; vy: number; phase: number };
-
-export type AsciiJellyfishVariant = "color" | "mono";
-
-const MONO: [number, number, number][] = [[225, 225, 225]];
-
-const glyphStyles = (palette: [number, number, number][]) =>
-  palette.map(([r, g, b]) =>
-    Array.from({ length: LEVELS }, (_, l) => {
-      const hot = smoothstep(LEVELS - 3, LEVELS - 1, l) * 0.4;
-      const mix = (c: number) => Math.round(c + (255 - c) * hot);
-      return `rgba(${mix(r)},${mix(g)},${mix(b)},${(0.3 + (0.7 * (l + 1)) / LEVELS).toFixed(2)})`;
-    }),
-  );
-const glowStyles = (palette: [number, number, number][]) =>
-  palette.map(([r, g, b]) =>
-    Array.from(
-      { length: LEVELS },
-      (_, l) => `rgba(${r},${g},${b},${(0.02 + (0.13 * l) / LEVELS).toFixed(3)})`,
-    ),
-  );
-
-const STYLES = {
-  color: { glyph: glyphStyles(PALETTES), glow: glowStyles(PALETTES), plankton: "rgb(150,235,255)", ring: "rgb(190,240,255)" },
-  mono: { glyph: glyphStyles(MONO), glow: glowStyles(MONO), plankton: "rgb(210,210,210)", ring: "rgb(235,235,235)" },
-};
+type Ring = { x: number; y: number; r: number; age: number };
+type Mote = { x: number; y: number; vx: number; vy: number; phase: number };
 
 class Sea {
   width = 0;
@@ -105,12 +141,12 @@ class Sea {
   time = 0;
   jellies: Jelly[] = [];
   rings: Ring[] = [];
-  plankton: Plankton[] = [];
+  motes: Mote[] = [];
   pointer = { x: 0, y: 0, active: false };
 
   constructor(
     private count: number,
-    private shades: number,
+    private tints: number,
   ) {}
 
   resize(width: number, height: number) {
@@ -118,16 +154,16 @@ class Sea {
     this.width = width;
     this.height = height;
     if (first) this.seed();
-    const base = clamp(Math.min(width, height) * 0.075, 16, 40);
+    const base = clamp(Math.min(width, height) * 0.09, 30, 70);
     for (const j of this.jellies) {
       j.size = base * j.scale;
       j.x = clamp(j.x, 0, width);
       j.y = clamp(j.y, 0, height);
       this.hang(j);
     }
-    const planktonCount = clamp(Math.round((width * height) / 9000), 24, 120);
-    while (this.plankton.length < planktonCount) {
-      this.plankton.push({
+    const motes = clamp(Math.round((width * height) / 7000), 30, 140);
+    while (this.motes.length < motes) {
+      this.motes.push({
         x: rand(0, width),
         y: rand(0, height),
         vx: 0,
@@ -135,29 +171,31 @@ class Sea {
         phase: rand(0, TAU),
       });
     }
-    this.plankton.length = planktonCount;
+    this.motes.length = motes;
   }
 
   private seed() {
     const { width: W, height: H } = this;
     this.jellies = [];
     for (let i = 0; i < this.count; i++) {
-      const depth = rand(0.5, 1);
+      const depth = rand(0.55, 1);
       this.jellies.push({
-        x: rand(W * 0.15, W * 0.85),
-        y: rand(H * 0.2, H * 0.8),
+        x: ((i + 0.5) / this.count) * W + rand(-0.08, 0.08) * W,
+        y: rand(H * 0.3, H * 0.85),
         vx: 0,
         vy: 0,
-        heading: rand(0, TAU),
-        axis: -Math.PI / 2,
-        scale: 0.65 + depth * 0.5,
-        size: 30,
+        axis: UP + rand(-0.3, 0.3),
+        scale: 0.7 + depth * 0.4,
+        size: 40,
         depth,
-        color: i % this.shades,
-        period: rand(2.4, 3.6),
+        tint: i % this.tints,
+        period: rand(3.2, 4.4),
         clock: rand(0, 1),
-        goalX: rand(W * 0.12, W * 0.88),
-        goalY: rand(H * 0.15, H * 0.85),
+        c: 0,
+        squeeze: 0,
+        rush: 0,
+        goalX: rand(W * 0.15, W * 0.85),
+        goalY: rand(H * 0.1, H * 0.9),
         retarget: rand(4, 9),
         pos: new Float32Array(CHAINS * SEGMENTS * 2),
         prev: new Float32Array(CHAINS * SEGMENTS * 2),
@@ -167,24 +205,22 @@ class Sea {
   }
 
   chainLength(j: Jelly, k: number) {
-    return j.size * (k < TENTACLE_ROOTS.length ? 2.8 : 1.8);
+    return k < TENTACLES.length ? j.size * (2.4 + 0.25 * ((k * 7) % 3)) : j.size * 1.3;
   }
 
   rootOf(j: Jelly, k: number, out: { x: number; y: number }) {
-    const c = contraction(j.clock);
-    const rw = j.size * (1 - 0.3 * c);
-    const f =
-      k < TENTACLE_ROOTS.length
-        ? TENTACLE_ROOTS[k]
-        : ARM_ROOTS[k - TENTACLE_ROOTS.length] * 0.6;
+    const rw = j.size * (1 - 0.22 * j.c);
     const dx = Math.cos(j.axis);
     const dy = Math.sin(j.axis);
-    out.x = j.x - dy * f * rw - dx * j.size * 0.2;
-    out.y = j.y + dx * f * rw - dy * j.size * 0.2;
+    const tentacle = k < TENTACLES.length;
+    const f = tentacle ? TENTACLES[k] * 0.95 : ARMS[k - TENTACLES.length];
+    const back = tentacle ? j.size * 0.12 : j.size * 0.02;
+    out.x = j.x - dy * f * rw - dx * back;
+    out.y = j.y + dx * f * rw - dy * back;
   }
 
-  // lay every chain straight behind the bell
   private hang(j: Jelly) {
+    j.c = contraction(j.clock);
     const dx = Math.cos(j.axis);
     const dy = Math.sin(j.axis);
     const root = { x: 0, y: 0 };
@@ -200,105 +236,107 @@ class Sea {
   }
 
   startle(x: number, y: number) {
-    this.rings.push({ x, y, r: 4, age: 0, depth: 1 });
+    this.rings.push({ x, y, r: 4, age: 0 });
+    if (this.rings.length > 6) this.rings.shift();
     for (const j of this.jellies) {
       const dx = j.x - x;
       const dy = j.y - y;
       const d = Math.hypot(dx, dy) || 1;
-      if (d > 300) continue;
-      const k = 1 - d / 300;
-      j.vx += (dx / d) * 170 * k;
-      j.vy += (dy / d) * 170 * k;
-      if (j.clock - Math.floor(j.clock) > PULSE_SHARE) {
-        j.clock = Math.floor(j.clock) + 1;
-        this.emit(j);
-      }
+      if (d > 280) continue;
+      const k = 1 - d / 280;
+      j.vx += (dx / d) * 60 * k;
+      j.vy += (dy / d) * 60 * k;
+      j.rush = 1;
     }
-    for (const p of this.plankton) {
-      const dx = p.x - x;
-      const dy = p.y - y;
+    for (const m of this.motes) {
+      const dx = m.x - x;
+      const dy = m.y - y;
       const d = Math.hypot(dx, dy) || 1;
-      if (d > 260) continue;
-      const k = (1 - d / 260) * 200;
-      p.vx += (dx / d) * k;
-      p.vy += (dy / d) * k;
+      if (d > 220) continue;
+      const k = (1 - d / 220) * 120;
+      m.vx += (dx / d) * k;
+      m.vy += (dy / d) * k;
     }
-  }
-
-  private emit(j: Jelly) {
-    this.rings.push({ x: j.x, y: j.y, r: j.size * 0.8, age: 0, depth: j.depth });
-    if (this.rings.length > 24) this.rings.shift();
   }
 
   step(dt: number) {
     this.time += dt;
     this.stepJellies(dt);
-    this.stepPlankton(dt);
+    this.stepMotes(dt);
     for (const r of this.rings) {
       r.age += dt;
-      r.r += 70 * dt;
+      r.r += 110 * dt;
     }
-    this.rings = this.rings.filter((r) => r.age < 1.6);
+    this.rings = this.rings.filter((r) => r.age < 1.4);
   }
 
   private stepJellies(dt: number) {
     const { width: W, height: H, time: t, pointer, jellies } = this;
     const root = { x: 0, y: 0 };
     for (const j of jellies) {
-      const before = j.clock - Math.floor(j.clock);
-      let speedUp = 1;
-
-      if (t > j.retarget || Math.hypot(j.goalX - j.x, j.goalY - j.y) < j.size * 1.5) {
-        j.goalX = rand(W * 0.12, W * 0.88);
-        j.goalY = rand(H * 0.15, H * 0.85);
-        j.retarget = t + rand(7, 12);
+      if (t > j.retarget || Math.hypot(j.goalX - j.x, j.goalY - j.y) < j.size) {
+        j.goalX = rand(W * 0.15, W * 0.85);
+        j.goalY = rand(H * 0.1, H * 0.9);
+        j.retarget = t + rand(8, 14);
       }
       const toGoal = Math.atan2(j.goalY - j.y, j.goalX - j.x);
-      j.heading += clamp(angleDiff(j.heading, toGoal), -1, 1) * dt * 0.9;
-      const lean = clamp(angleDiff(-Math.PI / 2, j.heading), -1.1, 1.1);
-      j.axis += angleDiff(j.axis, -Math.PI / 2 + lean) * Math.min(1, dt * 2);
+      let lean = clamp(angleDiff(UP, toGoal), -0.7, 0.7);
+      let speedUp = 1 + j.rush * 3;
 
       if (pointer.active) {
         const dx = j.x - pointer.x;
         const dy = j.y - pointer.y;
         const d = Math.hypot(dx, dy) || 1;
-        const reach = j.size * 3 + 70;
+        const reach = j.size * 2.5 + 60;
         if (d < reach) {
           const w = 1 - d / reach;
-          j.vx += (dx / d) * 150 * w * dt;
-          j.vy += (dy / d) * 150 * w * dt;
-          speedUp += w * 0.9;
+          j.vx += (dx / d) * 50 * w * dt;
+          j.vy += (dy / d) * 50 * w * dt;
+          lean = clamp(angleDiff(UP, Math.atan2(dy, dx)), -0.8, 0.8);
+          speedUp += w * 1.2;
         }
       }
+      j.axis += angleDiff(j.axis, UP + lean) * Math.min(1, dt * 0.8);
 
       for (const o of jellies) {
         if (o === j) continue;
         const dx = j.x - o.x;
         const dy = j.y - o.y;
         const d = Math.hypot(dx, dy) || 1;
-        const reach = (j.size + o.size) * 1.5;
+        const reach = (j.size + o.size) * 1.4;
         if (d < reach) {
           const w = 1 - d / reach;
-          j.vx += (dx / d) * 60 * w * dt;
-          j.vy += (dy / d) * 60 * w * dt;
+          j.vx += (dx / d) * 30 * w * dt;
+          j.vy += (dy / d) * 30 * w * dt;
         }
       }
 
+      const before = j.clock - Math.floor(j.clock);
       j.clock += (dt / j.period) * speedUp;
-      const p = j.clock - Math.floor(j.clock);
-      if (p < before) this.emit(j);
-      if (p < PULSE_SHARE) {
-        j.vx += Math.cos(j.axis) * 130 * dt;
-        j.vy += Math.sin(j.axis) * 130 * dt;
-      }
-      j.vy += 5 * dt;
-      const drag = Math.exp(-dt * 1.5);
+      if (j.clock - Math.floor(j.clock) < before) j.rush = 0;
+      const c = contraction(j.clock);
+      j.squeeze = Math.max(0, c - j.c) / dt;
+      j.c = c;
+
+      const thrust = j.squeeze * j.size * 0.9;
+      j.vx += Math.cos(j.axis) * thrust * dt;
+      j.vy += Math.sin(j.axis) * thrust * dt + 4 * dt;
+      const drag = Math.exp(-dt * 1.2);
       j.vx *= drag;
       j.vy *= drag;
       j.x += j.vx * dt;
       j.y += j.vy * dt;
-      j.x = clamp(j.x, -j.size, W + j.size);
-      j.y = clamp(j.y, -j.size, H + j.size);
+
+      if (j.x < j.size) j.vx += (j.size - j.x) * dt;
+      if (j.x > W - j.size) j.vx -= (j.x - (W - j.size)) * dt;
+      if (j.y > H + j.size) j.vy -= (j.y - (H + j.size)) * dt;
+      // drifted out the top: come back up from below
+      if (j.y < -j.size * 4) {
+        j.y = H + j.size * 1.2;
+        j.x = rand(W * 0.15, W * 0.85);
+        j.vx = j.vy = 0;
+        this.hang(j);
+      }
 
       this.stepChains(j, dt, root);
     }
@@ -307,8 +345,8 @@ class Sea {
   private stepChains(j: Jelly, dt: number, root: { x: number; y: number }) {
     const dx = Math.cos(j.axis);
     const dy = Math.sin(j.axis);
-    const c = contraction(j.clock);
     const t = this.time;
+    const dt2 = dt * dt;
     for (let k = 0; k < CHAINS; k++) {
       const base = k * SEGMENTS * 2;
       const seg = this.chainLength(j, k) / (SEGMENTS - 1);
@@ -320,16 +358,17 @@ class Sea {
         const along = i / SEGMENTS;
         const x = j.pos[o];
         const y = j.pos[o + 1];
-        const sway = Math.sin(t * 2.2 + i * 0.55 + k * 1.7) * 45 * along;
-        const pull = (40 + 90 * c) * along;
+        // a wave travels from root to tip
+        const sway = Math.sin(t * 1.6 - i * 0.35 + k * 1.3) * 30 * along;
+        const pull = (18 + 30 * j.c) * along;
         const ax = -dx * pull - dy * sway;
-        const ay = 16 - dy * pull + dx * sway;
-        j.pos[o] = x + (x - j.prev[o]) * 0.96 + ax * dt * dt;
-        j.pos[o + 1] = y + (y - j.prev[o + 1]) * 0.96 + ay * dt * dt;
+        const ay = -dy * pull + dx * sway + 25;
+        j.pos[o] = x + (x - j.prev[o]) * 0.94 + ax * dt2;
+        j.pos[o + 1] = y + (y - j.prev[o + 1]) * 0.94 + ay * dt2;
         j.prev[o] = x;
         j.prev[o + 1] = y;
       }
-      for (let pass = 0; pass < 2; pass++) {
+      for (let pass = 0; pass < 3; pass++) {
         for (let i = 1; i < SEGMENTS; i++) {
           const o = base + i * 2;
           const ex = j.pos[o] - j.pos[o - 2];
@@ -342,37 +381,38 @@ class Sea {
     }
   }
 
-  private stepPlankton(dt: number) {
+  private stepMotes(dt: number) {
     const { time: t, pointer, jellies, width: W, height: H } = this;
-    const damp = Math.exp(-dt * 1.2);
-    for (const p of this.plankton) {
-      p.vx += Math.sin(p.y * 0.012 + t * 0.3) * 6 * dt;
-      p.vy += Math.cos(p.x * 0.01 + t * 0.25) * 4 * dt - 2 * dt;
+    const damp = Math.exp(-dt * 1.4);
+    for (const m of this.motes) {
+      m.vx += Math.sin(m.y * 0.01 + t * 0.2) * 3 * dt;
+      m.vy += (Math.cos(m.x * 0.008 + t * 0.15) * 2 - 1.5) * dt;
       for (const j of jellies) {
-        const dx = p.x - j.x;
-        const dy = p.y - j.y;
-        const reach = j.size * 3.2;
+        if (j.squeeze <= 0) continue;
+        const dx = m.x - j.x;
+        const dy = m.y - j.y;
+        const reach = j.size * 2.4;
         const d2 = dx * dx + dy * dy;
         if (d2 > reach * reach || d2 < 1) continue;
         const d = Math.sqrt(d2);
-        const k = contraction(j.clock) * (1 - d / reach) * 120 * dt;
-        p.vx += (dx / d) * k;
-        p.vy += (dy / d) * k;
+        const k = j.squeeze * (1 - d / reach) * 40 * dt;
+        m.vx += (dx / d) * k;
+        m.vy += (dy / d) * k;
       }
       if (pointer.active) {
-        const dx = p.x - pointer.x;
-        const dy = p.y - pointer.y;
+        const dx = m.x - pointer.x;
+        const dy = m.y - pointer.y;
         const d = Math.hypot(dx, dy) || 1;
-        if (d < 90) {
-          const k = (1 - d / 90) * 220 * dt;
-          p.vx += (dx / d) * k;
-          p.vy += (dy / d) * k;
+        if (d < 80) {
+          const k = (1 - d / 80) * 120 * dt;
+          m.vx += (dx / d) * k;
+          m.vy += (dy / d) * k;
         }
       }
-      p.vx *= damp;
-      p.vy *= damp;
-      p.x = (p.x + p.vx * dt + W) % W;
-      p.y = (p.y + p.vy * dt + H) % H;
+      m.vx *= damp;
+      m.vy *= damp;
+      m.x = (m.x + m.vx * dt + W) % W;
+      m.y = (m.y + m.vy * dt + H) % H;
     }
   }
 }
@@ -383,13 +423,19 @@ class Painter {
   private width = 0;
   private height = 0;
   private fontFamily = "ui-monospace, Menlo, monospace";
-  cw = 9;
-  ch = 14;
+  private fontSize = 11;
+  private cw = 7;
+  private ch = 13;
   private cols = 0;
   private rows = 0;
-  private glyph = new Uint16Array(0);
-  private level = new Uint8Array(0);
-  private box = { c0: 0, c1: 0, r0: 0, r1: 0 };
+  private code = new Uint16Array(0);
+  private r = new Uint8Array(0);
+  private g = new Uint8Array(0);
+  private b = new Uint8Array(0);
+  private a = new Float32Array(0);
+  private touched = new Int32Array(0);
+  private count = 0;
+  scheme: Scheme = "dark";
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -408,117 +454,212 @@ class Painter {
     this.dpr = dpr;
     this.canvas.width = Math.round(width * dpr);
     this.canvas.height = Math.round(height * dpr);
-    const fs = clamp(Math.round(width / 80), 11, 15);
-    this.ctx.font = `600 ${fs}px ${this.fontFamily}`;
+    this.fontSize = clamp(Math.round(width / 75), 10, 13);
+    this.ctx.font = `600 ${this.fontSize}px ${this.fontFamily}`;
     this.cw = Math.max(5, this.ctx.measureText("M").width);
-    this.ch = Math.round(fs * 1.45);
+    this.ch = Math.round(this.fontSize * 1.2);
     this.cols = Math.ceil(width / this.cw);
     this.rows = Math.ceil(height / this.ch);
-    this.glyph = new Uint16Array(this.cols * this.rows);
-    this.level = new Uint8Array(this.cols * this.rows);
+    const n = this.cols * this.rows;
+    this.code = new Uint16Array(n);
+    this.r = new Uint8Array(n);
+    this.g = new Uint8Array(n);
+    this.b = new Uint8Array(n);
+    this.a = new Float32Array(n);
+    this.touched = new Int32Array(n);
+    this.count = 0;
+  }
+
+  private set(
+    x: number,
+    y: number,
+    glyph: string,
+    r: number,
+    g: number,
+    b: number,
+    a: number,
+    force: boolean,
+  ) {
+    const col = Math.floor(x / this.cw);
+    const row = Math.floor(y / this.ch);
+    if (col < 0 || row < 0 || col >= this.cols || row >= this.rows || a < 0.03) return;
+    const i = row * this.cols + col;
+    if (this.code[i] === 0) this.touched[this.count++] = i;
+    else if (!force && this.a[i] >= a) return;
+    this.code[i] = glyph.charCodeAt(0);
+    this.r[i] = r;
+    this.g[i] = g;
+    this.b[i] = b;
+    this.a[i] = a;
   }
 
   render(sea: Sea) {
-    const { ctx, dpr, width, height, ch } = this;
+    const { ctx, dpr, width, height, cw, ch } = this;
     if (this.cols === 0) return;
+
+    this.paintMotes(sea);
+    this.paintRings(sea);
+    for (const j of sea.jellies) this.paintJelly(sea, j);
+
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
-    ctx.font = `600 ${Math.round(ch / 1.45)}px ${this.fontFamily}`;
+    ctx.font = `600 ${this.fontSize}px ${this.fontFamily}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-
-    this.drawPlankton(sea);
-    this.drawRings(sea);
-    for (const j of sea.jellies) this.drawJelly(sea, j);
-    ctx.globalAlpha = 1;
+    for (let k = 0; k < this.count; k++) {
+      const i = this.touched[k];
+      const col = i % this.cols;
+      const row = (i / this.cols) | 0;
+      ctx.fillStyle = `rgba(${this.r[i]},${this.g[i]},${this.b[i]},${this.a[i].toFixed(3)})`;
+      ctx.fillText(CHARS[this.code[i]], col * cw + cw / 2, row * ch + ch / 2 + 1);
+      this.code[i] = 0;
+    }
+    this.count = 0;
   }
 
-  private drawPlankton(sea: Sea) {
-    const { ctx, cw, ch } = this;
-    ctx.fillStyle = STYLES[this.variant].plankton;
-    for (const p of sea.plankton) {
-      const speed = Math.hypot(p.vx, p.vy);
-      const tw = 0.5 + 0.5 * Math.sin(sea.time * 1.4 + p.phase);
-      ctx.globalAlpha = clamp(0.12 + 0.3 * tw + speed * 0.006, 0, 0.8);
-      const col = Math.floor(p.x / cw);
-      const row = Math.floor(p.y / ch);
-      ctx.fillText(speed > 14 ? "o" : ".", col * cw + cw / 2, row * ch + ch / 2 + 1);
+  private paintMotes(sea: Sea) {
+    const [r, g, b] = PALETTES[this.scheme][this.variant].mote;
+    for (const m of sea.motes) {
+      const tw = 0.5 + 0.5 * Math.sin(sea.time * 0.9 + m.phase);
+      const a = 0.08 + 0.22 * tw + Math.min(0.3, Math.hypot(m.vx, m.vy) * 0.01);
+      this.set(m.x, m.y, ".", r, g, b, a, false);
     }
   }
 
-  private drawRings(sea: Sea) {
-    const { ctx, cw, ch } = this;
-    ctx.fillStyle = STYLES[this.variant].ring;
+  private paintRings(sea: Sea) {
+    const [r, g, b] = PALETTES[this.scheme][this.variant].hi;
     for (const ring of sea.rings) {
-      const fade = 1 - ring.age / 1.6;
-      ctx.globalAlpha = fade * fade * 0.5 * ring.depth;
-      const steps = clamp(Math.ceil((TAU * ring.r) / cw), 12, 140);
+      const fade = 1 - ring.age / 1.4;
+      const steps = clamp(Math.ceil((TAU * ring.r) / this.cw), 12, 160);
       for (let s = 0; s < steps; s++) {
-        const a = (s / steps) * TAU;
-        const col = Math.floor((ring.x + Math.cos(a) * ring.r) / cw);
-        const row = Math.floor((ring.y + Math.sin(a) * ring.r) / ch);
-        if (col < 0 || row < 0 || col >= this.cols || row >= this.rows) continue;
-        ctx.fillText(s % 2 ? "." : "'", col * cw + cw / 2, row * ch + ch / 2 + 1);
+        const ang = (s / steps) * TAU;
+        const x = ring.x + Math.cos(ang) * ring.r;
+        const y = ring.y + Math.sin(ang) * ring.r * 0.9;
+        this.set(x, y, ".", r, g, b, fade * fade * 0.5, false);
       }
     }
   }
 
-  private put(col: number, row: number, code: number, level: number, overwrite: boolean) {
-    if (col < 0 || row < 0 || col >= this.cols || row >= this.rows) return;
-    const i = row * this.cols + col;
-    if (!overwrite && this.glyph[i] !== 0) return;
-    this.glyph[i] = code;
-    this.level[i] = level;
-    const b = this.box;
-    if (col < b.c0) b.c0 = col;
-    if (col > b.c1) b.c1 = col;
-    if (row < b.r0) b.r0 = row;
-    if (row > b.r1) b.r1 = row;
-  }
-
-  private drawJelly(sea: Sea, j: Jelly) {
-    const { ctx, cw, ch } = this;
+  private paintJelly(sea: Sea, j: Jelly) {
+    const { cw, ch } = this;
     const t = sea.time;
-    const c = contraction(j.clock);
-    const p = j.clock - Math.floor(j.clock);
+    const palette = PALETTES[this.scheme][this.variant];
+    const tint = palette.tints[j.tint];
+    const hi = palette.hi;
+    const deep: RGB =
+      this.scheme === "dark"
+        ? [tint[0] * 0.4, tint[1] * 0.45, tint[2] * 0.55]
+        : [tint[0] + (255 - tint[0]) * 0.2, tint[1] + (255 - tint[1]) * 0.2, tint[2] + (255 - tint[2]) * 0.15];
+    // clear jelly needs more ink to show on a light page
+    const depthA = (0.45 + 0.55 * j.depth) * (this.scheme === "dark" ? 1 : 1.5);
+    const c = j.c;
     const dirX = Math.cos(j.axis);
     const dirY = Math.sin(j.axis);
-    const rw = j.size * (1 - 0.3 * c);
-    const hh = j.size * (0.85 + 0.25 * c);
-    const skirt = j.size * 0.2;
+    const rw = j.size * (1 - 0.22 * c);
+    const hh = j.size * (0.72 + 0.2 * c);
+    const skirt = j.size * 0.16;
     const flare = 0.07 * (1 - c);
-    const wave = clamp(p / 0.55, 0, 1);
+    const spacing = Math.min(cw, ch) * 0.5;
 
-    this.box = { c0: this.cols, c1: -1, r0: this.rows, r1: -1 };
+    for (let k = 0; k < CHAINS; k++) {
+      const arm = k >= TENTACLES.length;
+      const base = k * SEGMENTS * 2;
+      for (let i = 1; i < SEGMENTS; i++) {
+        const o = base + i * 2;
+        const x0 = j.pos[o - 2];
+        const y0 = j.pos[o - 1];
+        const x1 = j.pos[o];
+        const y1 = j.pos[o + 1];
+        const steps = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / spacing));
+        const wave = Math.sin(t * 1.6 - i * 0.35 + k * 1.3);
+        for (let s = 1; s <= steps; s++) {
+          const f = s / steps;
+          const along = (i - 1 + f) / (SEGMENTS - 1);
+          const x = x0 + (x1 - x0) * f;
+          const y = y0 + (y1 - y0) * f;
+          if (arm) {
+            const a = 0.55 * (1 - along * 0.75) * depthA;
+            const m = 0.6 + 0.2 * wave;
+            this.set(
+              x,
+              y,
+              wave > 0 ? ")" : "(",
+              ramp(deep, tint, hi, m, 0),
+              ramp(deep, tint, hi, m, 1),
+              ramp(deep, tint, hi, m, 2),
+              a,
+              false,
+            );
+          } else {
+            const a = (1 - along) ** 0.9 * 0.7 * depthA;
+            const m = 0.35 + 0.3 * (1 - along);
+            this.set(
+              x,
+              y,
+              along > 0.8 ? "." : ":",
+              ramp(deep, tint, hi, m, 0),
+              ramp(deep, tint, hi, m, 1),
+              ramp(deep, tint, hi, m, 2),
+              a,
+              false,
+            );
+          }
+        }
+      }
+    }
 
-    const inside = (dx: number, dy: number) => {
+    const fringe = Math.max(6, Math.round((rw * 2) / cw));
+    for (let m = 0; m < fringe; m++) {
+      const f = -1 + (2 * m) / (fringe - 1);
+      const bx = j.x - dirY * f * rw * (1 + flare) - dirX * skirt * 0.7;
+      const by = j.y + dirX * f * rw * (1 + flare) - dirY * skirt * 0.7;
+      const drift = Math.sin(t * 2 + m) * 2;
+      for (let s = 1; s <= 2; s++) {
+        this.set(
+          bx - dirX * s * ch * 0.8 - dirY * drift,
+          by - dirY * s * ch * 0.8 + dirX * drift,
+          "'",
+          tint[0],
+          tint[1],
+          tint[2],
+          (0.35 - s * 0.1) * depthA,
+          false,
+        );
+      }
+    }
+
+    // < 1 inside the bell, > 1 outside
+    const field = (dx: number, dy: number) => {
       const u = dx * dirX + dy * dirY;
       const v = -dx * dirY + dy * dirX;
       if (u >= 0) {
         const a = u / hh;
         const b = v / rw;
-        return a * a + b * b <= 1;
+        // the bell wall ripples like liquid
+        const wobble = 1 + 0.035 * Math.sin(Math.atan2(b, a) * 4 + t * 2.4 + j.tint);
+        return (a * a + b * b) / (wobble * wobble);
       }
-      const scallop = 0.72 + 0.28 * Math.abs(Math.sin((v / rw) * Math.PI * 3.5));
-      const edge = -skirt * scallop + Math.sin(v * 0.3 + t * 5) * j.size * 0.03;
-      return u >= edge && Math.abs(v) <= rw * (1 + (flare * -u) / skirt);
+      const scallop = 0.6 + 0.4 * Math.abs(Math.sin((v / rw) * Math.PI * 4));
+      const side = Math.abs(v) / (rw * (1 + (flare * -u) / skirt));
+      return Math.max(side, -u / (skirt * scallop)) ** 2;
     };
 
-    const reach = Math.max(rw, hh) + skirt + 2;
+    const reach = Math.max(rw * (1 + flare), hh) + skirt + ch;
     const c0 = Math.floor((j.x - reach) / cw);
     const c1 = Math.ceil((j.x + reach) / cw);
     const r0 = Math.floor((j.y - reach) / ch);
     const r1 = Math.ceil((j.y + reach) / ch);
+    const e = 0.5;
 
     for (let row = r0; row <= r1; row++) {
       for (let col = c0; col <= c1; col++) {
         const cx = col * cw + cw / 2;
         const cy = row * ch + ch / 2;
         let hits = 0;
-        for (let s = 0; s < 4; s++) {
-          const ox = (s & 1 ? 0.25 : -0.25) * cw;
-          const oy = (s & 2 ? 0.25 : -0.25) * ch;
-          if (inside(cx + ox - j.x, cy + oy - j.y)) hits++;
+        for (let sy = -1; sy <= 1; sy++) {
+          for (let sx = -1; sx <= 1; sx++) {
+            if (field(cx + sx * cw * 0.4 - j.x, cy + sy * ch * 0.4 - j.y) <= 1) hits++;
+          }
         }
         if (hits === 0) continue;
 
@@ -526,88 +667,54 @@ class Painter {
         const dy = cy - j.y;
         const u = dx * dirX + dy * dirY;
         const v = -dx * dirY + dy * dirX;
-        const a = u / hh;
-        const b = v / rw;
-        const rr = u >= 0 ? Math.min(1, Math.sqrt(a * a + b * b)) : 1;
 
-        let light = 0.1 + 0.55 * smoothstep(0.62, 1, rr) + 0.15 * c;
+        // cells barely touching the edge are dropped so the outline stays one cell thick
+        if (hits < 3) continue;
+        if (hits < 9) {
+          const gx = field(dx + e, dy) - field(dx - e, dy);
+          const gy = field(dx, dy + e) - field(dx, dy - e);
+          const glyph = u < -skirt * 0.2 ? "~" : outline(gx, gy);
+          const light = u < 0 ? 0.7 : 0.9;
+          this.set(
+            cx,
+            cy,
+            glyph,
+            ramp(deep, tint, hi, light, 0),
+            ramp(deep, tint, hi, light, 1),
+            ramp(deep, tint, hi, light, 2),
+            (u < 0 ? 0.7 : 0.9) * depthA,
+            true,
+          );
+          continue;
+        }
+
+        let light: number;
+        let solid: number;
         if (u >= 0) {
-          const canal = Math.abs(Math.cos(Math.atan2(b, a) * 5)) ** 14;
-          light += 0.35 * canal * smoothstep(0.2, 0.9, rr);
-          light += 0.45 * Math.exp(-(((rr - 0.45) / 0.09) ** 2));
-          if (p < 0.6) light += 0.5 * Math.exp(-(((rr - wave) / 0.16) ** 2));
+          const rr = Math.min(1, Math.hypot(u / hh, v / rw));
+          // slow caustics drifting through the clear jelly
+          const flow =
+            Math.sin(u * 0.11 + t * 1.3 + Math.sin(v * 0.07 - t * 0.9 + j.tint) * 2) *
+            Math.sin(v * 0.09 - t * 1.1 + Math.sin(u * 0.06 + t * 0.7) * 2);
+          const caustic = smoothstep(0.35, 0.95, flow);
+          const gonads = Math.exp(-(((rr - 0.4) / 0.09) ** 2));
+          const wall = smoothstep(0.82, 1, rr);
+          light = clamp(0.12 + 0.3 * wall + 0.35 * gonads + 0.45 * caustic + 0.12 * c, 0, 1);
+          solid = clamp(0.06 + 0.25 * wall + 0.35 * gonads + 0.5 * caustic, 0, 1);
         } else {
-          light = 0.85;
+          light = 0.4;
+          solid = 0.3;
         }
-        light = clamp(light, 0, 1);
-
-        const level = Math.min(LEVELS - 1, Math.floor(light * LEVELS));
-        const code =
-          hits < 3
-            ? EDGE.charCodeAt(Math.floor(hash(col, row) * EDGE.length))
-            : RAMP.charCodeAt(Math.floor(light * (RAMP.length - 1)));
-        this.put(col, row, code, level, true);
-      }
-    }
-
-    const root = { x: 0, y: 0 };
-    for (let k = 0; k < CHAINS; k++) {
-      const arm = k >= TENTACLE_ROOTS.length;
-      const base = k * SEGMENTS * 2;
-      sea.rootOf(j, k, root);
-      for (let i = 1; i < SEGMENTS; i++) {
-        const o = base + i * 2;
-        const x0 = j.pos[o - 2];
-        const y0 = j.pos[o - 1];
-        const x1 = j.pos[o];
-        const y1 = j.pos[o + 1];
-        const len = Math.hypot(x1 - x0, y1 - y0);
-        const along = i / SEGMENTS;
-        const ang = Math.atan2(y1 - y0, x1 - x0);
-        const sx = Math.abs(Math.cos(ang));
-        const sy = Math.abs(Math.sin(ang));
-        const glow = 0.5 + 0.5 * Math.sin(i * 0.7 - t * 3 + k);
-        const lv = clamp(
-          Math.floor((1 - along * 0.75) * (arm ? 0.9 : 0.6) * LEVELS + glow * 2),
-          0,
-          LEVELS - 1,
+        this.set(
+          cx,
+          cy,
+          RAMP[Math.floor(light * (RAMP.length - 1))],
+          ramp(deep, tint, hi, light, 0),
+          ramp(deep, tint, hi, light, 1),
+          ramp(deep, tint, hi, light, 2),
+          solid * depthA,
+          true,
         );
-        let ch2: string;
-        if (arm) ch2 = "%8S"[(i + k) % 3];
-        else if (along > 0.82) ch2 = i % 2 ? ":" : ".";
-        else if (sy > 0.85) ch2 = i % 3 ? "|" : "!";
-        else if (sx > 0.85) ch2 = "-";
-        else ch2 = (x1 - x0) * (y1 - y0) > 0 ? "\\" : "/";
-        const steps = Math.max(1, Math.ceil(len / (cw * 0.6)));
-        for (let s = 1; s <= steps; s++) {
-          const f = s / steps;
-          const col = Math.floor((x0 + (x1 - x0) * f) / cw);
-          const row = Math.floor((y0 + (y1 - y0) * f) / ch);
-          this.put(col, row, ch2.charCodeAt(0), lv, false);
-        }
-      }
-    }
-
-    const { c0: bc0, c1: bc1, r0: br0, r1: br1 } = this.box;
-    const glows = STYLES[this.variant].glow[j.color];
-    const styles = STYLES[this.variant].glyph[j.color];
-    for (let row = br0; row <= br1; row++) {
-      for (let col = bc0; col <= bc1; col++) {
-        const i = row * this.cols + col;
-        const code = this.glyph[i];
-        if (code === 0) continue;
-        const lv = this.level[i];
-        this.glyph[i] = 0;
-        const x = col * cw;
-        const y = row * ch;
-        ctx.globalAlpha = 0.78;
-        ctx.fillStyle = "#000";
-        ctx.fillRect(x, y, cw, ch);
-        ctx.globalAlpha = 0.55 + 0.45 * j.depth;
-        ctx.fillStyle = glows[lv];
-        ctx.fillRect(x, y, cw, ch);
-        ctx.fillStyle = styles[lv];
-        ctx.fillText(String.fromCharCode(code), x + cw / 2, y + ch / 2 + 1);
       }
     }
   }
@@ -625,7 +732,7 @@ function AsciiJellyfish({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const sea = new Sea(count, variant === "mono" ? 1 : PALETTES.length);
+    const sea = new Sea(count, PALETTES.dark[variant].tints.length);
     const painter = new Painter(canvas, variant);
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let raf = 0;
@@ -697,6 +804,17 @@ function AsciiJellyfish({
       }
     };
 
+    const syncScheme = () => {
+      painter.scheme = isDark(canvas) ? "dark" : "light";
+      if (motion.matches) painter.render(sea);
+    };
+    const themeObserver = new MutationObserver(syncScheme);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style", "data-theme"],
+    });
+    syncScheme();
+
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(canvas);
     const intersection = new IntersectionObserver(([entry]) => {
@@ -719,6 +837,7 @@ function AsciiJellyfish({
       disposed = true;
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
+      themeObserver.disconnect();
       intersection.disconnect();
       motion.removeEventListener("change", onMotion);
       canvas.removeEventListener("pointermove", onMove);
@@ -730,7 +849,7 @@ function AsciiJellyfish({
   return (
     <div
       data-slot="ascii-jellyfish"
-      className={cn("relative overflow-hidden bg-black font-mono", className)}
+      className={cn("relative overflow-hidden font-mono", className)}
       {...props}
     >
       <canvas ref={canvasRef} aria-hidden="true" className="block h-full w-full" />

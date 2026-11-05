@@ -79,7 +79,7 @@
       "name": "ascii-jellyfish",
       "type": "registry:ui",
       "title": "Ascii Jellyfish",
-      "description": "Jellyfish drawn as ASCII glyphs on a canvas, pulsing through the dark with trailing tentacles.",
+      "description": "Translucent jellyfish drawn as ASCII glyphs, pulsing through the water with trailing tentacles.",
       "registryDependencies": [
         "utils"
       ],
@@ -94,7 +94,7 @@
       "name": "ascii-butterflies",
       "type": "registry:ui",
       "title": "Ascii Butterflies",
-      "description": "A few butterflies drawn as ASCII glyphs, fluttering at random and landing now and then.",
+      "description": "A few butterflies drawn as ASCII glyphs, flapping on wandering paths and landing now and then.",
       "registryDependencies": [
         "utils"
       ],

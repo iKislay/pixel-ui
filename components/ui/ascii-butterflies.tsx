@@ -3,32 +3,70 @@
 import { useEffect, useRef, type ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
+export type AsciiButterfliesVariant = "color" | "mono";
+
+type RGB = [number, number, number];
+type Scheme = "dark" | "light";
+type Look = { wing: RGB; edge: RGB; spot: RGB; body: RGB };
+
 const TAU = Math.PI * 2;
 const STEP = 1 / 60;
 const MAX_STEPS = 4;
-const LEVELS = 8;
-const RAMP = ".:-=+*#%@";
-const EDGE = ".'`:";
-const TRAIL = 10;
+const CHARS = Array.from({ length: 128 }, (_, i) => String.fromCharCode(i));
+const EDGE_GLYPHS = "@0#@0";
+const ELEVATION = 0.5;
 
-const PALETTES: [number, number, number][] = [
-  [255, 165, 70],
-  [120, 190, 255],
-  [255, 130, 200],
-  [255, 230, 110],
-  [185, 150, 255],
-];
-const MONO: [number, number, number][] = [[228, 228, 228]];
+const WINGS: Record<Scheme, Record<AsciiButterfliesVariant, RGB[]>> = {
+  dark: {
+    color: [
+      [70, 160, 255],
+      [40, 215, 200],
+      [255, 110, 185],
+      [255, 210, 70],
+      [255, 145, 55],
+    ],
+    mono: [
+      [215, 215, 215],
+      [180, 180, 180],
+    ],
+  },
+  light: {
+    color: [
+      [25, 110, 230],
+      [0, 160, 150],
+      [225, 60, 140],
+      [240, 185, 20],
+      [240, 120, 20],
+    ],
+    mono: [
+      [120, 120, 120],
+      [150, 150, 150],
+    ],
+  },
+};
 
-export type AsciiButterfliesVariant = "color" | "mono";
+const look = (scheme: Scheme, variant: AsciiButterfliesVariant, kind: number): Look => {
+  const wing = WINGS[scheme][variant][kind];
+  if (scheme === "dark") {
+    const mix = (k: number) => Math.round(wing[k] + (240 - wing[k]) * 0.55);
+    return {
+      wing,
+      edge: [mix(0), mix(1), mix(2)],
+      spot: [250, 250, 250],
+      body: [190, 180, 170],
+    };
+  }
+  return {
+    wing,
+    edge: [38, 32, 28],
+    spot: [250, 246, 235],
+    body: [55, 48, 42],
+  };
+};
 
 const clamp = (v: number, lo: number, hi: number) =>
   v < lo ? lo : v > hi ? hi : v;
 const rand = (lo: number, hi: number) => lo + Math.random() * (hi - lo);
-const smoothstep = (e0: number, e1: number, x: number) => {
-  const t = clamp((x - e0) / (e1 - e0), 0, 1);
-  return t * t * (3 - 2 * t);
-};
 const angleDiff = (a: number, b: number) => {
   let d = (b - a) % TAU;
   if (d > Math.PI) d -= TAU;
@@ -41,25 +79,31 @@ const hash = (x: number, y: number) => {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 };
 
-const styles = (palette: [number, number, number][]) =>
-  palette.map(([r, g, b]) =>
-    Array.from({ length: LEVELS }, (_, l) => {
-      const hot = smoothstep(LEVELS - 3, LEVELS - 1, l) * 0.35;
-      const mix = (c: number) => Math.round(c + (255 - c) * hot);
-      return `rgba(${mix(r)},${mix(g)},${mix(b)},${(0.3 + (0.7 * (l + 1)) / LEVELS).toFixed(2)})`;
-    }),
-  );
-const glows = (palette: [number, number, number][]) =>
-  palette.map(([r, g, b]) =>
-    Array.from(
-      { length: LEVELS },
-      (_, l) => `rgba(${r},${g},${b},${(0.02 + (0.12 * l) / LEVELS).toFixed(3)})`,
-    ),
-  );
+// wing shapes in wing space: s runs out along the span, f runs forward along the body
+const ellipse = (s: number, f: number, cs: number, cf: number, rot: number, a: number, b: number) => {
+  const ps = s - cs;
+  const pf = f - cf;
+  const along = ps * Math.cos(rot) + pf * Math.sin(rot);
+  const across = -ps * Math.sin(rot) + pf * Math.cos(rot);
+  return (along / a) ** 2 + (across / b) ** 2;
+};
+const fore = (s: number, f: number) => ellipse(s, f, 0.52, 0.36, 0.55, 0.56, 0.33);
+const hind = (s: number, f: number) => ellipse(s, f, 0.38, -0.3, -0.75, 0.42, 0.3);
 
-const STYLES = {
-  color: { glyph: styles(PALETTES), glow: glows(PALETTES), trail: "rgb(255,220,170)" },
-  mono: { glyph: styles(MONO), glow: glows(MONO), trail: "rgb(215,215,215)" },
+const stroke = (tx: number, ty: number) => {
+  let a = Math.atan2(ty, tx);
+  if (a < 0) a += Math.PI;
+  const deg = (a * 180) / Math.PI;
+  if (deg < 22.5 || deg >= 157.5) return "-";
+  if (deg < 67.5) return "\\";
+  if (deg < 112.5) return "|";
+  return "/";
+};
+
+const isDark = (el: Element) => {
+  const m = getComputedStyle(el).color.match(/[\d.]+/g);
+  if (!m) return true;
+  return 0.299 * +m[0] + 0.587 * +m[1] + 0.114 * +m[2] > 128;
 };
 
 type Butterfly = {
@@ -70,9 +114,8 @@ type Butterfly = {
   scale: number;
   size: number;
   depth: number;
-  color: number;
+  kind: number;
   flap: number;
-  flapRate: number;
   resting: boolean;
   until: number;
   goalX: number;
@@ -80,9 +123,8 @@ type Butterfly = {
   retarget: number;
   fright: number;
   wobble: number;
-  trail: Float32Array;
-  trailAt: number;
-  trailHead: number;
+  facing: 1 | -1;
+  tilt: number;
 };
 
 class Meadow {
@@ -94,7 +136,7 @@ class Meadow {
 
   constructor(
     private count: number,
-    private shades: number,
+    private kinds: number,
   ) {}
 
   resize(width: number, height: number) {
@@ -102,7 +144,7 @@ class Meadow {
     this.width = width;
     this.height = height;
     if (first) this.seed();
-    const base = clamp(Math.min(width, height) * 0.1, 20, 46);
+    const base = clamp(Math.min(width, height) * 0.18, 60, 130);
     for (const b of this.flies) {
       b.size = base * b.scale;
       b.x = clamp(b.x, 0, width);
@@ -112,30 +154,30 @@ class Meadow {
 
   private seed() {
     const { width: W, height: H } = this;
+    const offset = Math.floor(rand(0, this.kinds));
     this.flies = [];
     for (let i = 0; i < this.count; i++) {
-      const depth = rand(0.6, 1);
+      const depth = rand(0.65, 1);
+      const heading = Math.random() < 0.5 ? rand(-0.4, 0.4) : Math.PI + rand(-0.4, 0.4);
       this.flies.push({
-        x: rand(W * 0.1, W * 0.9),
-        y: rand(H * 0.1, H * 0.9),
-        heading: rand(0, TAU),
-        speed: 40,
-        scale: 0.7 + depth * 0.45,
-        size: 20,
+        x: ((i + 0.5) / this.count) * W,
+        y: rand(H * 0.25, H * 0.75),
+        heading,
+        speed: 30,
+        scale: 0.75 + depth * 0.35,
+        size: 60,
         depth,
-        color: i % this.shades,
+        kind: (i + offset) % this.kinds,
         flap: rand(0, TAU),
-        flapRate: rand(8, 11),
         resting: false,
         until: rand(5, 11),
-        goalX: rand(W * 0.1, W * 0.9),
-        goalY: rand(H * 0.1, H * 0.9),
+        goalX: rand(W * 0.15, W * 0.85),
+        goalY: rand(H * 0.2, H * 0.8),
         retarget: rand(2, 5),
         fright: 0,
         wobble: rand(0, TAU),
-        trail: new Float32Array(TRAIL * 2),
-        trailAt: 0,
-        trailHead: 0,
+        facing: Math.cos(heading) >= 0 ? 1 : -1,
+        tilt: 0,
       });
     }
     this.flies.sort((a, b) => a.depth - b.depth);
@@ -148,52 +190,60 @@ class Meadow {
       b.heading = Math.atan2(b.y - y, b.x - x);
       b.fright = 1;
       b.resting = false;
-      b.until = this.time + rand(3, 6);
+      b.until = this.time + rand(4, 7);
     }
   }
 
   step(dt: number) {
     this.time += dt;
-    const { width: W, height: H, time: t, pointer } = this;
-    for (const b of this.flies) {
-      b.fright = Math.max(0, b.fright - dt * 0.8);
+    const { width: W, height: H, time: t, pointer, flies } = this;
+    for (const b of flies) {
+      b.fright = Math.max(0, b.fright - dt * 0.7);
 
       if (b.resting) {
-        b.speed += (0 - b.speed) * Math.min(1, dt * 4);
-        b.flap += dt * 1.6;
+        b.speed += (0 - b.speed) * Math.min(1, dt * 5);
+        b.flap += dt * 1.4;
         if (t > b.until) {
           b.resting = false;
-          b.until = t + rand(6, 12);
-          b.heading = rand(0, TAU);
+          b.until = t + rand(7, 13);
+          b.heading = (b.facing === 1 ? 0 : Math.PI) + rand(-0.6, 0.2) * b.facing;
         }
       } else {
-        b.flap += dt * b.flapRate * (1 + b.fright * 0.5);
+        b.flap += dt * (17 + b.fright * 9);
         if (t > b.retarget) {
-          b.goalX = rand(W * 0.1, W * 0.9);
-          b.goalY = rand(H * 0.1, H * 0.9);
-          b.retarget = t + rand(2, 5);
+          b.goalX = rand(W * 0.12, W * 0.88);
+          b.goalY = rand(H * 0.2, H * 0.8);
+          b.retarget = t + rand(2.5, 5);
         }
         const toGoal = Math.atan2(b.goalY - b.y, b.goalX - b.x);
-        b.wobble += dt * 2.4;
-        const flutter = Math.sin(b.wobble) + Math.sin(b.wobble * 2.3 + b.flap * 0.1);
-        b.heading +=
-          (clamp(angleDiff(b.heading, toGoal), -1, 1) * 0.9 + flutter * 0.9) * dt;
+        b.wobble += dt * 1.6;
+        const flutter = Math.sin(b.wobble) * 0.6 + Math.sin(b.wobble * 2.3 + 1.3) * 0.4;
+        b.heading += (clamp(angleDiff(b.heading, toGoal), -1, 1) * 1.1 + flutter) * dt;
 
         if (pointer.active) {
           const dx = b.x - pointer.x;
           const dy = b.y - pointer.y;
           const d = Math.hypot(dx, dy);
-          if (d < 130) {
+          if (d < 150) {
             b.heading += angleDiff(b.heading, Math.atan2(dy, dx)) * dt * 5;
-            b.fright = Math.max(b.fright, 1 - d / 130);
+            b.fright = Math.max(b.fright, 1 - d / 150);
+          }
+        }
+        for (const o of flies) {
+          if (o === b) continue;
+          const dx = b.x - o.x;
+          const dy = b.y - o.y;
+          if (Math.hypot(dx, dy) < (b.size + o.size) * 1.3) {
+            b.heading += angleDiff(b.heading, Math.atan2(dy, dx)) * dt * 1.5;
           }
         }
 
-        const beat = 0.5 + 0.5 * Math.sin(b.flap * 2 - 1);
-        const target = (34 + 26 * beat) * (1 + b.fright * 1.6);
-        b.speed += (target - b.speed) * Math.min(1, dt * 6);
+        // each downstroke gives a small burst of speed
+        const beat = 0.5 + 0.5 * Math.sin(b.flap);
+        const target = (28 + 20 * beat) * (1 + b.fright * 2);
+        b.speed += (target - b.speed) * Math.min(1, dt * 4);
 
-        if (t > b.until && b.fright === 0 && Math.hypot(b.goalX - b.x, b.goalY - b.y) < 140) {
+        if (t > b.until && b.fright < 0.05 && Math.hypot(b.goalX - b.x, b.goalY - b.y) < 120) {
           b.resting = true;
           b.until = t + rand(2.5, 5);
         }
@@ -202,18 +252,18 @@ class Meadow {
       b.x += Math.cos(b.heading) * b.speed * dt;
       b.y += Math.sin(b.heading) * b.speed * dt;
 
-      const m = b.size * 1.5;
+      const m = b.size * 1.2;
       if (b.x < m) b.x += (m - b.x) * dt * 2;
       if (b.x > W - m) b.x -= (b.x - (W - m)) * dt * 2;
       if (b.y < m) b.y += (m - b.y) * dt * 2;
       if (b.y > H - m) b.y -= (b.y - (H - m)) * dt * 2;
 
-      if (t > b.trailAt && !b.resting) {
-        b.trailAt = t + 0.07;
-        b.trailHead = (b.trailHead + 1) % TRAIL;
-        b.trail[b.trailHead * 2] = b.x;
-        b.trail[b.trailHead * 2 + 1] = b.y;
-      }
+      const cos = Math.cos(b.heading);
+      if (cos > 0.25) b.facing = 1;
+      else if (cos < -0.25) b.facing = -1;
+      // nose follows the climb or dive
+      const lean = b.resting ? 0 : clamp(Math.sin(b.heading) * 0.4 * b.facing, -0.4, 0.4);
+      b.tilt += (lean - b.tilt) * Math.min(1, dt * 3);
     }
   }
 }
@@ -224,14 +274,24 @@ class Painter {
   private width = 0;
   private height = 0;
   private fontFamily = "ui-monospace, Menlo, monospace";
-  private fontSize = 12;
-  cw = 9;
-  ch = 14;
+  private fontSize = 8;
+  private cw = 5;
+  private ch = 9;
   private cols = 0;
   private rows = 0;
-  private glyph = new Uint16Array(0);
-  private level = new Uint8Array(0);
-  private box = { c0: 0, c1: 0, r0: 0, r1: 0 };
+  private code = new Uint16Array(0);
+  private r = new Uint8Array(0);
+  private g = new Uint8Array(0);
+  private b = new Uint8Array(0);
+  private a = new Float32Array(0);
+  private z = new Float32Array(0);
+  private owner = new Int32Array(0);
+  private spot = new Uint8Array(0);
+  private mine: number[] = [];
+  private nextOwner = 1;
+  private touched = new Int32Array(0);
+  private count = 0;
+  scheme: Scheme = "dark";
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -250,171 +310,212 @@ class Painter {
     this.dpr = dpr;
     this.canvas.width = Math.round(width * dpr);
     this.canvas.height = Math.round(height * dpr);
-    this.fontSize = clamp(Math.round(width / 80), 11, 15);
-    this.ctx.font = `600 ${this.fontSize}px ${this.fontFamily}`;
-    this.cw = Math.max(5, this.ctx.measureText("M").width);
-    this.ch = Math.round(this.fontSize * 1.45);
+    this.fontSize = clamp(Math.round(width / 110), 7, 10);
+    this.ctx.font = `700 ${this.fontSize}px ${this.fontFamily}`;
+    this.cw = Math.max(4, this.ctx.measureText("M").width);
+    this.ch = Math.round(this.fontSize * 1.15);
     this.cols = Math.ceil(width / this.cw);
     this.rows = Math.ceil(height / this.ch);
-    this.glyph = new Uint16Array(this.cols * this.rows);
-    this.level = new Uint8Array(this.cols * this.rows);
+    const n = this.cols * this.rows;
+    this.code = new Uint16Array(n);
+    this.r = new Uint8Array(n);
+    this.g = new Uint8Array(n);
+    this.b = new Uint8Array(n);
+    this.a = new Float32Array(n);
+    this.z = new Float32Array(n);
+    this.owner = new Int32Array(n);
+    this.spot = new Uint8Array(n);
+    this.touched = new Int32Array(n);
+    this.count = 0;
+  }
+
+  private set(
+    x: number,
+    y: number,
+    glyph: string,
+    rgb: RGB,
+    a: number,
+    z: number,
+    owner = 0,
+    spot = false,
+  ) {
+    const col = Math.floor(x / this.cw);
+    const row = Math.floor(y / this.ch);
+    if (col < 0 || row < 0 || col >= this.cols || row >= this.rows) return;
+    const i = row * this.cols + col;
+    if (this.code[i] === 0) this.touched[this.count++] = i;
+    else if (this.z[i] > z) return;
+    this.code[i] = glyph.charCodeAt(0);
+    this.r[i] = rgb[0];
+    this.g[i] = rgb[1];
+    this.b[i] = rgb[2];
+    this.a[i] = a;
+    this.z[i] = z;
+    this.owner[i] = owner;
+    this.spot[i] = spot ? 1 : 0;
+    if (owner) this.mine.push(i);
+  }
+
+  // a wing cell is edge where it borders empty space or anything behind it
+  private outline(look: Look, alpha: number) {
+    const { cols, rows, code, owner, z } = this;
+    const edges: number[] = [];
+    for (const i of this.mine) {
+      const o = owner[i];
+      if (o <= 0) continue;
+      const col = i % cols;
+      const row = (i / cols) | 0;
+      let edge = false;
+      for (const [dc, dr] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const c = col + dc;
+        const r = row + dr;
+        if (c < 0 || r < 0 || c >= cols || r >= rows) continue;
+        const j = r * cols + c;
+        if (code[j] === 0 || (owner[j] !== o && z[j] < z[i])) {
+          edge = true;
+          break;
+        }
+      }
+      if (edge) edges.push(i);
+    }
+    for (const i of edges) {
+      const col = i % cols;
+      const row = (i / cols) | 0;
+      const spot = this.spot[i] === 1;
+      const rgb = spot ? look.spot : look.edge;
+      this.code[i] = (spot ? "o" : EDGE_GLYPHS[Math.floor(hash(col, row) * EDGE_GLYPHS.length)]).charCodeAt(0);
+      this.r[i] = rgb[0];
+      this.g[i] = rgb[1];
+      this.b[i] = rgb[2];
+      this.a[i] = alpha;
+      this.owner[i] = -1;
+    }
+    this.mine.length = 0;
   }
 
   render(meadow: Meadow) {
-    const { ctx, dpr, width, height } = this;
+    const { ctx, dpr, width, height, cw, ch } = this;
     if (this.cols === 0) return;
+    for (const b of meadow.flies) this.paintButterfly(b);
+
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
-    ctx.font = `600 ${this.fontSize}px ${this.fontFamily}`;
+    ctx.font = `700 ${this.fontSize}px ${this.fontFamily}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    this.drawTrails(meadow);
-    for (const b of meadow.flies) this.drawButterfly(b);
-    ctx.globalAlpha = 1;
-  }
-
-  private drawTrails(meadow: Meadow) {
-    const { ctx, cw, ch } = this;
-    ctx.fillStyle = STYLES[this.variant].trail;
-    for (const b of meadow.flies) {
-      for (let k = 1; k < TRAIL; k++) {
-        const i = (b.trailHead - k + TRAIL) % TRAIL;
-        const x = b.trail[i * 2];
-        const y = b.trail[i * 2 + 1];
-        if (x === 0 && y === 0) continue;
-        ctx.globalAlpha = (1 - k / TRAIL) * 0.35 * b.depth;
-        ctx.fillText(
-          ".",
-          Math.floor(x / cw) * cw + cw / 2,
-          Math.floor(y / ch) * ch + ch / 2 + 1,
-        );
-      }
+    for (let k = 0; k < this.count; k++) {
+      const i = this.touched[k];
+      const col = i % this.cols;
+      const row = (i / this.cols) | 0;
+      ctx.fillStyle = `rgba(${this.r[i]},${this.g[i]},${this.b[i]},${this.a[i].toFixed(3)})`;
+      ctx.fillText(CHARS[this.code[i]], col * cw + cw / 2, row * ch + ch / 2 + 1);
+      this.code[i] = 0;
     }
+    this.count = 0;
   }
 
-  private put(col: number, row: number, code: number, level: number) {
-    if (col < 0 || row < 0 || col >= this.cols || row >= this.rows) return;
-    const i = row * this.cols + col;
-    this.glyph[i] = code;
-    this.level[i] = level;
-    const b = this.box;
-    if (col < b.c0) b.c0 = col;
-    if (col > b.c1) b.c1 = col;
-    if (row < b.r0) b.r0 = row;
-    if (row > b.r1) b.r1 = row;
-  }
+  private paintButterfly(b: Butterfly) {
+    const S = b.size;
+    const colors = look(this.scheme, this.variant, b.kind);
+    const alpha = 0.65 + 0.35 * b.depth;
+    // wing angle above the body plane: flat spread at 0, folded up at about 1.4
+    const phi = b.resting ? 1.05 + 0.35 * Math.cos(b.flap) : 0.5 + 0.8 * Math.sin(b.flap);
+    const sinP = Math.sin(phi);
+    const cosP = Math.cos(phi);
+    const sinE = Math.sin(ELEVATION);
+    const cosE = Math.cos(ELEVATION);
+    const sinT = Math.sin(b.tilt);
+    const cosT = Math.cos(b.tilt);
+    const bob = b.resting ? 0 : -Math.sin(b.flap) * S * 0.05;
+    const facing = b.facing;
 
-  private drawButterfly(b: Butterfly) {
-    const { ctx, cw, ch } = this;
-    const s = b.size;
-    const dirX = Math.cos(b.heading);
-    const dirY = Math.sin(b.heading);
-    const open = b.resting
-      ? 0.55 + 0.45 * Math.cos(b.flap)
-      : 0.22 + 0.78 * Math.abs(Math.cos(b.flap));
-    const closed = 1 - open;
-
-    this.box = { c0: this.cols, c1: -1, r0: this.rows, r1: -1 };
-
-    const wing = (u: number, v: number) => {
-      const w = Math.abs(v) / (s * open);
-      const x = u / s;
-      const fore = ((x - 0.26) / 0.46) ** 2 + ((w - 0.5) / 0.55) ** 2;
-      const hind = ((x + 0.34) / 0.32) ** 2 + ((w - 0.42) / 0.4) ** 2;
-      return Math.min(fore, hind);
+    // body space (forward, up, toward viewer) to screen, with the camera a little above
+    const put = (
+      fx: number,
+      uy: number,
+      tz: number,
+      glyph: string,
+      rgb: RGB,
+      a: number,
+      owner = 0,
+      spot = false,
+    ) => {
+      const lx = (fx + tz * 0.15) * facing;
+      const ly = -uy * cosE + tz * sinE;
+      const sx = b.x + lx * cosT - ly * sinT;
+      const sy = b.y + bob + lx * sinT + ly * cosT;
+      this.set(sx, sy, glyph, rgb, a, tz * cosE + uy * sinE, owner, spot);
     };
 
-    const reach = s * 1.4;
-    const c0 = Math.floor((b.x - reach) / cw);
-    const c1 = Math.ceil((b.x + reach) / cw);
-    const r0 = Math.floor((b.y - reach) / ch);
-    const r1 = Math.ceil((b.y + reach) / ch);
-
-    for (let row = r0; row <= r1; row++) {
-      for (let col = c0; col <= c1; col++) {
-        const cx = col * cw + cw / 2;
-        const cy = row * ch + ch / 2;
-        let hits = 0;
-        for (let k = 0; k < 4; k++) {
-          const dx = cx + (k & 1 ? 0.25 : -0.25) * cw - b.x;
-          const dy = cy + (k & 2 ? 0.25 : -0.25) * ch - b.y;
-          const u = dx * dirX + dy * dirY;
-          const v = -dx * dirY + dy * dirX;
-          if (wing(u, v) <= 1) hits++;
-        }
-        if (hits === 0) continue;
-
-        const dx = cx - b.x;
-        const dy = cy - b.y;
-        const u = dx * dirX + dy * dirY;
-        const v = -dx * dirY + dy * dirX;
-        const e = Math.min(1, Math.sqrt(wing(u, v)));
-        const w = Math.abs(v) / (s * open);
-        const x = u / s;
-
-        let light = 0.18 + 0.5 * smoothstep(0.7, 1, e) + 0.2 * closed;
-        const vein = Math.abs(Math.cos(Math.atan2(w, x + 0.05) * 7)) ** 12;
-        light += 0.3 * vein * smoothstep(0.15, 0.8, e);
-        const eye = Math.hypot((x - 0.3) / 0.12, (w - 0.55) / 0.12);
-        light += 0.6 * Math.exp(-((eye - 0.9) ** 2) * 6);
-        light = clamp(light, 0, 1);
-
-        const code =
-          hits < 3
-            ? EDGE.charCodeAt(Math.floor(hash(col, row) * EDGE.length))
-            : RAMP.charCodeAt(Math.floor(light * (RAMP.length - 1)));
-        this.put(col, row, code, Math.min(LEVELS - 1, Math.floor(light * LEVELS)));
-      }
-    }
-
-    // body and antennae sit on top of the wings
-    const bodySteps = 14;
-    for (let i = 0; i <= bodySteps; i++) {
-      const f = i / bodySteps;
-      const u = s * (0.5 - f * 0.95);
-      const col = Math.floor((b.x + dirX * u) / cw);
-      const row = Math.floor((b.y + dirY * u) / ch);
-      const code = f < 0.12 ? "@" : f < 0.4 ? "8" : f < 0.75 ? "#" : "%";
-      this.put(col, row, code.charCodeAt(0), LEVELS - 1);
-    }
+    const step = (Math.min(this.cw, this.ch) * 0.45) / S;
+    const id = this.nextOwner;
+    this.nextOwner += 4;
     for (const side of [-1, 1]) {
-      for (let i = 1; i <= 4; i++) {
-        const f = i / 4;
-        const u = s * (0.5 + f * 0.32);
-        const v = side * s * 0.34 * f * f;
-        const col = Math.floor((b.x + dirX * u - dirY * v) / cw);
-        const row = Math.floor((b.y + dirY * u + dirX * v) / ch);
-        this.put(col, row, (i === 4 ? "o" : "'").charCodeAt(0), LEVELS - 3);
+      const near = side === 1;
+      const wingA = alpha * (near ? 1 : 0.8);
+      for (let si = 0, s = step; s <= 1.1; s += step, si++) {
+        for (let fi = 0, f = -0.75; f <= 0.95; f += step, fi++) {
+          const ef = fore(s, f);
+          const eh = hind(s, f);
+          const e = Math.min(ef, eh);
+          if (e > 1) continue;
+          const isFore = ef <= 1;
+          const en = Math.sqrt(isFore ? ef : eh);
+          const h = hash(si * 7 + (near ? 1 : 0), fi);
+
+          const ang = Math.atan2(f - (isFore ? 0.02 : -0.02), s);
+          const vein = Math.abs(Math.sin(ang * (isFore ? 5 : 4))) < 0.09 && en > 0.2;
+          let glyph: string;
+          let rgb: RGB;
+          if (vein) {
+            glyph = "|";
+            rgb = colors.edge;
+          } else if (en < 0.14) {
+            glyph = "%";
+            rgb = colors.edge;
+          } else {
+            glyph = en > 0.55 ? "o" : "x";
+            rgb = colors.wing;
+          }
+          const tz = s * S * cosP * side;
+          const uy = s * S * sinP;
+          const owner = id + (near ? 2 : 0) + (isFore ? 1 : 0);
+          const spot = isFore && en > 0.85 && f > 0.25 && h < 0.3;
+          put(f * S, uy, tz + (isFore ? 0.01 : 0), glyph, rgb, wingA, owner, spot);
+        }
       }
     }
 
-    const { c0: bc0, c1: bc1, r0: br0, r1: br1 } = this.box;
-    const glow = STYLES[this.variant].glow[b.color];
-    const glyphStyle = STYLES[this.variant].glyph[b.color];
-    for (let row = br0; row <= br1; row++) {
-      for (let col = bc0; col <= bc1; col++) {
-        const i = row * this.cols + col;
-        const code = this.glyph[i];
-        if (code === 0) continue;
-        const lv = this.level[i];
-        this.glyph[i] = 0;
-        const x = col * cw;
-        const y = row * ch;
-        ctx.globalAlpha = 0.8;
-        ctx.fillStyle = "#000";
-        ctx.fillRect(x, y, cw, ch);
-        ctx.globalAlpha = 0.6 + 0.4 * b.depth;
-        ctx.fillStyle = glow[lv];
-        ctx.fillRect(x, y, cw, ch);
-        ctx.fillStyle = glyphStyle[lv];
-        ctx.fillText(String.fromCharCode(code), x + cw / 2, y + ch / 2 + 1);
+    const bodyStep = (Math.min(this.cw, this.ch) * 0.5) / S;
+    for (let f = -0.62; f <= 0.3; f += bodyStep) {
+      const thick = f < -0.05 ? 0.06 * (1 - ((f + 0.05) / -0.6) ** 2) + 0.02 : 0.075;
+      for (let u = -thick; u <= thick; u += bodyStep) {
+        put(f * S, u * S, 0.001, Math.abs(u) > thick * 0.6 ? "0" : "@", colors.body, alpha);
       }
     }
+    put(0.36 * S, 0.02 * S, 0.002, "O", colors.body, alpha);
+    let px = 0.38;
+    let py = 0.05;
+    for (let i = 1; i <= 7; i++) {
+      const k = i / 7;
+      const nx = 0.38 + 0.4 * k;
+      const ny = 0.05 + 0.42 * k ** 0.8;
+      const glyph = i === 7 ? "o" : stroke((nx - px) * facing, -(ny - py) * cosE);
+      put(nx * S, ny * S, 0.002, glyph, colors.body, alpha * 0.85);
+      px = nx;
+      py = ny;
+    }
+    this.outline(colors, alpha);
   }
 }
 
 function AsciiButterflies({
-  count = 4,
+  count = 3,
   variant = "color",
   className,
   ...props
@@ -425,7 +526,7 @@ function AsciiButterflies({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const meadow = new Meadow(count, variant === "mono" ? 1 : PALETTES.length);
+    const meadow = new Meadow(count, WINGS.dark[variant].length);
     const painter = new Painter(canvas, variant);
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let raf = 0;
@@ -497,6 +598,17 @@ function AsciiButterflies({
       }
     };
 
+    const syncScheme = () => {
+      painter.scheme = isDark(canvas) ? "dark" : "light";
+      if (motion.matches) painter.render(meadow);
+    };
+    const themeObserver = new MutationObserver(syncScheme);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style", "data-theme"],
+    });
+    syncScheme();
+
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(canvas);
     const intersection = new IntersectionObserver(([entry]) => {
@@ -519,6 +631,7 @@ function AsciiButterflies({
       disposed = true;
       cancelAnimationFrame(raf);
       resizeObserver.disconnect();
+      themeObserver.disconnect();
       intersection.disconnect();
       motion.removeEventListener("change", onMotion);
       canvas.removeEventListener("pointermove", onMove);
@@ -530,7 +643,7 @@ function AsciiButterflies({
   return (
     <div
       data-slot="ascii-butterflies"
-      className={cn("relative overflow-hidden bg-black font-mono", className)}
+      className={cn("relative overflow-hidden font-mono", className)}
       {...props}
     >
       <canvas ref={canvasRef} aria-hidden="true" className="block h-full w-full" />

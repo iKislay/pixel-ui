@@ -397,10 +397,10 @@ export function Demo() {
     isNew: true,
     registry: "ascii-jellyfish",
     description:
-      "Jellyfish drawn as ASCII glyphs on a canvas, pulsing through the dark with trailing tentacles.",
+      "Translucent jellyfish drawn as ASCII glyphs, pulsing through the water with trailing tentacles.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/ascii-jellyfish.tsx`,
     interaction:
-      "Jellyfish squeeze their bells, glide, and drift while their tentacles trail behind. Each pulse sends a ring outward and pushes the plankton. Move the pointer near one and it swims away. Click to startle the ones close by. Honors prefers-reduced-motion.",
+      "Jellyfish squeeze their see-through bells, glide, and drift while their tentacles sway behind. Light ripples through each bell and every pulse pushes the plankton aside. Move the pointer near one and it swims away. Click to send a ripple and startle the ones close by. Honors prefers-reduced-motion.",
     props: [
       {
         name: "variant",
@@ -408,7 +408,7 @@ export function Demo() {
         default: '"color"',
         options: ["color", "mono"],
         description:
-          "Color gives each one its own glow. Mono draws everything in white and grey.",
+          "Color tints them in pale and deep blues. Mono uses greys only. Both follow your light or dark theme.",
       },
       {
         name: "count",
@@ -432,10 +432,10 @@ export function Demo() {
     isNew: true,
     registry: "ascii-butterflies",
     description:
-      "A few butterflies drawn as ASCII glyphs, fluttering at random and landing now and then.",
+      "A few butterflies drawn as ASCII glyphs, flapping on wandering paths and landing now and then.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/ascii-butterflies.tsx`,
     interaction:
-      "Butterflies flutter on wandering paths, leave a faint trail, and sometimes land to open and close their wings slowly. Move the pointer near one and it flits away. Click to scatter the ones close by. Honors prefers-reduced-motion.",
+      "Butterflies fly sideways on wandering paths, beating their wings up and down and turning to face where they go. Now and then one lands and slowly opens and closes its wings. Move the pointer near one and it flits away. Click to scatter the ones close by. Honors prefers-reduced-motion.",
     props: [
       {
         name: "variant",
@@ -443,12 +443,12 @@ export function Demo() {
         default: '"color"',
         options: ["color", "mono"],
         description:
-          "Color gives each one its own palette. Mono draws everything in white and grey.",
+          "Color mixes blue, teal, pink, yellow and orange wings. Mono uses greys only. Both follow your light or dark theme.",
       },
       {
         name: "count",
         type: 'number',
-        default: '4',
+        default: '3',
         description:
           "How many to release. Keep it small so the sky stays calm.",
       },
