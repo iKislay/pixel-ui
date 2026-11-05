@@ -29,28 +29,30 @@ export default async function Home() {
           <GooeyNavbar stars={stars} />
           <SpiderWebs />
           <AsciiJellyfish variant="color" count={3} className="absolute inset-0" />
-          <AmbientVeil />
 
           <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-3 px-4 pb-20 pt-28 text-center sm:gap-4 sm:px-6">
-            <HeroIntro
-              headline={
-                <>
-                  <span className="block">Pixel-Perfect Components,</span>
-                  <span className="block">For Modern Products.</span>
-                </>
-              }
-              sub={
-                <>
-                  Pixel UI is a free, open-source collection of pixel-perfect animated React components. Preview every one live below, then install it with the shadcn CLI or let your AI agent add it over {" "}
-                  <Link href="/mcp" className="text-inherit">
-                    MCP
-                  </Link>
-                  .
-                </>
-              }
-            >
-              <HeroCta />
-            </HeroIntro>
+            <div className="relative isolate flex w-full flex-col items-center justify-center gap-3 sm:gap-4">
+              <AmbientVeil />
+              <HeroIntro
+                headline={
+                  <>
+                    <span className="block">Pixel-Perfect Components,</span>
+                    <span className="block">For Modern Products.</span>
+                  </>
+                }
+                sub={
+                  <>
+                    Pixel UI is a free, open-source collection of pixel-perfect animated React components. Preview every one live below, then install it with the shadcn CLI or let your AI agent add it over {" "}
+                    <Link href="/mcp" className="text-inherit">
+                      MCP
+                    </Link>
+                    .
+                  </>
+                }
+              >
+                <HeroCta />
+              </HeroIntro>
+            </div>
           </div>
         </div>
       </section>

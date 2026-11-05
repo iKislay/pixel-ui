@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { AsciiButterflies } from "@/components/ui/ascii-butterflies";
-import AmbientVeil from "@/components/preview/AmbientVeil";
 import DemoSearch from "@/components/preview/DemoSearch";
 
 const VARIANTS = ["color", "mono"] as const;
@@ -21,7 +20,6 @@ export default function Page() {
   return (
     <div className="relative h-full w-full overflow-hidden font-runde">
       <AsciiButterflies variant={variant} count={count} className="absolute inset-0" />
-      <AmbientVeil className="bg-card/75 dark:bg-card/75" />
       <div className="relative flex h-full items-center justify-center pb-16">
         <DemoSearch />
       </div>

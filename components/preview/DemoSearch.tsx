@@ -1,12 +1,14 @@
 "use client";
 
 import { ArrowUp, Globe, Mic, Plus } from "lucide-react";
+import AmbientVeil from "./AmbientVeil";
 
 const CHIPS = ["/explore ideas", "/refine my writing", "/plan a project"];
 
 export default function DemoSearch() {
   return (
-    <div className="relative flex w-full max-w-xl flex-col items-center gap-4 px-6">
+    <div className="relative isolate flex w-full max-w-xl flex-col items-center gap-4 px-6">
+      <AmbientVeil className="[--veil:var(--card)] dark:[--veil:var(--card)]" />
       <p className="text-center text-2xl font-semibold tracking-tight text-black sm:text-3xl dark:text-white">
         What should we build today?
       </p>
