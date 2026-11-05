@@ -336,6 +336,76 @@ export function Demo() {
   )
 }`,
   },
+  {
+    name: "Ascii Jellyfish",
+    href: "/components/ascii-jellyfish",
+    category: "display",
+    isNew: true,
+    registry: "ascii-jellyfish",
+    description:
+      "Jellyfish drawn as ASCII glyphs on a canvas, pulsing through the dark with trailing tentacles.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/ascii-jellyfish.tsx`,
+    interaction:
+      "Jellyfish squeeze their bells, glide, and drift while their tentacles trail behind. Each pulse sends a ring outward and pushes the plankton. Move the pointer near one and it swims away. Click to startle the ones close by. Honors prefers-reduced-motion.",
+    props: [
+      {
+        name: "variant",
+        type: '"color" | "mono"',
+        default: '"color"',
+        options: ["color", "mono"],
+        description:
+          "Color gives each one its own glow. Mono draws everything in white and grey.",
+      },
+      {
+        name: "count",
+        type: 'number',
+        default: '4',
+        description:
+          "How many to put in the water.",
+      },
+    ],
+    usage: `import { AsciiJellyfish } from "@/components/ui/ascii-jellyfish"
+
+export function Demo() {
+  return <AsciiJellyfish variant="color" className="h-96 w-full rounded-2xl" />
+}`,
+    credits: ["Inspired by stackedlol/ascii-sharks"],
+  },
+  {
+    name: "Ascii Butterflies",
+    href: "/components/ascii-butterflies",
+    category: "display",
+    isNew: true,
+    registry: "ascii-butterflies",
+    description:
+      "A few butterflies drawn as ASCII glyphs, fluttering at random and landing now and then.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/ascii-butterflies.tsx`,
+    interaction:
+      "Butterflies flutter on wandering paths, leave a faint trail, and sometimes land to open and close their wings slowly. Move the pointer near one and it flits away. Click to scatter the ones close by. Honors prefers-reduced-motion.",
+    props: [
+      {
+        name: "variant",
+        type: '"color" | "mono"',
+        default: '"color"',
+        options: ["color", "mono"],
+        description:
+          "Color gives each one its own palette. Mono draws everything in white and grey.",
+      },
+      {
+        name: "count",
+        type: 'number',
+        default: '4',
+        description:
+          "How many to release. Keep it small so the sky stays calm.",
+      },
+    ],
+    usage: `import { AsciiButterflies } from "@/components/ui/ascii-butterflies"
+
+export function Demo() {
+  return <AsciiButterflies variant="color" className="h-96 w-full rounded-2xl" />
+}`,
+    credits: ["Inspired by stackedlol/ascii-sharks"],
+  },
 ];
 
 export type PackageManager = "npm" | "pnpm" | "yarn" | "bun";

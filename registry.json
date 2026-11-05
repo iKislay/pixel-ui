@@ -74,6 +74,36 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "ascii-jellyfish",
+      "type": "registry:ui",
+      "title": "Ascii Jellyfish",
+      "description": "Jellyfish drawn as ASCII glyphs on a canvas, pulsing through the dark with trailing tentacles.",
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/ascii-jellyfish.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "ascii-butterflies",
+      "type": "registry:ui",
+      "title": "Ascii Butterflies",
+      "description": "A few butterflies drawn as ASCII glyphs, fluttering at random and landing now and then.",
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/ascii-butterflies.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
