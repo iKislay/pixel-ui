@@ -2,13 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { cn } from "@/lib/utils";
 import SidebarNav from "./SidebarNav";
 import SidebarHeader from "./SidebarHeader";
 import SidebarScroll from "./SidebarScroll";
 import { ClosedIcon, OpenIcon } from "./icons";
 import { NavbarActions } from "../NavbarActions";
 
-export default function MobileSidebar() {
+export default function MobileSidebar({
+  triggerClassName,
+}: {
+  triggerClassName?: string;
+} = {}) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -27,7 +32,10 @@ export default function MobileSidebar() {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Open sidebar"
-          className="absolute left-4 top-4 z-60 cursor-pointer rounded-lg bg-[#F4F4F9] p-2 text-[#868593] dark:bg-popover dark:text-[#A1A0AB]"
+          className={cn(
+            "flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-2xl border border-black/[0.06] bg-muted text-[#868593] shadow-sm transition-[border-color,background-color,color] hover:border-black/10 hover:text-foreground active:scale-[0.98] dark:border-apple dark:bg-muted dark:text-[#A1A0AB] dark:hover:border-apple/80",
+            triggerClassName,
+          )}
         >
           <ClosedIcon className="size-5" />
         </button>

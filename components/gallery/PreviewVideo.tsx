@@ -55,7 +55,7 @@ export default function PreviewVideo({
       playsInline
       preload="metadata"
       aria-hidden="true"
-      className="h-full w-full object-cover"
+      className="h-full w-full object-cover rounded-[inherit]"
       style={scale ? { scale } : undefined}
     />
   );

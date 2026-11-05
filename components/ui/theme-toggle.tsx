@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { flushSync } from "react-dom";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -45,7 +46,9 @@ export function ThemeToggle({
     );
 
     const transition = doc.startViewTransition(() => {
-      setTheme(nextTheme);
+      flushSync(() => {
+        setTheme(nextTheme);
+      });
     });
 
     transition.ready

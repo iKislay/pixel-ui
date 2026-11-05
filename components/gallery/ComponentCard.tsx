@@ -33,10 +33,10 @@ export default function ComponentCard({
       onFocus={() => setActive(true)}
       onBlur={() => setActive(false)}
       className={cn(
-        "group relative flex h-full flex-col overflow-hidden rounded-[32px] transition-colors duration-200 ease-out",
+        "group relative flex h-full flex-col overflow-hidden transition-colors duration-200 ease-out [transform:translateZ(0)]",
         overlay
-          ? "bg-[#F5F5F7] dark:bg-[#121212]"
-          : "border border-black/[0.04] bg-[#F5F5F7] p-2 dark:border-transparent dark:border-apple dark:bg-[#121212] dark:hover:bg-muted",
+          ? "rounded-[44px] bg-[#F5F5F7] sm:rounded-[56px] lg:rounded-[64px] dark:bg-[#121212]"
+          : "rounded-[32px] border border-black/[0.04] bg-[#F5F5F7] p-2 dark:border-transparent dark:border-apple dark:bg-[#121212] dark:hover:bg-muted",
         large && "lg:h-full",
         className,
       )}
@@ -44,12 +44,14 @@ export default function ComponentCard({
     >
       <div
         className={cn(
-          "relative aspect-4/3 w-full overflow-hidden bg-white dark:bg-neutral-950",
-          !overlay && "rounded-3xl border border-black/[0.06] dark:border-neutral-500/15",
+          "relative aspect-4/3 w-full overflow-hidden bg-white isolate [transform:translateZ(0)] dark:bg-neutral-950",
+          overlay
+            ? "rounded-[44px] sm:rounded-[56px] lg:rounded-[64px]"
+            : "rounded-3xl border border-black/[0.06] dark:border-neutral-500/15",
           large && "lg:aspect-auto lg:flex-1",
           aspectClassName,
         )}
-        style={!overlay ? ({ cornerShape: "squircle" } as React.CSSProperties) : undefined}
+        style={{ cornerShape: "squircle" } as React.CSSProperties}
       >
         {item.preview ? (
           <PreviewVideo
@@ -64,7 +66,7 @@ export default function ComponentCard({
 
         {overlay && (
           <>
-            <div className="pointer-events-none absolute right-3 top-3 opacity-0 transition-all duration-200 ease-out group-hover:opacity-100 [@media(hover:none)]:opacity-100 sm:right-4 sm:top-4 motion-reduce:transition-none">
+            <div className="pointer-events-none absolute right-5 top-5 opacity-0 transition-all duration-200 ease-out group-hover:opacity-100 [@media(hover:none)]:opacity-100 sm:right-6 sm:top-6 motion-reduce:transition-none">
               <div className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-black/60 text-white shadow-md backdrop-blur-md dark:bg-[#1c1c1e]/85 sm:size-10">
                 <svg
                   viewBox="0 0 24 24"
@@ -81,7 +83,7 @@ export default function ComponentCard({
               </div>
             </div>
 
-            <div className="pointer-events-none absolute bottom-3 left-3 opacity-0 transition-all duration-200 ease-out group-hover:opacity-100 [@media(hover:none)]:opacity-100 sm:bottom-4 sm:left-4 motion-reduce:transition-none">
+            <div className="pointer-events-none absolute bottom-5 left-5 opacity-0 transition-all duration-200 ease-out group-hover:opacity-100 [@media(hover:none)]:opacity-100 sm:bottom-6 sm:left-6 motion-reduce:transition-none">
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3.5 py-1.5 font-runde text-xs font-medium text-white shadow-md backdrop-blur-md dark:bg-[#1c1c1e]/85 sm:px-4 sm:py-2 sm:text-sm">
                 <span>{item.name}</span>
                 {item.isNew && (

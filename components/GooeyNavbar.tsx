@@ -4,7 +4,7 @@ import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import HalloweenLogo from "@/components/HalloweenLogo";
+import { PixelUILogo } from "@/components/logos";
 import { NavbarActions } from "@/components/NavbarActions";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,6 @@ const inPill = "md:bg-transparent md:shadow-none";
 export default function GooeyNavbar({ stars }: { stars?: number | null }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const [logoHovered, setLogoHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const reduceMotion = useReducedMotion();
 
@@ -67,13 +66,9 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
         >
           <Link
             href="/"
-            onMouseEnter={() => setLogoHovered(true)}
-            onMouseLeave={() => setLogoHovered(false)}
-            onFocus={() => setLogoHovered(true)}
-            onBlur={() => setLogoHovered(false)}
             className={cn(pill, inPill, "flex h-12 items-center gap-2 px-4")}
           >
-            <HalloweenLogo hovered={logoHovered} />
+            <PixelUILogo className="size-5 text-white dark:text-white shrink-0 transition-transform duration-200 group-hover:scale-105 motion-reduce:transform-none" />
             <span className="font-runde text-md font-semibold text-white">
               Pixel UI
             </span>

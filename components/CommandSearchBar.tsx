@@ -11,7 +11,13 @@ import {
   SearchIcon,
 } from "./CommandMenuTrigger";
 
-export function CommandSearchBar({ className }: { className?: string }) {
+export function CommandSearchBar({
+  className,
+  buttonClassName,
+}: {
+  className?: string;
+  buttonClassName?: string;
+}) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -58,7 +64,8 @@ export function CommandSearchBar({ className }: { className?: string }) {
         onFocus={preloadCommandMenu}
         onClick={handleClick}
         className={cn(
-          "pointer-events-auto group flex h-11 w-full max-w-[calc(100%-6.5rem)] cursor-pointer items-center justify-between gap-3 rounded-2xl border border-black/[0.06] bg-muted px-3.5 shadow-sm transition-[border-color,background-color,opacity,transform] duration-200 hover:border-black/10 active:scale-[0.98] sm:max-w-sm dark:border-transparent dark:border-apple dark:hover:border-apple/80",
+          "pointer-events-auto group flex h-11 w-full max-w-full cursor-pointer items-center justify-between gap-3 rounded-2xl border border-black/[0.06] bg-muted px-3.5 shadow-sm transition-[border-color,background-color,opacity,transform] duration-200 hover:border-black/10 active:scale-[0.98] sm:max-w-sm dark:border-transparent dark:border-apple dark:hover:border-apple/80",
+          buttonClassName,
           isOpen && "pointer-events-none scale-95 opacity-0",
         )}
       >
