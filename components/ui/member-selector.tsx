@@ -3,12 +3,14 @@
 import {
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
   useSyncExternalStore,
   type ComponentProps,
+  type CSSProperties,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -34,8 +36,12 @@ type Spring = { easing: string; duration: number };
 
 const EXIT_MS = 180;
 const EXIT_EASE = "cubic-bezier(0.4, 0, 1, 1)";
-const POPOVER_MS = 240;
-const POPOVER_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
+const GAP = 8;
+const PADDING = 8;
+const FIELD_RADIUS = 16;
+const CARD_RADIUS = FIELD_RADIUS + PADDING;
+const FADE = 20;
+const THUMB_INSET = 6;
 const STAGGER = 20;
 
 const springs = new Map<string, Spring>();
@@ -414,31 +420,39 @@ function AvatarButton({
   );
 }
 
+const SQUIRCLE = { cornerShape: "squircle" } as CSSProperties;
+
 function MemberRow({
+  id,
   member,
   selected,
+  active,
   leaving,
   onToggle,
+  onHover,
 }: {
+  id?: string;
   member: Member;
   selected: boolean;
+  active?: boolean;
   leaving?: boolean;
-  onToggle: () => void;
+  onToggle?: () => void;
+  onHover?: () => void;
 }) {
   return (
-    <button
-      type="button"
+    <div
+      id={id}
+      role={leaving ? undefined : "option"}
+      aria-selected={leaving ? undefined : selected}
       data-key={member.id}
       data-exiting={leaving || undefined}
       data-slot="member-selector-option"
-      aria-pressed={selected}
-      tabIndex={leaving ? -1 : undefined}
       onClick={onToggle}
+      onMouseMove={onHover}
+      style={SQUIRCLE}
       className={cn(
-        "flex w-full cursor-pointer items-center gap-3 px-3 py-2.5 text-left outline-none transition-colors duration-200 focus-visible:bg-neutral-100 motion-reduce:transition-none dark:focus-visible:bg-neutral-800",
-        selected
-          ? "bg-neutral-900/5 hover:bg-neutral-900/10 dark:bg-white/5 dark:hover:bg-white/10"
-          : "hover:bg-neutral-100/70 dark:hover:bg-neutral-800/60",
+        "flex h-13 w-full cursor-pointer items-center gap-3 rounded-[14px] px-2.5 text-left transition-colors duration-150 motion-reduce:transition-none",
+        active && "bg-[#F4F4F9] dark:bg-[#2C2C2E]",
         leaving && "pointer-events-none absolute",
       )}
     >
@@ -454,16 +468,16 @@ function MemberRow({
       <span className="min-w-0 flex-1">
         <span
           className={cn(
-            "block truncate text-sm font-medium transition-colors duration-200 motion-reduce:transition-none",
-            selected
-              ? "text-neutral-900 dark:text-white"
-              : "text-neutral-900/80 dark:text-white/80",
+            "block truncate text-[14px] font-semibold leading-5 transition-colors duration-200 motion-reduce:transition-none",
+            selected || active
+              ? "text-black dark:text-white"
+              : "text-black/75 dark:text-white/75",
           )}
         >
           {member.name}
         </span>
         {member.email && (
-          <span className="block truncate text-xs text-neutral-500 dark:text-neutral-400">
+          <span className="block truncate text-[12px] font-medium leading-4 text-[#868593]">
             {member.email}
           </span>
         )}
@@ -472,10 +486,10 @@ function MemberRow({
       <span
         aria-hidden
         className={cn(
-          "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-200 motion-reduce:transition-none",
+          "flex size-5 shrink-0 items-center justify-center rounded-full transition-[background-color,box-shadow] duration-200 motion-reduce:transition-none",
           selected
-            ? "border-neutral-900 bg-neutral-900 dark:border-white dark:bg-white"
-            : "border-neutral-500/30 dark:border-neutral-400/30",
+            ? "bg-black dark:bg-white"
+            : "shadow-[inset_0_0_0_1.5px_#D9D9E0] dark:shadow-[inset_0_0_0_1.5px_#3A3A3C]",
         )}
       >
         <Icon
@@ -488,66 +502,119 @@ function MemberRow({
           <path d="M20 6 9 17l-5-5" />
         </Icon>
       </span>
-    </button>
+    </div>
   );
+}
+
+const shape = (top: number, right: number, bottom: number, left: number) =>
+  `inset(${top}px ${right}px ${bottom}px ${left}px round ${CARD_RADIUS}px)`;
+
+const HIDDEN_BODY = { opacity: "0", filter: "blur(6px)", transform: "translateY(-8px)" };
+const SHOWN_BODY = { opacity: "1", filter: "blur(0px)", transform: "none" };
+
+function bodyStyle(el: HTMLElement) {
+  const style = getComputedStyle(el);
+  return { opacity: style.opacity, filter: style.filter, transform: style.transform };
 }
 
 function Dropdown({
   open,
+  anchorRef,
   members,
   selected,
   query,
   reduced,
   onQuery,
   onToggle,
+  onClose,
   onClosed,
 }: {
   open: boolean;
+  anchorRef: RefObject<HTMLButtonElement | null>;
   members: Member[];
   selected: string[];
   query: string;
   reduced: boolean;
   onQuery: (query: string) => void;
   onToggle: (id: string) => void;
+  onClose: () => void;
   onClosed: () => void;
 }) {
+  const uid = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  const clipRef = useRef<HTMLDivElement>(null);
+  const spacerRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const thumbRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const animation = useRef<Animation | null>(null);
+  const animations = useRef<Animation[]>([]);
+  const idle = useRef<ReturnType<typeof setTimeout>>(undefined);
   const closed = useRef(onClosed);
+  const [activeId, setActiveId] = useState<string>();
 
   useLayoutEffect(() => {
     closed.current = onClosed;
   });
 
-  // one animation reversed on close, so toggling mid-flight eases back from where it is
+  // the card grows out of the add circle; every run starts from what is painted, so toggling mid-flight never jumps
   useLayoutEffect(() => {
     const panel = panelRef.current;
-    if (!panel) return;
-    let anim = animation.current;
-    if (!anim) {
-      anim = panel.animate(
-        reduced
-          ? [{ opacity: 0 }, { opacity: 1 }]
-          : [
-              { opacity: 0, transform: "translateY(-10px) scale(0.95)" },
-              { opacity: 1, transform: "none" },
-            ],
-        {
-          duration: reduced ? 120 : POPOVER_MS,
-          easing: POPOVER_EASE,
-          fill: "both",
-        },
-      );
-      animation.current = anim;
-    } else if (anim.playbackRate > 0 !== open) {
-      anim.reverse();
+    const clip = clipRef.current;
+    const spacer = spacerRef.current;
+    const body = bodyRef.current;
+    const anchor = anchorRef.current;
+    const circle = anchor?.firstElementChild;
+    if (!panel || !clip || !spacer || !body || !anchor || !circle) return;
+
+    const first = animations.current.length === 0;
+    const top = anchor.offsetHeight + GAP;
+    spacer.style.height = `${top}px`;
+
+    const p = clip.getBoundingClientRect();
+    const c = circle.getBoundingClientRect();
+    const folded = shape(c.top - p.top, p.right - c.right, p.bottom - c.bottom, c.left - p.left);
+    const unfolded = shape(top, 0, 0, 0);
+
+    const fromShape = first ? folded : getComputedStyle(clip).clipPath;
+    const fromBody = first ? HIDDEN_BODY : bodyStyle(body);
+    const fromOpacity = first ? "0" : getComputedStyle(panel).opacity;
+    animations.current.forEach((animation) => animation.cancel());
+
+    let main: Animation;
+    if (reduced) {
+      clip.style.clipPath = unfolded;
+      Object.assign(body.style, SHOWN_BODY);
+      panel.style.opacity = open ? "1" : "0";
+      main = panel.animate([{ opacity: fromOpacity }, { opacity: open ? 1 : 0 }], {
+        duration: 140,
+        easing: "ease-out",
+      });
+      animations.current = [main];
+    } else {
+      const motion = open ? spring(300, 32) : spring(440, 42);
+      const toBody = open ? SHOWN_BODY : HIDDEN_BODY;
+      clip.style.clipPath = open ? unfolded : folded;
+      Object.assign(body.style, toBody);
+      panel.style.opacity = "1";
+      main = clip.animate([{ clipPath: fromShape }, { clipPath: open ? unfolded : folded }], motion);
+      // content waits for the card to open up, and clears out before it folds back in
+      const bodyFrames: Keyframe[] = open
+        ? first
+          ? [fromBody, { ...fromBody, offset: 0.35 }, toBody]
+          : [fromBody, toBody]
+        : [fromBody, { ...toBody, offset: 0.4 }, toBody];
+      animations.current = [
+        main,
+        body.animate(bodyFrames, motion),
+        panel.animate([{ opacity: fromOpacity }, { opacity: 1, offset: 0.15 }, { opacity: 1 }], motion),
+      ];
     }
-    anim.onfinish = () => {
+    main.onfinish = () => {
       if (!open) closed.current();
     };
-  }, [open, reduced]);
+  }, [open, reduced, anchorRef]);
 
   useEffect(() => {
     inputRef.current?.focus({ preventScroll: true });
@@ -561,12 +628,12 @@ function Dropdown({
           m.name.toLowerCase().includes(q) ||
           m.email?.toLowerCase().includes(q),
       )
-      .sort(
-        (a, b) => +selected.includes(b.id) - +selected.includes(a.id),
-      );
+      .sort((a, b) => +selected.includes(b.id) - +selected.includes(a.id));
   }, [members, selected, query]);
 
   const [leaving, remove] = usePresence(filtered, keyOfMember);
+  const active = filtered.find((m) => m.id === activeId) ?? filtered[0];
+  const optionId = (id: string) => `${uid}-option-${id}`;
 
   useFlip(listRef, {
     reduced,
@@ -577,6 +644,54 @@ function Dropdown({
     onExited: remove,
   });
 
+  const paintScroll = useCallback(() => {
+    const scroller = scrollRef.current;
+    const thumb = thumbRef.current;
+    if (!scroller || !thumb) return;
+    const { scrollTop, scrollHeight, clientHeight } = scroller;
+    const room = scrollHeight - clientHeight;
+    const above = scrollTop > 1;
+    const below = scrollTop < room - 1;
+    scroller.style.maskImage = `linear-gradient(to bottom, ${above ? "transparent" : "#000"} 0, #000 ${FADE}px, #000 calc(100% - ${FADE}px), ${below ? "transparent" : "#000"} 100%)`;
+    if (room <= 1) {
+      delete thumb.dataset.scrollable;
+      return;
+    }
+    thumb.dataset.scrollable = "";
+    const track = clientHeight - THUMB_INSET * 2;
+    const size = Math.max((clientHeight / scrollHeight) * track, 28);
+    thumb.style.height = `${size}px`;
+    thumb.style.transform = `translateY(${(scrollTop / room) * (track - size)}px)`;
+  }, []);
+
+  useLayoutEffect(paintScroll);
+
+  const onScroll = () => {
+    paintScroll();
+    const thumb = thumbRef.current;
+    if (!thumb?.dataset.scrollable) return;
+    thumb.style.opacity = "1";
+    clearTimeout(idle.current);
+    idle.current = setTimeout(() => {
+      thumb.style.opacity = "";
+    }, 700);
+  };
+
+  useEffect(() => () => clearTimeout(idle.current), []);
+
+  const moveActive = (step: number) => {
+    if (!filtered.length) return;
+    const index = active ? filtered.indexOf(active) : -1;
+    const next = filtered[(index + step + filtered.length) % filtered.length];
+    setActiveId(next.id);
+    requestAnimationFrame(() =>
+      document.getElementById(optionId(next.id))?.scrollIntoView({
+        block: "nearest",
+        behavior: reduced ? "auto" : "smooth",
+      }),
+    );
+  };
+
   return (
     <div
       ref={panelRef}
@@ -584,54 +699,122 @@ function Dropdown({
       aria-label="Add members"
       data-slot="member-selector-dropdown"
       className={cn(
-        "absolute top-full right-0 z-50 mt-2 w-72 origin-top-right overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900",
+        "absolute top-0 right-0 z-40 w-80 max-w-[calc(100vw-2rem)] [filter:drop-shadow(0_0_0.5px_rgba(0,0,0,0.22))_drop-shadow(0_12px_32px_rgba(0,0,0,0.12))] dark:[filter:drop-shadow(0_0_0.5px_rgba(255,255,255,0.3))_drop-shadow(0_16px_40px_rgba(0,0,0,0.5))]",
         !open && "pointer-events-none",
       )}
     >
-      <div className="border-b border-neutral-200 p-3 dark:border-neutral-800">
-        <div className="relative">
-          <Icon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral-500 dark:text-neutral-400">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.3-4.3" />
-          </Icon>
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => onQuery(e.target.value)}
-            placeholder="Search members..."
-            aria-label="Search members"
-            className="w-full rounded-lg border border-transparent bg-neutral-100/70 py-2 pr-3 pl-9 text-sm text-neutral-900 outline-none transition-colors placeholder:text-neutral-500 focus:border-neutral-900/30 focus:bg-white motion-reduce:transition-none dark:bg-neutral-800/70 dark:text-white dark:placeholder:text-neutral-400 dark:focus:border-white/30 dark:focus:bg-neutral-900"
-          />
-        </div>
-      </div>
+      <div ref={clipRef} className="relative">
+        <div aria-hidden className="absolute inset-0 bg-white dark:bg-[#1C1C1E]" />
+        <div ref={spacerRef} aria-hidden />
 
-      <div className="max-h-64 overflow-y-auto [scrollbar-width:thin]">
-        <div ref={listRef} className="relative">
-          {filtered.map((member) => (
-            <MemberRow
-              key={member.id}
-              member={member}
-              selected={selected.includes(member.id)}
-              onToggle={() => onToggle(member.id)}
+        <div ref={bodyRef} className="relative" style={{ padding: PADDING }}>
+          <label
+            style={{ borderRadius: FIELD_RADIUS }}
+            className="flex h-12 cursor-text items-center gap-3 bg-[#F7F7FA] pr-2.5 pl-4 dark:bg-[#121212]"
+          >
+            <Icon strokeWidth={2.5} className="size-4 shrink-0 text-[#868593]">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </Icon>
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => {
+                onQuery(e.target.value);
+                setActiveId(undefined);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                  e.preventDefault();
+                  moveActive(e.key === "ArrowDown" ? 1 : -1);
+                } else if (e.key === "Enter" && active) {
+                  e.preventDefault();
+                  setActiveId(active.id);
+                  onToggle(active.id);
+                }
+              }}
+              placeholder="Search members"
+              role="combobox"
+              aria-expanded="true"
+              aria-controls={`${uid}-list`}
+              aria-activedescendant={active ? optionId(active.id) : undefined}
+              className="h-full w-full min-w-0 bg-transparent text-[15px] font-medium text-black caret-[#FC4C01] outline-none placeholder:text-[#A1A0AB] dark:text-white dark:placeholder:text-[#6E6D78]"
             />
-          ))}
-          {leaving.map((member) => (
-            <MemberRow
-              key={member.id}
-              member={member}
-              selected={selected.includes(member.id)}
-              leaving
-              onToggle={() => {}}
-            />
-          ))}
-        </div>
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={onClose}
+              className="group/esc grid h-7 w-10 shrink-0 cursor-pointer place-items-center rounded-[8px] bg-white text-[12px] font-semibold text-[#868593] outline-none transition-colors duration-150 hover:text-black focus-visible:ring-2 focus-visible:ring-[#FC4C01]/60 motion-reduce:transition-none dark:bg-[#2C2C2E] dark:hover:text-white"
+            >
+              <span className="col-start-1 row-start-1 transition-[opacity,filter,scale] duration-200 ease-out group-hover/esc:scale-75 group-hover/esc:opacity-0 group-hover/esc:blur-[2px] group-focus-visible/esc:scale-75 group-focus-visible/esc:opacity-0 group-focus-visible/esc:blur-[2px] motion-reduce:transition-none [@media(hover:none)]:hidden">
+                esc
+              </span>
+              <Icon
+                strokeWidth={2.5}
+                className="col-start-1 row-start-1 size-3.5 scale-75 opacity-0 blur-[2px] transition-[opacity,filter,scale] duration-200 ease-out group-hover/esc:scale-100 group-hover/esc:opacity-100 group-hover/esc:blur-none group-focus-visible/esc:scale-100 group-focus-visible/esc:opacity-100 group-focus-visible/esc:blur-none motion-reduce:transition-none [@media(hover:none)]:scale-100 [@media(hover:none)]:opacity-100 [@media(hover:none)]:blur-none"
+              >
+                <path d="M7 7l10 10M17 7L7 17" />
+              </Icon>
+            </button>
+          </label>
 
-        {filtered.length === 0 && (
-          <div className="px-3 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
-            No members found
+          <div className="group/list relative mt-2">
+            <div
+              ref={scrollRef}
+              id={`${uid}-list`}
+              role="listbox"
+              aria-multiselectable="true"
+              aria-label="Members"
+              onScroll={onScroll}
+              style={{ scrollPaddingBlock: FADE }}
+              className="h-66 overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              <div ref={listRef} className="relative">
+                {filtered.map((member) => (
+                  <MemberRow
+                    key={member.id}
+                    id={optionId(member.id)}
+                    member={member}
+                    selected={selected.includes(member.id)}
+                    active={member.id === active?.id}
+                    onToggle={() => {
+                      setActiveId(member.id);
+                      onToggle(member.id);
+                    }}
+                    onHover={() => setActiveId(member.id)}
+                  />
+                ))}
+                {leaving.map((member) => (
+                  <MemberRow
+                    key={member.id}
+                    member={member}
+                    selected={selected.includes(member.id)}
+                    leaving
+                  />
+                ))}
+              </div>
+
+              {filtered.length === 0 && (
+                <div className="flex h-full flex-col items-center justify-center gap-1 px-6 text-center">
+                  <p className="text-[13px] font-semibold text-black dark:text-white">
+                    Nothing found
+                  </p>
+                  <p className="max-w-full truncate text-[13px] font-medium text-[#868593]">
+                    No members match &ldquo;{query.trim()}&rdquo;
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div
+              ref={thumbRef}
+              aria-hidden
+              style={{ top: THUMB_INSET }}
+              className="pointer-events-none absolute right-0.5 w-[3px] rounded-full bg-black/25 opacity-0 transition-opacity duration-300 group-hover/list:data-scrollable:opacity-50 motion-reduce:transition-none dark:bg-white/30"
+            />
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -736,21 +919,22 @@ export function MemberSelector({
             aria-haspopup="dialog"
             data-slot="member-selector-add"
             onClick={() => setOpen(!open)}
-            className="group flex cursor-pointer flex-col items-center gap-1.5 outline-none transition-[scale] duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 active:scale-95 motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100"
+            className="group relative z-50 flex cursor-pointer flex-col items-center gap-1.5 outline-none transition-[scale] duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-105 active:scale-95 motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100"
           >
             <span
               className={cn(
-                "flex size-12 items-center justify-center rounded-full border-2 border-dashed transition-colors duration-200 group-focus-visible:ring-2 group-focus-visible:ring-neutral-400 group-focus-visible:ring-offset-2 motion-reduce:transition-none dark:ring-offset-neutral-950",
-                open
-                  ? "border-neutral-900 bg-neutral-900/10 dark:border-white dark:bg-white/10"
-                  : "border-neutral-500/40 group-hover:border-neutral-500/60 group-hover:bg-neutral-100/50 dark:border-neutral-400/40 dark:group-hover:border-neutral-400/60 dark:group-hover:bg-neutral-800/50",
+                "flex size-12 items-center justify-center rounded-full border-2 transition-[background-color,border-color,box-shadow] duration-300 group-focus-visible:ring-2 group-focus-visible:ring-neutral-400 group-focus-visible:ring-offset-2 motion-reduce:transition-none dark:ring-offset-neutral-950",
+                // stays filled until the card has folded back into it
+                rendered
+                  ? "border-transparent bg-white shadow-[0_0_0_0.5px_rgba(0,0,0,0.2),0_4px_12px_rgba(0,0,0,0.08)] dark:bg-[#1C1C1E] dark:shadow-[0_0_0_0.5px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.4)]"
+                  : "border-dashed border-neutral-500/40 group-hover:border-neutral-500/60 group-hover:bg-neutral-100/50 dark:border-neutral-400/40 dark:group-hover:border-neutral-400/60 dark:group-hover:bg-neutral-800/50",
               )}
             >
               <Icon
                 className={cn(
                   "size-5 transition-[rotate,color] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none",
                   open
-                    ? "rotate-45 text-neutral-900 dark:text-white"
+                    ? "rotate-45 text-black dark:text-white"
                     : "text-neutral-500 dark:text-neutral-400",
                 )}
               >
@@ -772,12 +956,17 @@ export function MemberSelector({
           {rendered && (
             <Dropdown
               open={open}
+              anchorRef={addRef}
               members={members}
               selected={selected}
               query={query}
               reduced={reduced}
               onQuery={setQuery}
               onToggle={toggle}
+              onClose={() => {
+                setOpen(false);
+                addRef.current?.focus();
+              }}
               onClosed={() => {
                 setRendered(false);
                 setQuery("");

@@ -311,7 +311,7 @@ export function Demo() {
       "An avatar row for picking people, with a searchable dropdown to add more.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/member-selector.tsx`,
     interaction:
-      "Tap an avatar to select or deselect it; selected people glide to the front and unselected ones fade to grayscale with a small plus badge. Tap Add to open a dropdown, search by name or email, and toggle anyone from the list. When the row is full, avatars pushed out shrink away as new ones pop in. Press Escape or click outside to close. Honors prefers-reduced-motion.",
+      "Tap an avatar to select or deselect it; selected people glide to the front and unselected ones fade to grayscale with a small plus badge. Tap Add and the circle morphs into a card with a search field; type to filter by name or email, use the arrow keys and Enter, or click anyone to toggle them. A hairline scrollbar shows only while you scroll. When the row is full, avatars pushed out shrink away as new ones pop in. Press Escape, the esc key in the field, or click outside to fold the card back. Honors prefers-reduced-motion.",
     props: [
       {
         name: "members",
@@ -357,9 +357,24 @@ import { useState } from "react"
 import { MemberSelector, type Member } from "@/components/ui/member-selector"
 
 const members: Member[] = [
-  { id: "1", name: "Yuki Tanaka", email: "yuki@company.com" },
-  { id: "2", name: "Matt Cooper", email: "matt@company.com" },
-  { id: "3", name: "Sofia Martinez", email: "sofia@company.com" },
+  {
+    id: "1",
+    name: "Yuki Tanaka",
+    email: "yuki@company.com",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=160&h=160&fit=crop&crop=faces",
+  },
+  {
+    id: "2",
+    name: "Matt Cooper",
+    email: "matt@company.com",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&h=160&fit=crop&crop=faces",
+  },
+  {
+    id: "3",
+    name: "Sofia Martinez",
+    email: "sofia@company.com",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&h=160&fit=crop&crop=faces",
+  },
 ]
 
 export function Demo() {
