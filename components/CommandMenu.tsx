@@ -171,7 +171,7 @@ export default function CommandMenu({
         x: Math.round(origin.left - left),
         width: Math.round(origin.width),
         height: Math.round(origin.height),
-        borderRadius: 16,
+        borderRadius: origin.radius ?? 16,
       },
     };
   }, [origin, viewport]);

@@ -11,7 +11,21 @@ export interface CommandMenuOrigin {
   left: number;
   width: number;
   height: number;
+  radius?: number;
 }
+
+export const measureOrigin = (el: HTMLElement): CommandMenuOrigin => {
+  const rect = el.getBoundingClientRect();
+  const radius = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 16;
+  return {
+    top: rect.top,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height,
+    // rounded-full computes to 9999px, which would stall the morph at full round
+    radius: Math.min(radius, rect.height / 2),
+  };
+};
 
 let lastOrigin: CommandMenuOrigin | null = null;
 
@@ -23,15 +37,12 @@ export const getCommandMenuOrigin = () => lastOrigin;
 
 export const getSearchBarRect = (): CommandMenuOrigin | null => {
   if (typeof document === "undefined") return null;
-  const el = document.querySelector<HTMLElement>("[data-command-search-bar]");
-  if (!el) return null;
-  const rect = el.getBoundingClientRect();
-  return {
-    top: rect.top,
-    left: rect.left,
-    width: rect.width,
-    height: rect.height,
-  };
+  const bars = document.querySelectorAll<HTMLElement>(
+    "[data-command-search-bar]",
+  );
+  // the navbar and sidebar bars are each hidden at some widths, so pick the visible one
+  const el = [...bars].find((bar) => bar.getClientRects().length > 0);
+  return el ? measureOrigin(el) : null;
 };
 
 export const openCommandMenu = (origin?: CommandMenuOrigin | null) => {

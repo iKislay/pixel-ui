@@ -5,6 +5,7 @@ import { Squircle } from "@squircle-js/react";
 import { cn } from "@/lib/utils";
 import {
   CLOSE_EVENT,
+  measureOrigin,
   OPEN_EVENT,
   openCommandMenu,
   preloadCommandMenu,
@@ -33,17 +34,7 @@ export function CommandSearchBar({
   }, []);
 
   const handleClick = () => {
-    const rect = buttonRef.current?.getBoundingClientRect();
-    openCommandMenu(
-      rect
-        ? {
-            top: rect.top,
-            left: rect.left,
-            width: rect.width,
-            height: rect.height,
-          }
-        : null,
-    );
+    openCommandMenu(buttonRef.current && measureOrigin(buttonRef.current));
   };
 
   return (
