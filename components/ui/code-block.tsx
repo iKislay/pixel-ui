@@ -17,7 +17,7 @@ export type CodeBlockProps = Omit<React.ComponentProps<'div'>, 'children'> & {
     code: string
     /** Prism language id, e.g. "tsx", "css", "json", "bash". */
     language?: string
-    /** Any hex color. The whole theme is built from shades of it. */
+    /** Any hex or CSS color variable. The whole theme is built from shades of it. */
     accent?: string
     /** "auto" follows the page theme; pass "dark" or "light" to pin it. */
     mode?: 'auto' | 'dark' | 'light'
@@ -67,11 +67,26 @@ function subscribeToPageMode(onChange: () => void) {
 // the server can't know the theme, so assume dark
 const serverMode = () => 'dark' as const
 
-const FALLBACK_HSL: [number, number, number] = [211, 100, 52]
+const FALLBACK_HSL: [number, number, number] = [220, 100, 64]
 
-function hexToHsl(hex: string): [number, number, number] {
-    if (typeof hex !== 'string') return FALLBACK_HSL
-    let value = hex.replace('#', '')
+function resolveColor(input: string): string {
+    if (typeof input !== 'string') return ''
+    const value = input.trim()
+    if (value.startsWith('var(')) {
+        if (typeof window !== 'undefined') {
+            const varName = value.slice(4, -1).trim()
+            const computed = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+            if (computed) return computed
+        }
+        return '#4785FF'
+    }
+    return value
+}
+
+function hexToHsl(color: string): [number, number, number] {
+    if (typeof color !== 'string') return FALLBACK_HSL
+    const resolved = resolveColor(color)
+    let value = resolved.replace('#', '')
     if (value.length === 4 || value.length === 8) {
         value = value.slice(0, value.length === 4 ? 3 : 6)
     }
@@ -276,7 +291,7 @@ function CopyButton({ code, floating }: { code: string; floating?: boolean }) {
 export function CodeBlock({
     code,
     language = 'tsx',
-    accent = '#F75001',
+    accent = 'var(--brand)',
     mode = 'auto',
     filename,
     showFrame = true,

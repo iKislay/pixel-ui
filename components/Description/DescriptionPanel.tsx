@@ -1,18 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { motion } from "motion/react";
-import { CodeXml, Maximize, Minimize, X } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { activeComponent } from "@/lib/components";
 import { cn } from "@/lib/utils";
 import CodeDrawer from "./CodeDrawer";
 import DescriptionContent from "./DescriptionContent";
-import InstallBar from "./InstallBar";
-import Tooltip from "../Tooltip";
 
 const MIN_PANEL_WIDTH = 380;
 const MAX_PANEL_WIDTH = 840;
+const COLLAPSE_THRESHOLD = 70;
+const SNAP_OPEN_THRESHOLD = 75;
 
 type DescriptionPanelProps = {
   open: boolean;
@@ -33,47 +32,183 @@ export function DescriptionPanel({
 }: DescriptionPanelProps) {
   const pathname = usePathname();
   const item = activeComponent(pathname);
+  const reduceMotion = useReducedMotion();
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerHeight, setContainerHeight] = useState(900);
 
   const [rawCodeOpen, setCodeOpen] = useState(false);
   const codeOpen = open && rawCodeOpen;
 
+  const [isHovered, setIsHovered] = useState(false);
+  const [pullOffset, setPullOffset] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const dragStartTimeRef = useRef(0);
+  const snapBackRafRef = useRef<number | null>(null);
+
   useEffect(() => {
+    const updateSize = () => {
+      if (containerRef.current) {
+        setContainerHeight(containerRef.current.clientHeight || window.innerHeight);
+      }
+    };
+    updateSize();
+    window.addEventListener("resize", updateSize);
     return () => {
+      window.removeEventListener("resize", updateSize);
+      if (snapBackRafRef.current) cancelAnimationFrame(snapBackRafRef.current);
       document.body.style.removeProperty("cursor");
       document.body.style.removeProperty("user-select");
     };
   }, []);
 
-  const toggleCode = () => {
-    if (codeOpen) {
-      setCodeOpen(false);
-    } else {
-      setOpen(true);
-      setCodeOpen(true);
-    }
+  const handleOpenCode = () => {
+    setOpen(true);
+    setCodeOpen(true);
   };
 
-  const handleResizeStart = (e: React.PointerEvent) => {
+  const animateSnapBack = (startPull: number) => {
+    const startTime = performance.now();
+    const duration = 260;
+
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / duration);
+      const ease = 1 - Math.pow(1 - t, 3);
+      const nextPull = startPull * (1 - ease);
+      setPullOffset(nextPull);
+
+      if (t < 1) {
+        snapBackRafRef.current = requestAnimationFrame(step);
+      } else {
+        setPullOffset(0);
+        setIsPulling(false);
+        snapBackRafRef.current = null;
+      }
+    };
+
+    snapBackRafRef.current = requestAnimationFrame(step);
+  };
+
+  const handleButtonDragStart = (e: React.PointerEvent) => {
     e.preventDefault();
     if (!onWidthChange || !setIsResizing) return;
 
-    setIsResizing(true);
+    if (snapBackRafRef.current) {
+      cancelAnimationFrame(snapBackRafRef.current);
+      snapBackRafRef.current = null;
+    }
+
     const startX = e.clientX;
+    dragStartTimeRef.current = Date.now();
+    const startOpen = open;
     const startWidth = width;
+    let didSnapOpen = false;
+    let hasCollapsed = false;
+    let currentDragWidth = startWidth;
+
+    if (!startOpen) {
+      setIsPulling(true);
+    } else {
+      setIsResizing(true);
+    }
 
     const onPointerMove = (moveEvent: PointerEvent) => {
-      const delta = startX - moveEvent.clientX;
-      const maxAllowed = Math.min(MAX_PANEL_WIDTH, window.innerWidth - 400);
-      const nextWidth = Math.max(MIN_PANEL_WIDTH, Math.min(maxAllowed, startWidth + delta));
-      onWidthChange(nextWidth);
+      if (!startOpen) {
+        const pull = Math.max(0, startX - moveEvent.clientX);
+
+        if (didSnapOpen) {
+          const maxAllowed = Math.min(MAX_PANEL_WIDTH, window.innerWidth - 400);
+          const cursorWidth = window.innerWidth - moveEvent.clientX;
+          if (cursorWidth > MIN_PANEL_WIDTH) {
+            setIsResizing(true);
+            currentDragWidth = Math.min(maxAllowed, cursorWidth);
+            onWidthChange(currentDragWidth);
+          }
+          return;
+        }
+
+        setPullOffset(pull);
+
+        if (pull >= SNAP_OPEN_THRESHOLD) {
+          didSnapOpen = true;
+          setIsPulling(false);
+          setPullOffset(0);
+          setOpen(true);
+          onWidthChange(MIN_PANEL_WIDTH);
+        }
+      } else {
+        if (hasCollapsed) return;
+
+        const delta = startX - moveEvent.clientX;
+        const maxAllowed = Math.min(MAX_PANEL_WIDTH, window.innerWidth - 400);
+
+        if (delta >= 0) {
+          const nextWidth = Math.min(maxAllowed, startWidth + delta);
+          onWidthChange(nextWidth);
+        } else {
+          const rawWidth = startWidth + delta;
+          if (rawWidth >= MIN_PANEL_WIDTH) {
+            onWidthChange(rawWidth);
+          } else {
+            const overdrag = MIN_PANEL_WIDTH - rawWidth;
+            if (overdrag >= COLLAPSE_THRESHOLD) {
+              hasCollapsed = true;
+              setIsResizing(false);
+              setOpen(false);
+              onWidthChange(MIN_PANEL_WIDTH);
+              cleanup();
+              return;
+            }
+            const resistedWidth = MIN_PANEL_WIDTH - overdrag * 0.2;
+            onWidthChange(resistedWidth);
+          }
+        }
+      }
     };
 
-    const onPointerUp = () => {
-      setIsResizing(false);
+    const cleanup = () => {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
       document.body.style.removeProperty("cursor");
       document.body.style.removeProperty("user-select");
+    };
+
+    const onPointerUp = (upEvent: PointerEvent) => {
+      cleanup();
+
+      if (!startOpen) {
+        if (!didSnapOpen) {
+          const elapsed = Date.now() - dragStartTimeRef.current;
+          const moved = Math.abs(upEvent.clientX - startX);
+          if (moved < 8 && elapsed < 350) {
+            setIsPulling(false);
+            setPullOffset(0);
+            setIsResizing(false);
+            setOpen(true);
+            onWidthChange(560);
+          } else {
+            setIsResizing(false);
+            animateSnapBack(pullOffset);
+          }
+        } else {
+          setIsPulling(false);
+          setPullOffset(0);
+          setIsResizing(false);
+          onWidthChange(Math.max(MIN_PANEL_WIDTH, currentDragWidth));
+        }
+      } else {
+        setIsResizing(false);
+        if (hasCollapsed) return;
+
+        if (width < MIN_PANEL_WIDTH) {
+          const overdrag = MIN_PANEL_WIDTH - width;
+          if (overdrag >= 15) {
+            setOpen(false);
+          }
+          onWidthChange(MIN_PANEL_WIDTH);
+        }
+      }
     };
 
     document.body.style.cursor = "col-resize";
@@ -82,91 +217,152 @@ export function DescriptionPanel({
     window.addEventListener("pointerup", onPointerUp);
   };
 
-  const panelShift = Math.max(600, width + 40);
+  const isPullActive = !open && (isPulling || pullOffset > 0);
+  const apexPull = Math.max(14, pullOffset * 1.45 + 14);
+  const midY = containerHeight / 2;
+
+  const cp1X = Math.max(0, apexPull - apexPull * 0.05);
+  const cp1Y = midY * 0.35;
+  const cp2X = apexPull * 0.06;
+  const cp2Y = midY * 0.72;
+
+  const cp3X = apexPull * 0.06;
+  const cp3Y = midY + (containerHeight - midY) * 0.28;
+  const cp4X = Math.max(0, apexPull - apexPull * 0.05);
+  const cp4Y = midY + (containerHeight - midY) * 0.65;
+
+  const clipPathD = `M ${apexPull} 0 C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, 0 ${midY} C ${cp3X} ${cp3Y}, ${cp4X} ${cp4Y}, ${apexPull} ${containerHeight} L ${width + 50} ${containerHeight} L ${width + 50} 0 Z`;
+  const curveBorderD = `M ${apexPull} 0 C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, 0 ${midY} C ${cp3X} ${cp3Y}, ${cp4X} ${cp4Y}, ${apexPull} ${containerHeight}`;
+
+  const currentPanelX = open
+    ? 0
+    : isPullActive
+      ? width - apexPull
+      : width - 14;
 
   return (
-    <div className="pointer-events-none absolute right-0 top-0 z-40 h-full">
-      <div
-        data-chrome
-        className="pointer-events-auto absolute right-4 top-4 z-50 flex items-stretch"
-      >
-        {item?.registry && <InstallBar key={item.href} item={item} />}
-
-        <div
-          className={cn(
-            "flex items-center gap-2 border border-black/[0.06] bg-muted p-2 shadow-sm dark:border-transparent dark:border-apple",
-            item?.registry ? "rounded-r-2xl border-l-0" : "rounded-2xl",
-          )}
-        >
-          <Tooltip label={open ? "Close description" : "Open description"} align="end">
-            <button
-              type="button"
-              onClick={() => setOpen((v) => !v)}
-              aria-label={open ? "Close description" : "Open description"}
-              className="cursor-pointer rounded-full bg-popover p-1"
-            >
-              {open ? (
-                <Maximize className="h-5 w-5" />
-              ) : (
-                <Minimize className="h-5 w-5" />
-              )}
-            </button>
-          </Tooltip>
-
-          {item?.registry && (
-            <Tooltip label={codeOpen ? "Hide code" : "Get code"} align="end">
-              <button
-                type="button"
-                onClick={toggleCode}
-                aria-label={codeOpen ? "Hide code" : "Get code"}
-                className="cursor-pointer rounded-full bg-popover p-1"
-              >
-                {codeOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <CodeXml className="h-5 w-5" />
-                )}
-              </button>
-            </Tooltip>
-          )}
-        </div>
-      </div>
+    <div
+      ref={containerRef}
+      className="pointer-events-none absolute right-0 top-0 z-40 h-full"
+    >
+      <svg width="0" height="0" className="pointer-events-none absolute">
+        <defs>
+          <clipPath id="sidebarCurveClip" clipPathUnits="userSpaceOnUse">
+            <path d={clipPathD} />
+          </clipPath>
+        </defs>
+      </svg>
 
       <motion.div
         initial={false}
-        animate={{ x: open ? 0 : panelShift }}
+        animate={{ x: currentPanelX }}
         transition={
-          isResizing
+          isResizing || isPulling
             ? { duration: 0 }
-            : { type: "spring", stiffness: 300, damping: 30 }
+            : { type: "spring", stiffness: 320, damping: 28, mass: 0.8 }
         }
         style={{ width }}
-        className="pointer-events-auto relative flex h-full flex-col overflow-hidden rounded-2xl bg-background"
+        className="pointer-events-auto relative flex h-full flex-col"
       >
-        {open && onWidthChange && (
-          <div
-            onPointerDown={handleResizeStart}
-            role="separator"
-            aria-orientation="vertical"
-            aria-label="Resize description panel"
-            className="group absolute -left-2.5 inset-y-0 z-50 flex w-5 cursor-col-resize items-center justify-center select-none"
-          >
-            <div className="h-10 w-1 rounded-full bg-foreground/15 transition-colors group-hover:bg-foreground/40 group-active:bg-foreground/60" />
-          </div>
-        )}
+        <div
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onPointerDown={handleButtonDragStart}
+          role="button"
+          aria-label={
+            open
+              ? "Drag to resize or collapse description panel"
+              : "Drag to open description panel"
+          }
+          className="group pointer-events-auto absolute -left-3.5 top-1/2 -translate-y-1/2 z-50 flex h-24 w-7 cursor-col-resize items-center justify-center select-none"
+        >
+          <motion.div
+            initial={false}
+            animate={{
+              opacity: open ? 0 : isPullActive ? Math.max(0, 1 - pullOffset / 20) : 1,
+              scale: open ? 0.85 : 1,
+            }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="absolute inset-0 rounded-l-2xl border-y border-l border-black/[0.08] bg-[#F4F4F9] shadow-[0_4px_24px_rgba(0,0,0,0.1),-4px_0_16px_rgba(0,0,0,0.06)] dark:border-apple dark:bg-neutral-900 dark:shadow-[0_4px_24px_rgba(0,0,0,0.6),-4px_0_16px_rgba(0,0,0,0.4)]"
+          />
 
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-12 bg-gradient-to-b from-background to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-gradient-to-t from-background to-transparent" />
+          <div className="relative z-10 h-9 w-1 rounded-full bg-foreground/25 transition-all duration-200 group-hover:h-11 group-hover:bg-foreground/50" />
 
-        <div className="no-scrollbar flex flex-1 flex-col overflow-y-auto">
-          <DescriptionContent item={item} className="p-8 pt-60" />
+          <AnimatePresence>
+            {isHovered && !isPulling && !isResizing && (
+              <motion.div
+                initial={{ opacity: 0, x: 8, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 8, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
+                className="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-3.5 flex items-center"
+              >
+                <span className="whitespace-nowrap rounded-xl border border-black/[0.08] bg-popover px-3 py-1.5 font-runde text-xs font-medium text-foreground shadow-xl dark:border-white/10 dark:bg-[#1E1E1E]">
+                  {open ? "Drag to resize or close" : "Drag to open"}
+                </span>
+                <div className="absolute -right-1 top-1/2 -translate-y-1/2 h-2 w-2 rotate-45 border-r border-t border-black/[0.08] bg-popover dark:border-white/10 dark:bg-[#1E1E1E]" />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <CodeDrawer
-          open={codeOpen}
-          onClose={() => setCodeOpen(false)}
-          item={item}
-        />
+        <div
+          style={{
+            clipPath: isPullActive && !reduceMotion ? "url(#sidebarCurveClip)" : undefined,
+            WebkitClipPath: isPullActive && !reduceMotion ? "url(#sidebarCurveClip)" : undefined,
+          }}
+          className={cn(
+            "relative flex h-full flex-col overflow-hidden bg-background",
+            open && "rounded-2xl border-l border-black/[0.08] dark:border-apple shadow-[-4px_0_24px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_32px_rgba(0,0,0,0.5)]",
+          )}
+        >
+          {isPullActive && (
+            <svg
+              width={width}
+              height={containerHeight}
+              className="pointer-events-none absolute inset-0 overflow-visible"
+            >
+              <path
+                d={curveBorderD}
+                fill="none"
+                className="stroke-black/[0.08] dark:stroke-apple drop-shadow-[0_4px_24px_rgba(0,0,0,0.1),-4px_0_16px_rgba(0,0,0,0.06)] dark:drop-shadow-[0_4px_24px_rgba(0,0,0,0.6),-4px_0_16px_rgba(0,0,0,0.4)]"
+                strokeWidth={1}
+              />
+            </svg>
+          )}
+
+          {open && onWidthChange && (
+            <div
+              onPointerDown={handleButtonDragStart}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize or collapse description panel"
+              className="group absolute -left-2.5 inset-y-0 z-40 flex w-5 cursor-col-resize select-none"
+            />
+          )}
+
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-gradient-to-t from-background to-transparent" />
+
+          <div
+            style={{
+              transform: isPullActive ? `translateX(${Math.min(24, pullOffset * 0.25)}px)` : "none",
+              transition: isPulling ? "none" : "transform 0.2s ease-out",
+            }}
+            className="no-scrollbar flex flex-1 flex-col overflow-y-auto"
+          >
+            <DescriptionContent
+              item={item}
+              onOpenCode={handleOpenCode}
+              className="p-8 pb-16"
+            />
+          </div>
+
+          <CodeDrawer
+            open={codeOpen}
+            onClose={() => setCodeOpen(false)}
+            item={item}
+          />
+        </div>
       </motion.div>
     </div>
   );

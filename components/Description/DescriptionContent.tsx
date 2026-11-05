@@ -6,13 +6,14 @@ import CopyButton from "../CopyButton";
 import Tooltip from "../Tooltip";
 import PanelCode from "./PanelCode";
 import InstallCommand from "./InstallCommand";
+import SourceCodePreview from "./SourceCodePreview";
 import DependencyPill from "./DependencyPill";
 import PropsTable from "./PropsTable";
 import { MailIcon, XIcon } from "./icons";
 
 type DescriptionContentProps = {
   item?: ComponentItem;
-  showSourceHint?: boolean;
+  onOpenCode?: () => void;
   className?: string;
 };
 
@@ -32,7 +33,7 @@ function SectionLabel({
 
 export default function DescriptionContent({
   item,
-  showSourceHint = true,
+  onOpenCode,
   className,
 }: DescriptionContentProps) {
   return (
@@ -64,16 +65,6 @@ export default function DescriptionContent({
         </div>
       )}
 
-      {item?.props && item.props.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <SectionLabel as="h2">Props</SectionLabel>
-          <p className="-mt-1 text-sm leading-relaxed text-foreground/70">
-            Options you can pass to customize this component.
-          </p>
-          <PropsTable props={item.props} />
-        </div>
-      )}
-
       {item?.registry && (
         <div className="flex flex-col gap-3">
           <SectionLabel as="h2">Installation</SectionLabel>
@@ -88,12 +79,20 @@ export default function DescriptionContent({
         </div>
       )}
 
-      {item?.registry && showSourceHint && (
+      {item?.registry && (
         <div className="flex flex-col gap-3">
           <SectionLabel as="h2">Source Code</SectionLabel>
-          <p className="text-sm leading-relaxed text-foreground/70">
-            {PANEL_INFO.sourceHint}
+          <SourceCodePreview item={item} onOpenCode={onOpenCode} />
+        </div>
+      )}
+
+      {item?.props && item.props.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <SectionLabel as="h2">Props</SectionLabel>
+          <p className="-mt-1 text-sm leading-relaxed text-foreground/70">
+            Options you can pass to customize this component.
           </p>
+          <PropsTable props={item.props} />
         </div>
       )}
 

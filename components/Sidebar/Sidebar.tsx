@@ -50,7 +50,7 @@ const Sidebar = ({
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Collapse sidebar"
-                  className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center bg-[#F4F4F9] text-[#868593] outline-none transition-[color,transform] duration-200 hover:text-black focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#FC4C01]/60 active:scale-95 motion-reduce:transition-none dark:bg-popover dark:text-[#A1A0AB] dark:hover:text-white"
+                  className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center bg-[#F4F4F9] text-[#868593] outline-none transition-[color,transform] duration-200 hover:text-black focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand/60 active:scale-95 motion-reduce:transition-none dark:bg-popover dark:text-[#A1A0AB] dark:hover:text-white"
                 >
                   <OpenIcon className="size-4" />
                 </button>

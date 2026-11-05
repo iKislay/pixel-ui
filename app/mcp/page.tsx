@@ -91,7 +91,7 @@ export default async function McpPage() {
               key={step.heading}
               className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-4 pb-12 last:pb-0"
             >
-              <span className="flex size-6 items-center justify-center rounded-full bg-[#FC4C01]/10 font-mono text-xs font-medium text-[#FC4C01]">
+              <span className="flex size-6 items-center justify-center rounded-full bg-brand/10 font-mono text-xs font-medium text-brand">
                 {index + 1}
               </span>
               <section className="flex flex-col gap-3">

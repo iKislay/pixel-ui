@@ -88,7 +88,7 @@ export default function HeroCta() {
       >
         <StretchSquircleBg
           hovered={hovered === "cta"}
-          bgClassName="bg-[#FC4C01] transition-colors duration-150 ease-out group-hover:bg-[#e64500]"
+          bgClassName="bg-brand transition-colors duration-150 ease-out group-hover:bg-brand-hover"
         />
         <Link
           href="/components"

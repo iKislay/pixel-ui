@@ -3,8 +3,13 @@ export type CompiledProgram = {
   dispose: () => void;
 };
 
-export function hexToRgb(hex: string): [number, number, number] {
-  let h = hex.replace("#", "").trim();
+export function hexToRgb(color: string): [number, number, number] {
+  let resolved = color.trim();
+  if (resolved.startsWith("var(") && typeof window !== "undefined") {
+    const varName = resolved.slice(4, -1).trim();
+    resolved = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  }
+  let h = resolved.replace("#", "").trim();
   if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
   const n = parseInt(h, 16);
   if (h.length !== 6 || Number.isNaN(n)) return [1, 1, 1];

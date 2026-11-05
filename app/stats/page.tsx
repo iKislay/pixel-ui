@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Footer from "@/components/Footer";
+import { PixelUILogo } from "@/components/logos";
 import GooeyNavbar from "@/components/GooeyNavbar";
 import HeroIntro from "@/components/HeroIntro";
 import StatGrid, { type Stat } from "@/components/stats/StatGrid";
@@ -96,12 +97,8 @@ export default async function StatsPage() {
         >
           <GooeyNavbar stars={stars} />
 
-          <img
-            src="/logos/Pixelui.svg"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-[68%] w-[860px] max-w-none -translate-x-1/2 -translate-y-1/2 opacity-[0.05] [filter:brightness(0)] dark:opacity-[0.07] dark:[filter:brightness(0)_invert(1)]"
-          />
+          <PixelUILogo className="pointer-events-none absolute left-1/2 top-[68%] w-[860px] max-w-none -translate-x-1/2 -translate-y-1/2 select-none opacity-[0.05] dark:opacity-[0.07]" />
+
           <div className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(120%_75%_at_50%_-5%,rgba(255,255,255,0.07),transparent_60%)] dark:block" />
 
           <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-3 px-4 pb-20 pt-28 text-center sm:gap-4 sm:px-6">
@@ -123,7 +120,6 @@ export default async function StatsPage() {
                   strokeLinejoin="round"
                   xmlns="http://www.w3.org/2000/svg"
                   className="size-4 animate-bounce motion-reduce:animate-none"
-                  aria-hidden="true"
                 >
                   <path d="m6 9 6 6 6-6" />
                 </svg>

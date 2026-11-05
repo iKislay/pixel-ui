@@ -13,11 +13,11 @@
 
 **A shadcn registry of pixel-perfect, ready-to-use components and animations.**
 
-<img src="https://img.shields.io/badge/Next.js-0a0a0a?logo=nextdotjs&logoColor=FC4C01" alt="Next.js" />
-<img src="https://img.shields.io/badge/Tailwind_CSS-0a0a0a?logo=tailwindcss&logoColor=FC4C01" alt="Tailwind CSS" />
-<img src="https://img.shields.io/badge/TypeScript-0a0a0a?logo=typescript&logoColor=FC4C01" alt="TypeScript" />
-<img src="https://img.shields.io/badge/shadcn-registry-FC4C01?labelColor=0a0a0a" alt="shadcn registry" />
-<img src="https://img.shields.io/badge/license-MIT%20%2B%20Commons%20Clause%20%2B%20Attribution-0a0a0a?labelColor=0a0a0a&color=FC4C01" alt="MIT + Commons Clause + Attribution" />
+<img src="https://img.shields.io/badge/Next.js-0a0a0a?logo=nextdotjs&logoColor=4785FF" alt="Next.js" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-0a0a0a?logo=tailwindcss&logoColor=4785FF" alt="Tailwind CSS" />
+<img src="https://img.shields.io/badge/TypeScript-0a0a0a?logo=typescript&logoColor=4785FF" alt="TypeScript" />
+<img src="https://img.shields.io/badge/shadcn-registry-4785FF?labelColor=0a0a0a" alt="shadcn registry" />
+<img src="https://img.shields.io/badge/license-MIT%20%2B%20Commons%20Clause%20%2B%20Attribution-0a0a0a?labelColor=0a0a0a&color=4785FF" alt="MIT + Commons Clause + Attribution" />
 
 [**pixelui.dev**](https://pixelui.dev) &nbsp;&middot;&nbsp; [Components](https://pixelui.dev/components) &nbsp;&middot;&nbsp; [Follow on X](https://x.com/pixeluiHQ)
 

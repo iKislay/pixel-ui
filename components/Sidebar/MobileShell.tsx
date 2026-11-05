@@ -5,7 +5,6 @@ import { activeComponent } from "@/lib/components";
 import { cn } from "@/lib/utils";
 import MobileSidebar from "./MobileSidebar";
 import DescriptionContent from "../Description/DescriptionContent";
-import SourceSection from "../Description/SourceSection";
 import CarbonAds from "../CarbonAds";
 import { CommandSearchBar } from "../CommandSearchBar";
 
@@ -33,14 +32,8 @@ export default function MobileShell({
         </div>
 
         <div className={cn(CARD, "p-6")}>
-          <DescriptionContent item={item} showSourceHint={false} />
+          <DescriptionContent item={item} />
         </div>
-
-        {item?.registry && (
-          <div className={cn(CARD, "p-6")}>
-            <SourceSection key={item.registry} registry={item.registry} />
-          </div>
-        )}
       </div>
     </div>
   );

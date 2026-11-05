@@ -44,9 +44,9 @@ export default async function ComponentsIndexPage() {
             </a>
             .{" "}
             <span className="hidden [@media(hover:hover)]:inline">
-              <span className="text-[#FC4C01]">[</span>
+              <span className="text-brand">[</span>
               Hover to play video
-              <span className="text-[#FC4C01]">]</span>
+              <span className="text-brand">]</span>
             </span>
           </p>
         </header>
@@ -60,9 +60,9 @@ export default async function ComponentsIndexPage() {
             <h2 className="font-runde text-lg font-semibold tracking-tight sm:text-xl">
               {section.label}{" "}
               <span className="text-muted-foreground">
-                <span className="text-[#FC4C01]">[</span>
+                <span className="text-brand">[</span>
                 {section.items.length}
-                <span className="text-[#FC4C01]">]</span>
+                <span className="text-brand">]</span>
               </span>
             </h2>
 

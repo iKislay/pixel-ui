@@ -30,7 +30,7 @@ export default function CtaLink({
           className={cn(
             "flex h-12 items-center px-6 font-runde text-sm font-semibold text-white transition-colors duration-150 ease-out",
             primary
-              ? "bg-[#FC4C01] hover:bg-[#e64500]"
+              ? "bg-brand hover:bg-brand-hover"
               : "bg-neutral-900 hover:bg-neutral-800",
           )}
         >

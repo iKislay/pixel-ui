@@ -74,7 +74,7 @@ export default function LegalPage({
                   <li key={item} className="flex items-start gap-2.5">
                     <span
                       aria-hidden="true"
-                      className="mt-2.5 size-1 shrink-0 rounded-full bg-[#FC4C01]"
+                      className="mt-2.5 size-1 shrink-0 rounded-full bg-brand"
                     />
                     <span>{linkify(item)}</span>
                   </li>

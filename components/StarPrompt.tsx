@@ -64,7 +64,7 @@ export function StarPrompt() {
                     type="button"
                     aria-label="Close"
                     onClick={() => setOpen(false)}
-                    className="absolute right-2 top-2 grid size-8 cursor-pointer place-items-center rounded-full text-[#A1A0AB] outline-none transition-colors hover:bg-[#F4F4F9] hover:text-black focus-visible:ring-2 focus-visible:ring-[#FC4C01]/60 motion-reduce:transition-none dark:text-[#6E6D78] dark:hover:bg-[#2C2C2E] dark:hover:text-white"
+                    className="absolute right-2 top-2 grid size-8 cursor-pointer place-items-center rounded-full text-[#A1A0AB] outline-none transition-colors hover:bg-[#F4F4F9] hover:text-black focus-visible:ring-2 focus-visible:ring-brand/60 motion-reduce:transition-none dark:text-[#6E6D78] dark:hover:bg-[#2C2C2E] dark:hover:text-white"
                   >
                     <svg
                       viewBox="0 0 24 24"
@@ -103,7 +103,7 @@ export function StarPrompt() {
                         target="_blank"
                         rel="noreferrer"
                         onClick={() => setOpen(false)}
-                        className="flex h-9 flex-1 items-center justify-center gap-1.5 bg-[#F4F4F9] text-[13px] font-semibold text-black outline-none transition-[background-color,transform] hover:bg-[#EDEDF3] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#FC4C01]/60 active:scale-[0.97] motion-reduce:transition-none dark:bg-[#2C2C2E] dark:text-white dark:hover:bg-[#3A3A3C]"
+                        className="flex h-9 flex-1 items-center justify-center gap-1.5 bg-[#F4F4F9] text-[13px] font-semibold text-black outline-none transition-[background-color,transform] hover:bg-[#EDEDF3] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand/60 active:scale-[0.97] motion-reduce:transition-none dark:bg-[#2C2C2E] dark:text-white dark:hover:bg-[#3A3A3C]"
                       >
                         <XLogo className="size-3" />
                         Follow
@@ -115,7 +115,7 @@ export function StarPrompt() {
                         target="_blank"
                         rel="noreferrer"
                         onClick={() => setOpen(false)}
-                        className="flex h-9 flex-1 items-center justify-center gap-1.5 bg-[#FC4C01] text-[13px] font-semibold text-white outline-none transition-[background-color,transform] hover:bg-[#E54400] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/70 active:scale-[0.97] motion-reduce:transition-none"
+                        className="flex h-9 flex-1 items-center justify-center gap-1.5 bg-brand text-[13px] font-semibold text-white outline-none transition-[background-color,transform] hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/70 active:scale-[0.97] motion-reduce:transition-none"
                       >
                         <GithubLogo className="size-3.5" />
                         Star

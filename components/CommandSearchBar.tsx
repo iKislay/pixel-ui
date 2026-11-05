@@ -1,14 +1,45 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { Squircle } from "@squircle-js/react";
 import { cn } from "@/lib/utils";
 import {
+  CLOSE_EVENT,
+  OPEN_EVENT,
   openCommandMenu,
   preloadCommandMenu,
   SearchIcon,
 } from "./CommandMenuTrigger";
 
 export function CommandSearchBar({ className }: { className?: string }) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const onOpen = () => setIsOpen(true);
+    const onClose = () => setIsOpen(false);
+    window.addEventListener(OPEN_EVENT, onOpen);
+    window.addEventListener(CLOSE_EVENT, onClose);
+    return () => {
+      window.removeEventListener(OPEN_EVENT, onOpen);
+      window.removeEventListener(CLOSE_EVENT, onClose);
+    };
+  }, []);
+
+  const handleClick = () => {
+    const rect = buttonRef.current?.getBoundingClientRect();
+    openCommandMenu(
+      rect
+        ? {
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+          }
+        : null,
+    );
+  };
+
   return (
     <div
       data-chrome
@@ -18,13 +49,18 @@ export function CommandSearchBar({ className }: { className?: string }) {
       )}
     >
       <button
+        ref={buttonRef}
+        data-command-search-bar
         type="button"
         aria-label="Search components"
         aria-keyshortcuts="Meta+K Control+K"
         onPointerEnter={preloadCommandMenu}
         onFocus={preloadCommandMenu}
-        onClick={openCommandMenu}
-        className="pointer-events-auto group flex h-11 w-full max-w-[calc(100%-6.5rem)] cursor-pointer items-center justify-between gap-3 rounded-2xl border border-black/[0.06] bg-muted px-3.5 shadow-sm transition-[border-color,background-color] hover:border-black/10 sm:max-w-sm dark:border-transparent dark:border-apple dark:hover:border-apple/80"
+        onClick={handleClick}
+        className={cn(
+          "pointer-events-auto group flex h-11 w-full max-w-[calc(100%-6.5rem)] cursor-pointer items-center justify-between gap-3 rounded-2xl border border-black/[0.06] bg-muted px-3.5 shadow-sm transition-[border-color,background-color,opacity,transform] duration-200 hover:border-black/10 active:scale-[0.98] sm:max-w-sm dark:border-transparent dark:border-apple dark:hover:border-apple/80",
+          isOpen && "pointer-events-none scale-95 opacity-0",
+        )}
       >
         <span className="flex min-w-0 items-center gap-2 text-muted-foreground transition-colors group-hover:text-foreground">
           <SearchIcon className="size-4 shrink-0" />

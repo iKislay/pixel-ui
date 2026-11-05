@@ -14,8 +14,14 @@ import {
 } from "@/lib/components";
 import { cn } from "@/lib/utils";
 import { PixelUILogo } from "@/components/logos";
-import { OPEN_EVENT, SearchIcon } from "./CommandMenuTrigger";
-
+import {
+  CLOSE_EVENT,
+  getCommandMenuOrigin,
+  getSearchBarRect,
+  OPEN_EVENT,
+  SearchIcon,
+  type CommandMenuOrigin,
+} from "./CommandMenuTrigger";
 
 // card radius = field radius + padding, so the corners stay concentric
 const PADDING = 8;
@@ -25,8 +31,12 @@ const CARD_RADIUS = FIELD_RADIUS + PADDING;
 const FADE = 28;
 const VIDEO_DELAY = 150;
 
-const spring = { type: "spring", stiffness: 420, damping: 32 } as const;
-
+const morphSpring = {
+  type: "spring",
+  stiffness: 360,
+  damping: 32,
+  mass: 0.85,
+} as const;
 
 const rankCategory = (item: ComponentItem) => {
   const index = CATEGORY_ORDER.indexOf(item.category);
@@ -69,7 +79,7 @@ const Highlight = ({ text, query }: { text: string; query: string }) => {
   return (
     <>
       {text.slice(0, start)}
-      <span className="text-[#FC4C01]">
+      <span className="text-brand">
         {text.slice(start, start + q.length)}
       </span>
       {text.slice(start + q.length)}
@@ -88,7 +98,7 @@ const ArrowIcon = () => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2.5"
+    strokeWidth={2.5}
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden
@@ -135,7 +145,7 @@ const Preview = ({ item }: { item: ComponentItem }) => {
         <h3 className="flex items-center gap-2 text-[15px] font-semibold leading-5 tracking-[-0.01em] text-black dark:text-white">
           {item.name}
           {item.isNew && (
-            <span className="rounded-full bg-[#FC4C01]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#FC4C01]">
+            <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-brand">
               New
             </span>
           )}
@@ -160,6 +170,12 @@ export default function CommandMenu({
   const [open, setOpen] = useState(initialOpen);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
+  const [modalHeight, setModalHeight] = useState(480);
+  const [origin, setOrigin] = useState<CommandMenuOrigin | null>(() =>
+    typeof window !== "undefined"
+      ? (getCommandMenuOrigin() ?? getSearchBarRect())
+      : null,
+  );
   const listRef = useRef<HTMLDivElement>(null);
   const returnFocus = useRef<HTMLElement | null>(
     initialOpen && typeof document !== "undefined"
@@ -178,9 +194,37 @@ export default function CommandMenu({
   }, [open]);
 
   useEffect(() => {
-    const show = () => {
+    const updateHeight = () => {
+      setModalHeight(Math.min(480, Math.round(window.innerHeight * 0.72)));
+    };
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
+  const morph = useMemo(() => {
+    if (!origin || typeof window === "undefined") {
+      return { deltaX: 0, deltaY: -20, initialWidth: 384 };
+    }
+    const targetTop = window.innerHeight * 0.12;
+    const targetCenterX = window.innerWidth / 2;
+    const searchBarCenterX = origin.left + origin.width / 2;
+    return {
+      deltaX: Math.round(searchBarCenterX - targetCenterX),
+      deltaY: Math.round(origin.top - targetTop),
+      initialWidth: Math.round(origin.width),
+    };
+  }, [origin]);
+
+  useEffect(() => {
+    const show = (e?: Event) => {
       if (openRef.current) return;
       returnFocus.current = document.activeElement as HTMLElement | null;
+      const customOrigin = (e as CustomEvent<{ origin?: CommandMenuOrigin }>)
+        ?.detail?.origin;
+      const resolved =
+        customOrigin ?? getCommandMenuOrigin() ?? getSearchBarRect();
+      setOrigin(resolved);
       setQuery("");
       setActive(0);
       setOpen(true);
@@ -235,6 +279,7 @@ export default function CommandMenu({
   const go = (item: ComponentItem | undefined) => {
     if (!item) return;
     setOpen(false);
+    window.dispatchEvent(new Event(CLOSE_EVENT));
     router.push(item.href);
   };
 
@@ -260,7 +305,7 @@ export default function CommandMenu({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={close}
             className="absolute inset-0 bg-black/30 backdrop-blur-[2px] dark:bg-black/60"
           />
@@ -271,15 +316,39 @@ export default function CommandMenu({
             aria-label="Search components"
             data-slot="command-menu"
             initial={
-              reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: -6 }
+              reduceMotion
+                ? { opacity: 0 }
+                : {
+                    opacity: 0.85,
+                    x: morph.deltaX,
+                    y: morph.deltaY,
+                    maxWidth: morph.initialWidth,
+                  }
             }
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            animate={{
+              opacity: 1,
+              x: 0,
+              y: 0,
+              maxWidth: 760,
+            }}
             exit={
-              reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: -6 }
+              reduceMotion
+                ? { opacity: 0 }
+                : {
+                    opacity: 0,
+                    x: morph.deltaX,
+                    y: morph.deltaY,
+                    maxWidth: morph.initialWidth,
+                  }
             }
-            transition={reduceMotion ? { duration: 0.15 } : spring}
+            transition={reduceMotion ? { duration: 0.15 } : morphSpring}
+            onAnimationComplete={() => {
+              if (!open) {
+                window.dispatchEvent(new Event(CLOSE_EVENT));
+              }
+            }}
             // drop-shadow, since a box-shadow would be cut off by the squircle clip
-            className="relative w-full max-w-[760px] [filter:drop-shadow(0_2px_4px_rgba(0,0,0,0.05))_drop-shadow(0_12px_32px_rgba(0,0,0,0.12))] dark:[filter:drop-shadow(0_2px_4px_rgba(0,0,0,0.35))_drop-shadow(0_16px_40px_rgba(0,0,0,0.5))]"
+            className="relative w-full [filter:drop-shadow(0_2px_4px_rgba(0,0,0,0.05))_drop-shadow(0_12px_32px_rgba(0,0,0,0.12))] dark:[filter:drop-shadow(0_2px_4px_rgba(0,0,0,0.35))_drop-shadow(0_16px_40px_rgba(0,0,0,0.5))]"
           >
             {/* the outer squircle shows through the 1px gap as a hairline, which a border can't do on a clipped shape */}
             <Squircle
@@ -293,9 +362,17 @@ export default function CommandMenu({
                   cornerRadius={CARD_RADIUS}
                   cornerSmoothing={1}
                 >
-                  <div
+                  <motion.div
                     style={{ padding: PADDING }}
-                    className="flex h-[min(480px,72vh)] flex-col bg-white dark:bg-[#1C1C1E]"
+                    initial={
+                      reduceMotion ? false : { height: 48 + PADDING * 2 }
+                    }
+                    animate={{ height: modalHeight }}
+                    exit={
+                      reduceMotion ? undefined : { height: 48 + PADDING * 2 }
+                    }
+                    transition={reduceMotion ? { duration: 0.15 } : morphSpring}
+                    className="flex flex-col overflow-hidden bg-white dark:bg-[#1C1C1E]"
                   >
                     <Squircle
                       asChild
@@ -321,13 +398,13 @@ export default function CommandMenu({
                               ? `command-item-${activeItem.href}`
                               : undefined
                           }
-                          className="h-full w-full bg-transparent text-[15px] font-medium text-black caret-[#FC4C01] outline-none placeholder:text-[#A1A0AB] dark:text-white dark:placeholder:text-[#6E6D78]"
+                          className="h-full w-full bg-transparent text-[15px] font-medium text-black caret-brand outline-none placeholder:text-[#A1A0AB] dark:text-white dark:placeholder:text-[#6E6D78]"
                         />
                         <button
                           type="button"
                           aria-label="Close"
                           onClick={close}
-                          className="group grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-[8px] bg-white text-[12px] font-semibold text-[#868593] outline-none transition-colors duration-150 hover:text-black focus-visible:ring-2 focus-visible:ring-[#FC4C01]/60 motion-reduce:transition-none sm:w-10 dark:bg-[#2C2C2E] dark:hover:text-white"
+                          className="group grid h-7 w-7 shrink-0 cursor-pointer place-items-center rounded-[8px] bg-white text-[12px] font-semibold text-[#868593] outline-none transition-colors duration-150 hover:text-black focus-visible:ring-2 focus-visible:ring-brand/60 motion-reduce:transition-none sm:w-10 dark:bg-[#2C2C2E] dark:hover:text-white"
                         >
                           <span className="col-start-1 row-start-1 hidden transition-[opacity,filter,scale] duration-200 ease-out group-hover:scale-75 group-hover:opacity-0 group-hover:blur-[2px] group-focus-visible:scale-75 group-focus-visible:opacity-0 group-focus-visible:blur-[2px] motion-reduce:transition-none sm:inline">
                             esc
@@ -347,7 +424,17 @@ export default function CommandMenu({
                       </label>
                     </Squircle>
 
-                    <div className="mt-2 flex min-h-0 flex-1 gap-2">
+                    <motion.div
+                      initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={reduceMotion ? undefined : { opacity: 0 }}
+                      transition={{
+                        duration: 0.2,
+                        delay: reduceMotion ? 0 : 0.05,
+                        ease: "easeOut",
+                      }}
+                      className="mt-2 flex min-h-0 flex-1 gap-2"
+                    >
                       <div
                         ref={listRef}
                         id="command-menu-list"
@@ -414,7 +501,7 @@ export default function CommandMenu({
                                     </span>
                                   )}
                                   {selected && (
-                                    <span className="shrink-0 text-[#FC4C01]">
+                                    <span className="shrink-0 text-brand">
                                       <ArrowIcon />
                                     </span>
                                   )}
@@ -430,9 +517,18 @@ export default function CommandMenu({
                           <Preview key={activeItem.href} item={activeItem} />
                         )}
                       </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="hidden shrink-0 items-center gap-4 px-3 pb-1 pt-2.5 text-[12px] font-medium text-[#868593] sm:flex">
+                    <motion.div
+                      initial={reduceMotion ? false : { opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={reduceMotion ? undefined : { opacity: 0 }}
+                      transition={{
+                        duration: 0.15,
+                        delay: reduceMotion ? 0 : 0.08,
+                      }}
+                      className="hidden shrink-0 items-center gap-4 px-3 pb-1 pt-2.5 text-[12px] font-medium text-[#868593] sm:flex"
+                    >
                       <span className="flex items-center gap-1.5">
                         <Key>↑</Key>
                         <Key>↓</Key>
@@ -446,8 +542,8 @@ export default function CommandMenu({
                         <PixelUILogo className="size-3.5" />
                         {results.length} of {components.length}
                       </span>
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 </Squircle>
               </div>
             </Squircle>

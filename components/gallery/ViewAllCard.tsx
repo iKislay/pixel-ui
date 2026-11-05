@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PixelUILogo } from "@/components/logos";
 import { cn } from "@/lib/utils";
 
 export default function ViewAllCard({
@@ -12,17 +13,12 @@ export default function ViewAllCard({
     <Link
       href="/components"
       className={cn(
-        "group relative flex min-h-45 flex-col justify-between overflow-hidden rounded-[32px] bg-[#FC4C01] p-6 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] transition-colors duration-200 ease-out hover:bg-[#e04300]",
+        "group relative flex min-h-45 flex-col justify-between overflow-hidden rounded-[32px] bg-brand p-6 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)] transition-colors duration-200 ease-out hover:bg-brand-hover",
         className,
       )}
       style={{ cornerShape: "squircle" } as React.CSSProperties}
     >
-      <img
-        src="/logos/Pixelui.svg"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-20 -right-20 h-80 w-80 opacity-25 [filter:brightness(0)_invert(1)]"
-      />
+      <PixelUILogo className="pointer-events-none absolute -bottom-10 -right-10 size-56 select-none text-white opacity-10 sm:-bottom-14 sm:-right-14 sm:size-72 dark:text-white dark:opacity-10" />
 
       <svg
         viewBox="0 0 24 24"

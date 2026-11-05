@@ -64,75 +64,80 @@ function NavLink({ label, href, external, icon: Icon }: FooterLink) {
 
 export default function Footer() {
   return (
-    <footer className="relative w-full overflow-hidden bg-white text-black dark:bg-black dark:text-white">
-      <PixelUILogo className="pointer-events-none absolute -bottom-14 -right-14 size-[22rem] select-none opacity-5 sm:-bottom-20 sm:-right-20 sm:size-[30rem] lg:-bottom-24 lg:-right-24 lg:size-[38rem] dark:opacity-[0.07]" />
+    <footer className="relative w-full p-1.5 md:p-2.5">
+      <div
+        className="relative flex min-h-[24rem] w-full flex-col justify-between overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F5F5F7] px-6 py-8 text-black sm:min-h-[30rem] sm:px-10 sm:py-10 lg:min-h-[34rem] lg:px-12 lg:py-12 dark:border-transparent dark:border-apple dark:bg-[#121212] dark:text-white"
+        style={{ cornerShape: "squircle" } as React.CSSProperties}
+      >
+        <PixelUILogo className="pointer-events-none absolute -bottom-10 -right-10 size-64 select-none opacity-5 sm:-bottom-14 sm:-right-14 sm:size-80 lg:-bottom-16 lg:-right-16 lg:size-[24rem] dark:opacity-[0.07]" />
 
-      <div className="relative mx-auto flex min-h-[min(40svh,50rem)] w-full max-w-[96rem] flex-col px-6 pt-10 sm:min-h-[min(85svh,50rem)] sm:px-10 sm:pt-24 md:pt-32">
-        <div className="h-px w-full bg-white/10" />
+        <div className="relative mx-auto flex w-full max-w-[96rem] flex-1 flex-col justify-between">
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-6">
+              <Link href="/" className="flex h-fit w-fit items-center gap-2.5">
+                <PixelUILogo className="h-8 w-8" />
+                <span className="font-runde text-2xl font-bold tracking-tight">
+                  Pixel UI
+                </span>
+              </Link>
 
-        <div className="flex flex-wrap items-center justify-between gap-6 py-8">
-          <Link href="/" className="flex h-fit w-fit items-center gap-2.5">
-            <PixelUILogo className="h-8 w-8" />
-            <span className="font-runde text-2xl font-bold tracking-tight">
-              Pixel UI
+              <nav className="flex flex-wrap items-center gap-x-7 gap-y-2">
+                {LINKS.map((link, index) => (
+                  <Fragment key={link.label}>
+                    {link.icon && !LINKS[index - 1]?.icon && (
+                      <span
+                        aria-hidden="true"
+                        className="-mx-3 text-lg text-black/25 dark:text-white/25"
+                      >
+                        |
+                      </span>
+                    )}
+                    <NavLink {...link} />
+                  </Fragment>
+                ))}
+              </nav>
+            </div>
+
+            <div className="pt-8 sm:pt-12">
+              <h2 className="selection-contrast font-runde text-[clamp(1.5rem,6.25vw,5.25rem)] font-bold leading-[0.92] tracking-tight">
+                Pixel-Perfect Components
+              </h2>
+            </div>
+          </div>
+
+          <div
+            className={`selection-contrast flex flex-wrap items-center justify-between gap-3 pt-10 text-xs ${MUTED}`}
+          >
+            <span className="flex flex-wrap items-center gap-2.5">
+              <span>Pixel UI &copy; {new Date().getFullYear()}</span>
+              <span
+                aria-hidden="true"
+                className="text-black/25 dark:text-white/25"
+              >
+                &middot;
+              </span>
+              <a href={`mailto:${SUPPORT_EMAIL}`} className={HOVER}>
+                Support: {SUPPORT_EMAIL}
+              </a>
             </span>
-          </Link>
-
-          <nav className="flex flex-wrap items-center gap-x-7 gap-y-2">
-            {LINKS.map((link, index) => (
-              <Fragment key={link.label}>
-                {link.icon && !LINKS[index - 1]?.icon && (
-                  <span
-                    aria-hidden="true"
-                    className="-mx-3 text-lg text-black/25 dark:text-white/25"
-                  >
-                    |
-                  </span>
-                )}
-                <NavLink {...link} />
-              </Fragment>
-            ))}
-          </nav>
-        </div>
-
-        <div className="flex flex-1 items-center py-16">
-          <h2 className="selection-contrast font-runde text-[clamp(3rem,12.5vw,10.5rem)] font-bold leading-[0.92] tracking-tight">
-            Pixel-Perfect Components
-          </h2>
-        </div>
-
-        <div
-          className={`selection-contrast flex flex-wrap items-center justify-between gap-3 pb-8 text-xs ${MUTED}`}
-        >
-          <span className="flex flex-wrap items-center gap-2.5">
-            <span>Pixel UI &copy; {new Date().getFullYear()}</span>
-            <span
-              aria-hidden="true"
-              className="text-black/25 dark:text-white/25"
-            >
-              &middot;
+            <span className="flex flex-wrap items-center gap-2.5">
+              {UTILITY_LINKS.map((link, index) => (
+                <Fragment key={link.href}>
+                  {index > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className="text-black/25 dark:text-white/25"
+                    >
+                      &middot;
+                    </span>
+                  )}
+                  <a href={link.href} className={HOVER}>
+                    {link.label}
+                  </a>
+                </Fragment>
+              ))}
             </span>
-            <a href={`mailto:${SUPPORT_EMAIL}`} className={HOVER}>
-              Support: {SUPPORT_EMAIL}
-            </a>
-          </span>
-          <span className="flex flex-wrap items-center gap-2.5">
-            {UTILITY_LINKS.map((link, index) => (
-              <Fragment key={link.href}>
-                {index > 0 && (
-                  <span
-                    aria-hidden="true"
-                    className="text-black/25 dark:text-white/25"
-                  >
-                    &middot;
-                  </span>
-                )}
-                <a href={link.href} className={HOVER}>
-                  {link.label}
-                </a>
-              </Fragment>
-            ))}
-          </span>
+          </div>
         </div>
       </div>
     </footer>
