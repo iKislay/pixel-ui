@@ -184,7 +184,7 @@ function Section({
   return (
     <section className="mx-auto w-full max-w-4xl px-5 pt-20 sm:px-6 md:pt-28">
       <div className="mb-6 flex flex-col gap-1.5">
-        <h2 className="text-balance font-serif text-3xl font-normal tracking-tight sm:text-4xl">
+        <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-4xl">
           {title}
         </h2>
         <p className="text-balance text-sm font-medium text-muted-foreground">

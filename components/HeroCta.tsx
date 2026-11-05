@@ -94,7 +94,7 @@ export default function HeroCta() {
           href="/components"
           className="relative flex h-12 items-center px-6 text-sm font-semibold font-rund text-white"
         >
-          View all components
+          Browse components
         </Link>
       </motion.div>
     </div>

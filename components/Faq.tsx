@@ -40,7 +40,7 @@ export default function Faq({ items }: { items: FaqItem[] }) {
               className="flex w-full cursor-pointer items-center justify-between gap-6 px-4 py-4 text-left"
             >
               <span
-                className={`font-serif text-lg tracking-tight transition-colors duration-150 ease-out sm:text-xl ${expanded ? "text-foreground" : "text-foreground/60 hover:text-foreground"}`}
+                className={`text-[15px] font-medium transition-colors duration-150 ease-out ${expanded ? "text-foreground" : "text-foreground/60 hover:text-foreground"}`}
               >
                 {item.question}
               </span>

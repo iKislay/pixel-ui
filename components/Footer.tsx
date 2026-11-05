@@ -98,7 +98,7 @@ export default function Footer() {
 
           <div className="pt-4 sm:pt-6">
             <h2 className="selection-contrast font-serif text-[clamp(1.5rem,4vw,3.5rem)] font-normal leading-none tracking-tight">
-              Pixel-Perfect <span className="italic">Components</span>
+              Crafted with <span className="italic">precision</span>
             </h2>
           </div>
         </div>

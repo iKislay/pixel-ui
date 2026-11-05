@@ -55,7 +55,7 @@ export default function LegalPage({
       <div className="mt-12 flex flex-col gap-10">
         {sections.map((section) => (
           <section key={section.heading} className="flex flex-col gap-3">
-            <h2 className="font-serif text-2xl font-normal tracking-tight">
+            <h2 className="text-xl font-medium tracking-tight">
               {section.heading}
             </h2>
 

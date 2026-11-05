@@ -51,7 +51,7 @@ export default async function ComponentsIndexPage() {
             id={section.id}
             className="mt-14 scroll-mt-28 first:mt-10"
           >
-            <h2 className="font-serif text-2xl font-normal tracking-tight sm:text-3xl">
+            <h2 className="text-2xl font-medium tracking-tight sm:text-3xl">
               {section.label}{" "}
               <span className="text-muted-foreground">
                 <span className="text-brand">[</span>

@@ -123,7 +123,7 @@ export default async function McpPage() {
                 {index + 1}
               </span>
               <section className="flex flex-col gap-3">
-                <h2 className="font-serif text-xl font-normal leading-6 tracking-tight">
+                <h2 className="text-base font-medium leading-6">
                   {step.heading}
                 </h2>
                 {step.content}
@@ -133,8 +133,8 @@ export default async function McpPage() {
         </ol>
 
         <section className="mt-16 flex flex-col gap-3 border-t border-foreground/10 pt-10">
-          <h2 className="font-serif text-2xl font-normal tracking-tight">
-            Without <span className="italic">MCP</span>
+          <h2 className="text-2xl font-medium tracking-tight">
+            Without <span className="font-serif font-normal italic">MCP</span>
           </h2>
           <p className="text-[15px] leading-relaxed text-muted-foreground">
             The shadcn CLI installs the same files. Browse everything on the{" "}
@@ -150,8 +150,8 @@ export default async function McpPage() {
         </section>
 
         <section className="mt-16 flex flex-col gap-3 border-t border-foreground/10 pt-10">
-          <h2 className="font-serif text-2xl font-normal tracking-tight">
-            Common <span className="italic">questions</span>
+          <h2 className="text-2xl font-medium tracking-tight">
+            Common <span className="font-serif font-normal italic">questions</span>
           </h2>
           <div className="-mx-4">
             <Faq items={FAQ} />

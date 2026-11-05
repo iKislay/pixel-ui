@@ -28,8 +28,8 @@ export default function NotFoundHero() {
           </Rise>
 
           <Rise index={1}>
-            <p className="font-serif text-3xl font-normal tracking-tight text-black dark:text-white sm:text-4xl">
-              This page <span className="italic">went missing</span>.
+            <p className="text-3xl font-medium tracking-tight text-black dark:text-white sm:text-4xl">
+              This page <span className="font-serif font-normal italic">went missing</span>.
             </p>
           </Rise>
 

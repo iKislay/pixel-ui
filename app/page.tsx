@@ -76,7 +76,7 @@ export default async function Home() {
                 }
                 sub={
                   <>
-                    Pixel UI is a free, open-source collection of pixel-perfect animated React components. Preview every one live below, then install it with the shadcn CLI or let your AI agent add it over {" "}
+                    Free, animated React components crafted with Motion and Tailwind CSS. Try them below, then drop them into your project using the shadcn CLI or{" "}
                     <Link href="/mcp" className="text-inherit">
                       MCP
                     </Link>
@@ -94,8 +94,8 @@ export default async function Home() {
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-5 pb-20 sm:px-6 md:grid-cols-[1fr_2fr] md:pb-28">
         <header className="flex flex-col items-start gap-1">
           <span className="text-sm font-medium text-muted-foreground">FAQ</span>
-          <h2 className="font-serif text-3xl font-normal tracking-tight text-foreground sm:text-4xl md:text-5xl">
-            Good to <span className="italic">know</span>
+          <h2 className="text-3xl font-medium tracking-tight text-foreground sm:text-4xl md:text-5xl">
+            Good to <span className="font-serif font-normal italic">know</span>
           </h2>
         </header>
         <Faq items={FAQ} />

@@ -7,7 +7,7 @@ export const SITE_ALT_NAMES = ["PixelUI", "Pixel UI Components", "pixelui.dev"];
 export const SITE_TAGLINE = "Pixel UI: Pixel-Perfect Animated React Components";
 
 export const SITE_DESCRIPTION =
-  "Pixel UI (PixelUI) is a free, open-source registry of pixel-perfect animated React components. Built with Tailwind CSS, Motion and the shadcn CLI. Copy, paste, and own the code.";
+  "Free, open-source animated React components built with Tailwind CSS and Motion. Install via shadcn or MCP, copy into your codebase, and own every frame.";
 
 export const SITE_REPO = "https://github.com/ikislay/pixel-ui";
 
