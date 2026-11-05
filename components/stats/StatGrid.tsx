@@ -12,7 +12,7 @@ export default function StatGrid({ stats }: { stats: Stat[] }) {
           className="flex flex-col items-center gap-1 rounded-3xl bg-card/60 px-4 py-8 text-center dark:bg-muted/60 sm:px-6 sm:py-9"
           style={{ cornerShape: "squircle" } as React.CSSProperties}
         >
-          <span className="font-runde text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
+          <span className="font-serif text-3xl font-normal tracking-tight sm:text-4xl lg:text-5xl">
             {stat.value}
           </span>
           <span className="text-balance text-xs font-medium text-muted-foreground sm:text-sm">

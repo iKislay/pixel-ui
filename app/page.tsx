@@ -36,7 +36,7 @@ export default async function Home() {
               <HeroIntro
                 headline={
                   <>
-                    <span className="block">Pixel-Perfect Components,</span>
+                    <span className="block italic">Pixel-Perfect Components,</span>
                     <span className="block">For Modern Products.</span>
                   </>
                 }

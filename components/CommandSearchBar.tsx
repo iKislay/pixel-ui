@@ -71,14 +71,14 @@ export function CommandSearchBar({
       >
         <span className="flex min-w-0 items-center gap-2 text-muted-foreground transition-colors group-hover:text-foreground">
           <SearchIcon className="size-4 shrink-0" />
-          <span className="truncate font-runde text-[13px] font-medium text-[#868593] dark:text-[#A1A0AB]">
+          <span className="truncate text-[13px] font-medium text-[#868593] dark:text-[#A1A0AB]">
             <span className="hidden sm:inline">Search components...</span>
             <span className="sm:hidden">Search...</span>
           </span>
         </span>
 
         <Squircle asChild cornerRadius={8} cornerSmoothing={1}>
-          <kbd className="flex h-7 min-w-7 shrink-0 items-center justify-center bg-popover px-2 font-runde text-[11px] font-semibold text-[#868593] shadow-xs transition-colors group-hover:text-black dark:text-[#A1A0AB] dark:group-hover:text-white">
+          <kbd className="flex h-7 min-w-7 shrink-0 items-center justify-center bg-popover px-2 text-[11px] font-semibold text-[#868593] shadow-xs transition-colors group-hover:text-black dark:text-[#A1A0AB] dark:group-hover:text-white">
             ⌘K
           </kbd>
         </Squircle>

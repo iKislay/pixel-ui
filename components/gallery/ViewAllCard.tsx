@@ -34,8 +34,8 @@ export default function ViewAllCard({
         <path d="M7 17 17 7M8 7h9v9" />
       </svg>
 
-      <span className="relative font-runde text-2xl font-bold tracking-tight sm:text-3xl">
-        View all
+      <span className="relative font-serif text-3xl font-normal tracking-tight sm:text-4xl">
+        View <span className="italic">all</span>
         <br />
         {count} components
       </span>

@@ -29,8 +29,8 @@ export default async function ComponentsIndexPage() {
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-5 pb-16 pt-32 sm:px-6 md:pt-40">
         <header className="flex flex-col items-center gap-3 text-center">
-          <h1 className="max-w-2xl text-balance font-runde text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">
-            {components.length}+ pixel-perfect and unique components
+          <h1 className="max-w-2xl text-balance font-serif text-3xl font-normal tracking-tight sm:text-4xl md:text-5xl">
+            {components.length}+ pixel-perfect and unique <span className="italic">components</span>
           </h1>
           <p className="max-w-lg text-balance text-sm font-medium text-muted-foreground sm:text-base">
             Every component is a single file you own, not a dependency you
@@ -51,7 +51,7 @@ export default async function ComponentsIndexPage() {
             id={section.id}
             className="mt-14 scroll-mt-28 first:mt-10"
           >
-            <h2 className="font-runde text-lg font-semibold tracking-tight sm:text-xl">
+            <h2 className="font-serif text-2xl font-normal tracking-tight sm:text-3xl">
               {section.label}{" "}
               <span className="text-muted-foreground">
                 <span className="text-brand">[</span>

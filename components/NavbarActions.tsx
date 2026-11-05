@@ -129,7 +129,7 @@ export function NavbarActions({
             </span>
 
             {liveStars != null && (
-              <span className="font-runde text-xs font-medium tabular-nums text-foreground/80">
+              <span className="text-xs font-medium tabular-nums text-foreground/80">
                 {liveStars}
               </span>
             )}
@@ -245,7 +245,7 @@ export function NavbarActions({
         </span>
 
         {liveStars != null && (
-          <span className="pr-4 font-runde text-sm font-medium tabular-nums text-foreground/80">
+          <span className="pr-4 text-sm font-medium tabular-nums text-foreground/80">
             {liveStars}
           </span>
         )}

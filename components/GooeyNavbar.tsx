@@ -160,7 +160,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     className={cn(
-                      "font-runde text-3xl font-semibold transition-colors duration-150 ease-out",
+                      "text-3xl font-semibold transition-colors duration-150 ease-out",
                       pathname === link.href
                         ? "text-foreground"
                         : "text-foreground/50",

@@ -79,7 +79,7 @@ export default async function McpPage() {
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 pb-24 pt-32 sm:px-6 md:pt-40">
         <header className="flex flex-col gap-3">
-          <h1 className="font-runde text-3xl font-bold tracking-tight sm:text-4xl">
+          <h1 className="font-serif text-4xl font-normal tracking-tight sm:text-5xl">
             MCP
           </h1>
           <p className="font-medium text-muted-foreground">{DESCRIPTION}</p>
@@ -95,7 +95,7 @@ export default async function McpPage() {
                 {index + 1}
               </span>
               <section className="flex flex-col gap-3">
-                <h2 className="font-runde text-lg font-bold leading-6 tracking-tight">
+                <h2 className="font-serif text-xl font-normal leading-6 tracking-tight">
                   {step.heading}
                 </h2>
                 {step.content}
@@ -105,8 +105,8 @@ export default async function McpPage() {
         </ol>
 
         <section className="mt-16 flex flex-col gap-3 border-t border-foreground/10 pt-10">
-          <h2 className="font-runde text-lg font-bold tracking-tight">
-            Without MCP
+          <h2 className="font-serif text-2xl font-normal tracking-tight">
+            Without <span className="italic">MCP</span>
           </h2>
           <p className="text-[15px] leading-relaxed text-muted-foreground">
             The shadcn CLI installs the same files. Browse everything on the{" "}

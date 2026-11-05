@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito_Sans, Geist_Mono } from "next/font/google";
+import { Nunito_Sans, Geist_Mono, Instrument_Serif } from "next/font/google";
 import localFont from "next/font/local";
 import { ThemeProvider } from "@/components/theme-provider";
 import { StarPrompt } from "@/components/StarPrompt";
@@ -24,26 +24,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const volteRounded = localFont({
-  variable: "--font-volte-rounded",
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+});
+
+const openRunde = localFont({
+  variable: "--font-open-runde",
   src: [
     {
-      path: "../public/fonts/VolteRounded-Regular.woff2",
+      path: "../public/fonts/OpenRunde-Regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../public/fonts/VolteRounded-Medium.woff2",
+      path: "../public/fonts/OpenRunde-Medium.woff2",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../public/fonts/VolteRounded-Semibold.woff2",
+      path: "../public/fonts/OpenRunde-Semibold.woff2",
       weight: "600",
       style: "normal",
     },
     {
-      path: "../public/fonts/VolteRounded-Bold.woff2",
+      path: "../public/fonts/OpenRunde-Bold.woff2",
       weight: "700",
       style: "normal",
     },
@@ -114,7 +121,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${nunitoSans.variable} ${geistMono.variable} ${volteRounded.variable} h-full antialiased`}
+      className={`${nunitoSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${openRunde.variable} h-full antialiased`}
     >
       <head>
         <script

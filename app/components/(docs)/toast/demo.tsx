@@ -95,7 +95,7 @@ const DEMOS = [
 
 export default function ToastPage() {
   return (
-    <div className="relative flex h-full min-h-[460px] items-center justify-center px-6 font-runde">
+    <div className="relative flex h-full min-h-[460px] items-center justify-center px-6">
       <div className="flex max-w-sm flex-wrap justify-center gap-2">
         {DEMOS.map((demo) => (
           <button

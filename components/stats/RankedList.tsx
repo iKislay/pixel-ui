@@ -51,7 +51,7 @@ export default function RankedList({
           />
 
           <div className="relative flex items-center gap-3 px-4 py-3 sm:px-5">
-            <span className="w-5 shrink-0 font-runde text-sm font-bold tabular-nums text-muted-foreground">
+            <span className="w-5 shrink-0 text-sm font-bold tabular-nums text-muted-foreground">
               {index + 1}
             </span>
 
@@ -63,7 +63,7 @@ export default function RankedList({
               </span>
             )}
 
-            <span className="ml-auto shrink-0 font-runde text-sm font-bold tabular-nums sm:text-base">
+            <span className="ml-auto shrink-0 text-sm font-bold tabular-nums sm:text-base">
               {formatNumber(row.value)}
               <span className="ml-1.5 text-xs font-medium text-muted-foreground">
                 {row.value === 1 ? unit.replace(/s$/, "") : unit}

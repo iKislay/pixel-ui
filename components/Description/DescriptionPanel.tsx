@@ -308,7 +308,7 @@ export default function DescriptionPanel({
                 transition={{ duration: 0.15, ease: "easeOut" }}
                 className="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 mr-3.5 flex items-center"
               >
-                <span className="whitespace-nowrap rounded-xl border border-black/[0.08] bg-popover px-3 py-1.5 font-runde text-xs font-medium text-foreground shadow-xl dark:border-white/10 dark:bg-[#1E1E1E]">
+                <span className="whitespace-nowrap rounded-xl border border-black/[0.08] bg-popover px-3 py-1.5 text-xs font-medium text-foreground shadow-xl dark:border-white/10 dark:bg-[#1E1E1E]">
                   {open ? "Drag to resize or close" : "Drag to open"}
                 </span>
                 <div className="absolute -right-1 top-1/2 -translate-y-1/2 h-2 w-2 rotate-45 border-r border-t border-black/[0.08] bg-popover dark:border-white/10 dark:bg-[#1E1E1E]" />

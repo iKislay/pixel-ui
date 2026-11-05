@@ -43,7 +43,7 @@ export default function LegalPage({
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-5 pb-24 pt-32 sm:px-6 md:pt-40">
       <header className="flex flex-col gap-3">
-        <h1 className="font-runde text-3xl font-bold tracking-tight sm:text-4xl">
+        <h1 className="font-serif text-4xl font-normal tracking-tight sm:text-5xl">
           {title}
         </h1>
         <p className="font-medium text-muted-foreground">{intro}</p>
@@ -55,7 +55,7 @@ export default function LegalPage({
       <div className="mt-12 flex flex-col gap-10">
         {sections.map((section) => (
           <section key={section.heading} className="flex flex-col gap-3">
-            <h2 className="font-runde text-lg font-bold tracking-tight">
+            <h2 className="font-serif text-2xl font-normal tracking-tight">
               {section.heading}
             </h2>
 

@@ -12,8 +12,8 @@ export default function ComponentsShowcase() {
         <span className="text-sm font-medium text-muted-foreground">
           New
         </span>
-        <h2 className="font-runde text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl">
-          Recently launched
+        <h2 className="font-serif text-3xl font-normal tracking-tight text-foreground sm:text-4xl md:text-5xl">
+          Recently <span className="italic">launched</span>
         </h2>
       </header>
 

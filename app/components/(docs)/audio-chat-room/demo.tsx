@@ -36,7 +36,7 @@ export default function AudioChatRoomPage() {
   }));
 
   return (
-    <div className="relative flex h-full min-h-[500px] items-center justify-center px-6 font-runde">
+    <div className="relative flex h-full min-h-[500px] items-center justify-center px-6">
       <AudioChatRoom
         participants={participants}
         you={{

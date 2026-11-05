@@ -31,7 +31,7 @@ export default function MemberSelectorPage() {
   const maxVisible = Number(maxStr) || 5;
 
   return (
-    <div className="relative flex h-full min-h-[500px] items-center justify-center px-6 pb-24 font-runde">
+    <div className="relative flex h-full min-h-[500px] items-center justify-center px-6 pb-24">
       <MemberSelector
         members={MEMBERS}
         selected={selected}

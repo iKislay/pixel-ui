@@ -99,8 +99,8 @@ export default function Footer() {
           </div>
 
           <div className="pt-4 sm:pt-6">
-            <h2 className="selection-contrast font-runde text-[clamp(0.75rem,3.125vw,2.625rem)] font-bold leading-[0.95] tracking-tight">
-              Pixel-Perfect Components
+            <h2 className="selection-contrast font-serif text-[clamp(1.5rem,4vw,3.5rem)] font-normal leading-none tracking-tight">
+              Pixel-Perfect <span className="italic">Components</span>
             </h2>
           </div>
         </div>

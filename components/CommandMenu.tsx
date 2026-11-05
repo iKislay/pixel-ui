@@ -88,7 +88,7 @@ const Highlight = ({ text, query }: { text: string; query: string }) => {
 };
 
 const Key = ({ children }: { children: React.ReactNode }) => (
-  <kbd className="grid h-5 min-w-5 place-items-center rounded-[6px] bg-[#F7F7FA] px-1 font-runde text-[10px] font-semibold text-[#868593] dark:bg-[#121212]">
+  <kbd className="grid h-5 min-w-5 place-items-center rounded-[6px] bg-[#F7F7FA] px-1 text-[10px] font-semibold text-[#868593] dark:bg-[#121212]">
     {children}
   </kbd>
 );
@@ -300,7 +300,7 @@ export default function CommandMenu({
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-100 flex items-start justify-center px-4 pt-[12vh] font-runde">
+        <div className="fixed inset-0 z-100 flex items-start justify-center px-4 pt-[12vh]">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

@@ -67,7 +67,7 @@ export default function ComponentCard({
       </div>
 
       <div className="pointer-events-none absolute bottom-5 left-5 opacity-0 transition-all duration-200 ease-out group-hover:opacity-100 [@media(hover:none)]:opacity-100 sm:bottom-6 sm:left-6 motion-reduce:transition-none">
-        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3.5 py-1.5 font-runde text-xs font-medium text-white shadow-md backdrop-blur-md dark:bg-[#1c1c1e]/85 sm:px-4 sm:py-2 sm:text-sm">
+        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3.5 py-1.5 text-xs font-medium text-white shadow-md backdrop-blur-md dark:bg-[#1c1c1e]/85 sm:px-4 sm:py-2 sm:text-sm">
           <span>{item.name}</span>
           {item.isNew && (
             <span className="rounded-full bg-brand/20 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-brand">

@@ -22,14 +22,14 @@ export default function NotFoundHero() {
 
           <Rise
             index={0}
-            className="font-runde text-[6.5rem] font-bold leading-[0.85] tracking-tight sm:text-[9rem] lg:text-[12rem]"
+            className="font-serif text-[7.5rem] font-normal leading-[0.85] tracking-tight sm:text-[10rem] lg:text-[13rem]"
           >
             <DodgingDigits digits="404" accentIndex={1} />
           </Rise>
 
           <Rise index={1}>
-            <p className="font-runde text-2xl font-bold tracking-tight text-black dark:text-white sm:text-3xl">
-              This page went missing.
+            <p className="font-serif text-3xl font-normal tracking-tight text-black dark:text-white sm:text-4xl">
+              This page <span className="italic">went missing</span>.
             </p>
           </Rise>
 

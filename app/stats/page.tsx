@@ -108,7 +108,7 @@ export default async function StatsPage() {
             >
               <a
                 href="#overview"
-                className="flex flex-col items-center gap-2 font-runde text-sm font-semibold text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground"
+                className="flex flex-col items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground"
               >
                 Scroll to the numbers
                 <svg
@@ -184,7 +184,7 @@ function Section({
   return (
     <section className="mx-auto w-full max-w-4xl px-5 pt-20 sm:px-6 md:pt-28">
       <div className="mb-6 flex flex-col gap-1.5">
-        <h2 className="text-balance font-runde text-2xl font-bold tracking-tight sm:text-3xl">
+        <h2 className="text-balance font-serif text-3xl font-normal tracking-tight sm:text-4xl">
           {title}
         </h2>
         <p className="text-balance text-sm font-medium text-muted-foreground">

@@ -50,7 +50,7 @@ export function StarPrompt() {
           exit={reduceMotion ? { opacity: 0 } : { x: "120%" }}
           transition={reduceMotion ? { duration: 0.15 } : spring}
           // drop-shadow, since a box-shadow would be cut off by the squircle clip
-          className="fixed bottom-4 right-4 z-50 w-[calc(100vw-2rem)] font-runde [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.05))_drop-shadow(0_2px_4px_rgba(0,0,0,0.05))_drop-shadow(0_6px_10px_rgba(0,0,0,0.06))] sm:bottom-6 sm:right-6 sm:w-[300px] dark:[filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.4))_drop-shadow(0_2px_4px_rgba(0,0,0,0.35))_drop-shadow(0_6px_10px_rgba(0,0,0,0.4))]"
+          className="fixed bottom-4 right-4 z-50 w-[calc(100vw-2rem)] [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.05))_drop-shadow(0_2px_4px_rgba(0,0,0,0.05))_drop-shadow(0_6px_10px_rgba(0,0,0,0.06))] sm:bottom-6 sm:right-6 sm:w-[300px] dark:[filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.4))_drop-shadow(0_2px_4px_rgba(0,0,0,0.35))_drop-shadow(0_6px_10px_rgba(0,0,0,0.4))]"
         >
           {/* the outer squircle shows through the 1px gap as a hairline, which a border can't do on a clipped shape */}
           <Squircle asChild cornerRadius={CARD_RADIUS + 1} cornerSmoothing={1}>

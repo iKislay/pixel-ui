@@ -12,7 +12,7 @@ export default function Page() {
   const count = Number(countStr) || 3;
 
   return (
-    <div className="relative h-full min-h-[500px] w-full overflow-hidden font-runde">
+    <div className="relative h-full min-h-[500px] w-full overflow-hidden">
       <AsciiButterflies variant={variant} count={count} className="absolute inset-0" />
       <div className="relative flex h-full min-h-[500px] items-center justify-center pb-16">
         <DemoSearch />
