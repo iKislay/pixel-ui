@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import SidebarNav from "./SidebarNav";
 import SidebarHeader from "./SidebarHeader";
 import SidebarScroll from "./SidebarScroll";
@@ -95,19 +95,31 @@ const Sidebar = ({
 
   return (
     <div className="pointer-events-none absolute left-0 top-0 z-40 h-full">
-      {!open && (
-        <Tooltip label="Open sidebar">
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            aria-label="Open sidebar"
-            data-chrome
-            className="pointer-events-auto absolute left-4 top-4 z-50 cursor-pointer rounded-lg bg-[#F4F4F9] p-2 text-[#868593] transition-[color,transform] duration-200 hover:text-black active:scale-95 motion-reduce:transition-none dark:bg-popover dark:text-[#A1A0AB] dark:hover:text-white"
+      <AnimatePresence>
+        {!open && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
+            className="pointer-events-none absolute left-4 top-0 z-50 flex h-11 items-center"
           >
-            <ClosedIcon className="size-5" />
-          </button>
-        </Tooltip>
-      )}
+            <Tooltip label="Open sidebar">
+              <Squircle asChild cornerRadius={8} cornerSmoothing={1}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(true)}
+                  aria-label="Open sidebar"
+                  data-chrome
+                  className="pointer-events-auto flex size-8 cursor-pointer items-center justify-center bg-[#F4F4F9] text-[#868593] outline-none transition-[color,transform] duration-200 hover:text-black focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand/60 active:scale-95 motion-reduce:transition-none dark:bg-popover dark:text-[#A1A0AB] dark:hover:text-white"
+                >
+                  <ClosedIcon className="size-[18px]" />
+                </button>
+              </Squircle>
+            </Tooltip>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Squircle asChild cornerRadius={23} cornerSmoothing={1}>
         <motion.div
