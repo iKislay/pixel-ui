@@ -31,7 +31,6 @@ const PANEL_WIDTH = 760;
 const PILL_HEIGHT = 52;
 const GAP = 10;
 const EDGE = 16;
-const FADE = 40;
 
 const morphSpring = {
   type: "spring",
@@ -128,7 +127,6 @@ export default function CommandMenu({
       : null,
   );
   const openRef = useRef(initialOpen);
-  const [edges, setEdges] = useState({ start: false, end: false });
 
   const matches = useMemo(() => search(query), [query]);
   const results = category
@@ -240,22 +238,10 @@ export default function CommandMenu({
     };
   }, []);
 
-  const measureEdges = () => {
-    const shelf = shelfRef.current;
-    if (!shelf) return;
-    const start = shelf.scrollLeft > 0;
-    const end = shelf.scrollLeft + shelf.clientWidth < shelf.scrollWidth - 1;
-    setEdges((prev) =>
-      prev.start === start && prev.end === end ? prev : { start, end },
-    );
-  };
-
-  useEffect(measureEdges, [open, results.length, viewport]);
-
   useEffect(() => {
     shelfRef.current
       ?.querySelector(`[data-index="${active}"]`)
-      ?.scrollIntoView({ block: "nearest", inline: "nearest" });
+      ?.scrollIntoView({ block: "nearest" });
   }, [active]);
 
   const close = () => {
@@ -277,17 +263,17 @@ export default function CommandMenu({
     inputRef.current?.focus();
   };
 
-  // ←/→ walk the shelf, ↑/↓ walk the category chips
+  // ↑/↓ walk the list, ←/→ walk the category chips
   const onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const count = results.length;
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
-      const step = e.key === "ArrowRight" ? 1 : -1;
+      const step = e.key === "ArrowDown" ? 1 : -1;
       setActive((i) => (count ? (i + step + count) % count : 0));
-    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       e.preventDefault();
       const cycle = [null, ...categories];
-      const step = e.key === "ArrowDown" ? 1 : -1;
+      const step = e.key === "ArrowRight" ? 1 : -1;
       const next = cycle.indexOf(category) + step;
       pickCategory(cycle[(next + cycle.length) % cycle.length]);
     } else if (e.key === "Enter" && !e.nativeEvent.isComposing) {
@@ -452,7 +438,7 @@ export default function CommandMenu({
                 {results.length === 0 ? (
                   <motion.div
                     variants={rise}
-                    className="mt-3 flex h-[150px] flex-col items-center justify-center gap-1 rounded-[20px] bg-[#F4F4F9] text-center sm:h-[168px] dark:bg-[#121212]"
+                    className="mt-3 flex aspect-4/3 flex-col items-center justify-center gap-1 rounded-[20px] bg-[#F4F4F9] text-center sm:aspect-auto sm:h-[300px] dark:bg-[#121212]"
                   >
                     <p className="text-[14px] font-semibold text-black dark:text-white">
                       Nothing found
@@ -462,104 +448,103 @@ export default function CommandMenu({
                     </p>
                   </motion.div>
                 ) : (
-                  <div
-                    ref={shelfRef}
-                    id="command-menu-shelf"
-                    role="listbox"
-                    aria-orientation="horizontal"
-                    aria-label={shelfTitle}
-                    onScroll={measureEdges}
-                    style={{
-                      scrollPaddingInline: FADE,
-                      maskImage: `linear-gradient(to right, ${
-                        edges.start ? "transparent" : "#000"
-                      } 0, #000 ${FADE}px, #000 calc(100% - ${FADE}px), ${
-                        edges.end ? "transparent" : "#000"
-                      } 100%)`,
-                    }}
-                    className="no-scrollbar -mx-1 mt-3 flex gap-3 overflow-x-auto px-1 pb-1 pt-2"
+                  <motion.div
+                    variants={rise}
+                    className="mt-3 grid gap-4 sm:grid-cols-[200px_1fr]"
                   >
-                    <AnimatePresence mode="popLayout">
+                    <div
+                      ref={shelfRef}
+                      id="command-menu-shelf"
+                      role="listbox"
+                      aria-label={shelfTitle}
+                      className="no-scrollbar flex max-h-[184px] flex-col gap-0.5 overflow-y-auto sm:max-h-[372px]"
+                    >
                       {results.map((item, index) => {
                         const selected = index === active;
                         return (
-                          <motion.div
+                          <div
                             key={item.href}
-                            layout={!reduceMotion}
-                            variants={rise}
-                            exit={{
-                              opacity: 0,
-                              scale: 0.9,
-                              transition: { duration: 0.15 },
-                            }}
                             id={`command-item-${item.href}`}
                             role="option"
                             aria-selected={selected}
                             data-index={index}
                             onMouseEnter={() => setActive(index)}
                             onClick={() => go(item)}
-                            className="w-[150px] shrink-0 cursor-pointer sm:w-[168px]"
+                            className={cn(
+                              "relative flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl px-3 text-[14px] font-semibold transition-colors duration-200",
+                              selected
+                                ? "text-black dark:text-white"
+                                : "text-[#868593]",
+                            )}
                           >
-                            <motion.div
-                              animate={
-                                reduceMotion
-                                  ? undefined
-                                  : { y: selected ? -4 : 0, scale: selected ? 1 : 0.97 }
-                              }
-                              transition={softSpring}
-                              className={cn(
-                                "relative aspect-square overflow-hidden rounded-[20px] bg-[#F4F4F9] ring-offset-2 ring-offset-white transition-shadow duration-200 dark:bg-[#121212] dark:ring-offset-[#1C1C1E]",
-                                selected && "ring-2 ring-brand",
-                              )}
-                            >
-                              <Recording slug={item.registry} playing={selected} />
-                              {item.isNew && (
-                                <span className="absolute left-2.5 top-2.5 rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                                  New
-                                </span>
-                              )}
-                            </motion.div>
-                            <p
-                              className={cn(
-                                "mt-3 truncate px-1 text-[14px] font-semibold transition-colors duration-200",
-                                selected
-                                  ? "text-black dark:text-white"
-                                  : "text-[#868593]",
-                              )}
-                            >
+                            {selected && (
+                              <motion.span
+                                layoutId="command-row"
+                                transition={reduceMotion ? { duration: 0 } : softSpring}
+                                className="absolute inset-0 rounded-xl bg-[#F4F4F9] dark:bg-[#2C2C2E]"
+                              />
+                            )}
+                            <span className="relative truncate">
                               <Highlight text={item.name} query={query} />
-                            </p>
-                          </motion.div>
+                            </span>
+                            {item.isNew && (
+                              <span className="relative ml-auto shrink-0 rounded-full bg-brand px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white">
+                                New
+                              </span>
+                            )}
+                          </div>
                         );
                       })}
-                    </AnimatePresence>
-                  </div>
-                )}
+                    </div>
 
-                <div className="mt-4 h-5 overflow-hidden px-1">
-                  <AnimatePresence mode="wait" initial={false}>
-                    {activeItem?.description && (
-                      <motion.p
-                        key={activeItem.href}
-                        initial={
-                          reduceMotion
-                            ? { opacity: 0 }
-                            : { opacity: 0, y: 6, filter: "blur(4px)" }
-                        }
-                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                        exit={
-                          reduceMotion
-                            ? { opacity: 0 }
-                            : { opacity: 0, y: -6, filter: "blur(4px)" }
-                        }
-                        transition={{ duration: 0.16, ease: "easeOut" }}
-                        className="truncate text-[13px] font-medium text-[#868593]"
+                    <div className="order-first min-w-0 sm:order-none">
+                      <div
+                        onClick={() => go(activeItem)}
+                        className="relative aspect-4/3 cursor-pointer overflow-hidden rounded-[20px] bg-[#F4F4F9] dark:bg-[#121212]"
                       >
-                        {activeItem.description}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </div>
+                        <AnimatePresence initial={false}>
+                          {activeItem && (
+                            <motion.div
+                              key={activeItem.href}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.18, ease: "easeOut" }}
+                              className="absolute inset-0"
+                            >
+                              <Recording slug={activeItem.registry} playing />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+
+                      <div className="mt-3 h-10 overflow-hidden px-1">
+                        <AnimatePresence mode="wait" initial={false}>
+                          {activeItem?.description && (
+                            <motion.p
+                              key={activeItem.href}
+                              initial={
+                                reduceMotion
+                                  ? { opacity: 0 }
+                                  : { opacity: 0, y: 6, filter: "blur(4px)" }
+                              }
+                              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                              exit={
+                                reduceMotion
+                                  ? { opacity: 0 }
+                                  : { opacity: 0, y: -6, filter: "blur(4px)" }
+                              }
+                              transition={{ duration: 0.16, ease: "easeOut" }}
+                              className="line-clamp-2 text-[13px] font-medium text-[#868593]"
+                            >
+                              {activeItem.description}
+                            </motion.p>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </motion.div>
             </motion.div>
           </div>
