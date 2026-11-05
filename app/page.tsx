@@ -8,6 +8,7 @@ import ComponentsShowcase from "@/components/ComponentsShowcase";
 import Footer from "@/components/Footer";
 import SpiderWebs from "@/components/SpiderWebs";
 import { AsciiJellyfish } from "@/components/ui/ascii-jellyfish";
+import AmbientVeil from "@/components/preview/AmbientVeil";
 
 export const metadata: Metadata = {
   alternates: {
@@ -28,6 +29,7 @@ export default async function Home() {
           <GooeyNavbar stars={stars} />
           <SpiderWebs />
           <AsciiJellyfish variant="color" count={3} className="absolute inset-0" />
+          <AmbientVeil />
 
           <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-3 px-4 pb-20 pt-28 text-center sm:gap-4 sm:px-6">
             <HeroIntro

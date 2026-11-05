@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { AsciiJellyfish } from "@/components/ui/ascii-jellyfish";
+import AmbientVeil from "@/components/preview/AmbientVeil";
+import DemoSearch from "@/components/preview/DemoSearch";
 
 const VARIANTS = ["color", "mono"] as const;
 const COUNTS = [1, 2, 3, 4, 5, 6];
@@ -17,8 +19,12 @@ export default function Page() {
   const [variant, setVariant] = useState<(typeof VARIANTS)[number]>("color");
   const [count, setCount] = useState(4);
   return (
-    <div className="relative h-full w-full font-runde">
-      <AsciiJellyfish variant={variant} count={count} className="h-full w-full" />
+    <div className="relative h-full w-full overflow-hidden font-runde">
+      <AsciiJellyfish variant={variant} count={count} className="absolute inset-0" />
+      <AmbientVeil className="bg-card/75 dark:bg-card/75" />
+      <div className="relative flex h-full items-center justify-center pb-16">
+        <DemoSearch />
+      </div>
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 flex-wrap justify-center gap-2">
         <div className={GROUP}>
           {VARIANTS.map((v) => (
