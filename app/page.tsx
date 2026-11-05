@@ -5,7 +5,9 @@ import { fetchStarCount } from "@/lib/github";
 import HeroCta from "@/components/HeroCta";
 import HeroIntro from "@/components/HeroIntro";
 import ComponentsShowcase from "@/components/ComponentsShowcase";
+import Faq, { type FaqItem } from "@/components/Faq";
 import Footer from "@/components/Footer";
+import { REGISTRY_REPO } from "@/lib/components";
 import SpiderWebs from "@/components/SpiderWebs";
 import { AsciiJellyfish } from "@/components/ui/ascii-jellyfish";
 import AmbientVeil from "@/components/preview/AmbientVeil";
@@ -15,6 +17,38 @@ export const metadata: Metadata = {
     canonical: "/",
   },
 };
+
+const FAQ: FaqItem[] = [
+  {
+    question: "What is Pixel UI?",
+    answer:
+      "A free, open-source collection of pixel-perfect animated React components. Each one is a single file you copy into your project and own.",
+  },
+  {
+    question: "How do I install a component?",
+    answer: `Use the shadcn CLI, for example \`npx shadcn@latest add ${REGISTRY_REPO}/toast\`. Or let your AI agent add it over MCP.`,
+  },
+  {
+    question: "What does my project need?",
+    answer:
+      "React, Tailwind CSS, and shadcn set up with the `cn` helper. The CLI installs any other dependency a component uses, like Motion.",
+  },
+  {
+    question: "Can I use it in commercial projects?",
+    answer:
+      "Yes. Ship it in any app, site, or product. Credit Pixel UI with a visible link to pixelui.dev, and don't sell or redistribute the components themselves.",
+  },
+  {
+    question: "Can I change the code?",
+    answer:
+      "Yes. The file lands in `components/ui`, so edit anything. Props cover the common tweaks.",
+  },
+  {
+    question: "Do the animations respect reduced motion?",
+    answer:
+      "Yes. Every interactive component honors your system's reduced motion setting.",
+  },
+];
 
 export default async function Home() {
   const stars = await fetchStarCount();
@@ -57,6 +91,15 @@ export default async function Home() {
         </div>
       </section>
       <ComponentsShowcase />
+      <section className="mx-auto grid w-full max-w-6xl gap-8 px-5 pb-20 sm:px-6 md:grid-cols-[1fr_2fr] md:pb-28">
+        <header className="flex flex-col items-start gap-1">
+          <span className="text-sm font-medium text-muted-foreground">FAQ</span>
+          <h2 className="font-serif text-3xl font-normal tracking-tight text-foreground sm:text-4xl md:text-5xl">
+            Good to <span className="italic">know</span>
+          </h2>
+        </header>
+        <Faq items={FAQ} />
+      </section>
       <Footer />
     </>
   );

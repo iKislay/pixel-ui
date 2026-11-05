@@ -199,7 +199,6 @@ export function Demo() {
       onMutedChange={(muted) => {}}
     />
 }`,
-    credits: ["Inspired by morphin.dev"],
   },
   {
     name: "Toast",

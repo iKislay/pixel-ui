@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import Faq, { type FaqItem } from "@/components/Faq";
 import Footer from "@/components/Footer";
 import GooeyNavbar from "@/components/GooeyNavbar";
 import McpAsk from "@/components/mcp/McpAsk";
@@ -70,6 +71,33 @@ const STEPS: { heading: string; content: ReactNode }[] = [
   },
 ];
 
+const FAQ: FaqItem[] = [
+  {
+    question: "Does Pixel UI run its own MCP server?",
+    answer:
+      "No. Your editor talks to the shadcn MCP server, and Pixel UI is a registry it reads from.",
+  },
+  {
+    question: "Which editors work?",
+    answer:
+      "Claude Code, Cursor, VS Code, and Codex. Any client that runs the shadcn MCP server works the same way.",
+  },
+  {
+    question: "Why keep {name} in the registry URL?",
+    answer:
+      "shadcn swaps it for the component you ask for, so one entry covers every component.",
+  },
+  {
+    question: "Is the code different from the CLI install?",
+    answer: "No. MCP and the CLI install the same files into `components/ui`.",
+  },
+  {
+    question: "My agent can't find a component. What now?",
+    answer:
+      "Check that `@pixel-ui` is in `components.json`, then restart your editor so the MCP server reloads.",
+  },
+];
+
 export default async function McpPage() {
   const stars = await fetchStarCount();
 
@@ -119,6 +147,15 @@ export default async function McpPage() {
             page.
           </p>
           <McpCode value={MCP_CLI} />
+        </section>
+
+        <section className="mt-16 flex flex-col gap-3 border-t border-foreground/10 pt-10">
+          <h2 className="font-serif text-2xl font-normal tracking-tight">
+            Common <span className="italic">questions</span>
+          </h2>
+          <div className="-mx-4">
+            <Faq items={FAQ} />
+          </div>
         </section>
       </main>
 
