@@ -75,7 +75,7 @@ export const components: ComponentItem[] = [
       { name: "lucide-react" },
     ],
     interaction:
-      "Click the button to switch themes. The sun and moon icons rotate into place while the new theme radiates outward across the screen. Honors prefers-reduced-motion: the theme switches instantly without the expanding circle.",
+      "Click the button to switch themes. A soft tick plays, the sun and moon icons rotate into place, and the new theme radiates outward across the screen. Honors prefers-reduced-motion: the theme switches instantly without the expanding circle.",
     usage: `import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Demo() {
@@ -86,6 +86,12 @@ export default function Demo() {
         name: "className",
         type: "string",
         description: "Classes applied to the root button element.",
+      },
+      {
+        name: "sound",
+        type: "boolean",
+        default: "true",
+        description: "Plays a soft tick on click. Set to false to keep it silent.",
       },
     ],
   },

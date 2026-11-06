@@ -6,11 +6,31 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
-export type ThemeToggleProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
+export type ThemeToggleProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  sound?: boolean;
+};
+
+function tick() {
+  try {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(1600, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.035, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.04);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.onended = () => void ctx.close();
+    osc.stop(ctx.currentTime + 0.06);
+  } catch {}
+}
 
 export function ThemeToggle({
   className,
   onClick,
+  sound = true,
   ...props
 }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
@@ -18,6 +38,7 @@ export function ThemeToggle({
   const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     if (event.defaultPrevented) return;
+    if (sound) tick();
 
     const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
 
