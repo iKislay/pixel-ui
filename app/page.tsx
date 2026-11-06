@@ -54,15 +54,15 @@ export default async function Home() {
 
   return (
     <>
-      <section className="relative w-full p-1.5 md:p-2.5">
+      <GooeyNavbar stars={stars} />
+      <section className="relative w-full p-2 pt-16">
         <div
-          className="relative flex min-h-[min(100svh_-_0.75rem,60rem)] w-full items-center justify-center overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F4F5F8] dark:border-transparent dark:border-apple dark:bg-[#0F1011] md:min-h-[min(100svh_-_1.25rem,60rem)]"
+          className="relative flex min-h-[min(100svh_-_4.5rem,60rem)] w-full items-center justify-center overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F4F5F8] dark:border-transparent dark:border-apple dark:bg-[#0F1011]"
           style={{ cornerShape: "squircle" } as React.CSSProperties}
         >
-          <GooeyNavbar stars={stars} />
           <AsciiJellyfish variant="color" count={4} className="absolute inset-0" />
 
-          <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-3 px-4 pb-20 pt-28 text-center sm:gap-4 sm:px-6">
+          <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-3 px-4 py-20 text-center sm:gap-4 sm:px-6">
             <div className="relative isolate flex w-full flex-col items-center justify-center gap-3 sm:gap-4">
               <AmbientVeil />
               <HeroIntro

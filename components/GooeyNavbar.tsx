@@ -105,7 +105,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
   };
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-5 md:top-4 z-50 flex justify-center px-5 sm:px-6 md:top-7.5">
+    <div className="pointer-events-none fixed inset-x-0 top-2 z-50 flex justify-center px-5 sm:px-6 md:top-2">
       <motion.nav
         ref={navRef}
         layout={animateLayout}

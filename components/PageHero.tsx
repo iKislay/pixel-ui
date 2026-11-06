@@ -13,22 +13,23 @@ export default function PageHero({
   children: React.ReactNode;
 }) {
   return (
-    <section className="relative w-full p-1.5 md:p-2.5">
-      <div
-        className="relative flex min-h-[min(78svh,50rem)] w-full items-center justify-center overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F4F5F8] dark:border-transparent dark:border-apple dark:bg-[#0F1011]"
-        style={{ cornerShape: "squircle" } as React.CSSProperties}
-      >
-        <GooeyNavbar stars={stars} />
+    <>
+      <GooeyNavbar stars={stars} />
+      <section className="relative w-full p-2 pt-16">
+        <div
+          className="relative flex min-h-[min(78svh,50rem)] w-full items-center justify-center overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F4F5F8] dark:border-transparent dark:border-apple dark:bg-[#0F1011]"
+          style={{ cornerShape: "squircle" } as React.CSSProperties}
+        >
+          <div className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(120%_75%_at_50%_-5%,rgba(255,255,255,0.07),transparent_60%)] dark:block" />
 
-        <div className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(120%_75%_at_50%_-5%,rgba(255,255,255,0.07),transparent_60%)] dark:block" />
-
-        <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-3 px-4 pb-20 pt-28 text-center sm:gap-4 sm:px-6">
-          <HeroIntro headline={headline} sub={sub}>
-            {children}
-          </HeroIntro>
+          <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-3 px-4 py-20 text-center sm:gap-4 sm:px-6">
+            <HeroIntro headline={headline} sub={sub}>
+              {children}
+            </HeroIntro>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 
