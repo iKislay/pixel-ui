@@ -116,6 +116,7 @@ type Butterfly = {
   kind: number;
   flap: number;
   resting: boolean;
+  settle: number;
   until: number;
   goalX: number;
   goalY: number;
@@ -123,7 +124,26 @@ type Butterfly = {
   fright: number;
   wobble: number;
   facing: 1 | -1;
+  turned: number;
   tilt: number;
+};
+
+// box distance from the centre: 0 at the middle, 1 on the border
+const edginess = (x: number, y: number, r: { x0: number; x1: number; y0: number; y1: number }) =>
+  Math.max(
+    Math.abs(x - (r.x0 + r.x1) / 2) / ((r.x1 - r.x0) / 2 || 1),
+    Math.abs(y - (r.y0 + r.y1) / 2) / ((r.y1 - r.y0) / 2 || 1),
+  );
+
+const edgePoint = (r: { x0: number; x1: number; y0: number; y1: number }) => {
+  let x = 0;
+  let y = 0;
+  for (let i = 0; i < 20; i++) {
+    x = rand(r.x0, r.x1);
+    y = rand(r.y0, r.y1);
+    if (edginess(x, y, r) > 0.7) break;
+  }
+  return { x, y };
 };
 
 class Meadow {
@@ -160,9 +180,10 @@ class Meadow {
     for (let i = 0; i < this.count; i++) {
       const depth = rand(0.65, 1);
       const heading = Math.random() < 0.5 ? rand(-0.4, 0.4) : Math.PI + rand(-0.4, 0.4);
+      const start = edgePoint({ x0: 0, x1: W, y0: 0, y1: H });
       this.flies.push({
-        x: rand(0, W),
-        y: rand(0, H),
+        x: start.x,
+        y: start.y,
         heading,
         vx: Math.cos(heading) * 40,
         vy: Math.sin(heading) * 40,
@@ -172,6 +193,7 @@ class Meadow {
         kind: (i + offset) % this.kinds,
         flap: rand(0, TAU),
         resting: false,
+        settle: 0,
         until: rand(5, 11),
         goalX: rand(W * 0.15, W * 0.85),
         goalY: rand(H * 0.2, H * 0.8),
@@ -179,6 +201,7 @@ class Meadow {
         fright: 0,
         wobble: rand(0, TAU),
         facing: Math.cos(heading) >= 0 ? 1 : -1,
+        turned: 0,
         tilt: 0,
       });
     }
@@ -197,13 +220,19 @@ class Meadow {
     return { x0, x1, y0, y1 };
   }
 
-  // far goals give long drifting paths instead of circling in place
+  // goals hug the border so the flies stay clear of centred page content, and never share a spot
   private pickGoal(b: Butterfly) {
     const r = this.bounds(b);
-    for (let i = 0; i < 8; i++) {
-      b.goalX = rand(r.x0, r.x1);
-      b.goalY = rand(r.y0, r.y1);
-      if (Math.hypot(b.goalX - b.x, b.goalY - b.y) > Math.min(this.width, this.height) * 0.4) break;
+    const roam = Math.random() < 0.1;
+    const far = Math.min(this.width, this.height) * 0.25;
+    for (let i = 0; i < 16; i++) {
+      const p = roam ? { x: rand(r.x0, r.x1), y: rand(r.y0, r.y1) } : edgePoint(r);
+      b.goalX = p.x;
+      b.goalY = p.y;
+      if (Math.hypot(p.x - b.x, p.y - b.y) < far) continue;
+      if (!roam && edginess((p.x + b.x) / 2, (p.y + b.y) / 2, r) < 0.45) continue;
+      if (this.flies.some((o) => o !== b && Math.hypot(o.goalX - p.x, o.goalY - p.y) < (b.size + o.size) * 1.5)) continue;
+      break;
     }
     b.retarget = this.time + rand(10, 18);
   }
@@ -274,8 +303,10 @@ class Meadow {
           const d = Math.hypot(dx, dy) || 1;
           const reach = (b.size + o.size) * 1.2;
           if (d < reach) {
-            b.vx += (dx / d) * 20 * (1 - d / reach) * dt;
-            b.vy += (dy / d) * 20 * (1 - d / reach) * dt;
+            // the sideways share lets head-on pairs slide past instead of stalling nose to nose
+            const push = (150 * (1 - d / reach) * dt) / d;
+            b.vx += (dx - dy * 0.6) * push;
+            b.vy += (dy + dx * 0.6) * push;
           }
         }
 
@@ -293,15 +324,26 @@ class Meadow {
       if (b.y < bx.y0) b.vy += (bx.y0 - b.y) * 2 * dt;
       if (b.y > bx.y1) b.vy -= (b.y - bx.y1) * 2 * dt;
       const slack = b.size * 0.15;
-      b.x = clamp(b.x, bx.x0 - slack, bx.x1 + slack);
-      b.y = clamp(b.y, bx.y0 - slack, bx.y1 + slack);
+      // kill the outward velocity at the wall, or the fly keeps pressing into it and jitters
+      if (b.x < bx.x0 - slack || b.x > bx.x1 + slack) {
+        b.x = clamp(b.x, bx.x0 - slack, bx.x1 + slack);
+        b.vx = 0;
+      }
+      if (b.y < bx.y0 - slack || b.y > bx.y1 + slack) {
+        b.y = clamp(b.y, bx.y0 - slack, bx.y1 + slack);
+        b.vy = 0;
+      }
 
       if (Math.hypot(b.vx, b.vy) > 1) b.heading = Math.atan2(b.vy, b.vx);
-      if (b.vx > 3) b.facing = 1;
-      else if (b.vx < -3) b.facing = -1;
+      // the weave swings vx past zero on vertical flight, so a bare sign check mirrors the sprite every few frames
+      if (t > b.turned && Math.abs(b.vx) > 12 && Math.sign(b.vx) !== b.facing) {
+        b.facing = b.facing === 1 ? -1 : 1;
+        b.turned = t + 1;
+      }
       // nose follows the climb or dive
       const lean = b.resting ? 0 : clamp(Math.sin(b.heading) * 0.4 * b.facing, -0.4, 0.4);
       b.tilt += (lean - b.tilt) * Math.min(1, dt * 2);
+      b.settle += ((b.resting ? 1 : 0) - b.settle) * Math.min(1, dt * 4);
     }
   }
 }
@@ -462,14 +504,16 @@ class Painter {
     const colors = look(this.scheme, this.variant, b.kind);
     const alpha = 0.65 + 0.35 * b.depth;
     // wing angle above the body plane: flat spread at 0, folded up at about 1.4
-    const phi = b.resting ? 1.05 + 0.35 * Math.cos(b.flap) : 0.5 + 0.8 * Math.sin(b.flap);
+    // blended so landing and take-off ease between poses instead of snapping
+    const fly = 0.5 + 0.8 * Math.sin(b.flap);
+    const phi = fly + (1.05 + 0.35 * Math.cos(b.flap) - fly) * b.settle;
     const sinP = Math.sin(phi);
     const cosP = Math.cos(phi);
     const sinE = Math.sin(ELEVATION);
     const cosE = Math.cos(ELEVATION);
     const sinT = Math.sin(b.tilt);
     const cosT = Math.cos(b.tilt);
-    const bob = b.resting ? 0 : -Math.sin(b.flap) * S * 0.05;
+    const bob = -Math.sin(b.flap) * S * 0.05 * (1 - b.settle);
     const facing = b.facing;
 
     // body space (forward, up, toward viewer) to screen, with the camera a little above
