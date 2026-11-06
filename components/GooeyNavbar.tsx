@@ -33,7 +33,13 @@ const softSpring = { type: "spring", stiffness: 420, damping: 30 } as const;
 // the open card overhangs the navbar row by this much on the top and sides
 const INSET = 12;
 
-export default function GooeyNavbar({ stars }: { stars?: number | null }) {
+export default function GooeyNavbar({
+  stars,
+  attached = false,
+}: {
+  stars?: number | null;
+  attached?: boolean;
+}) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,11 +48,12 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    // attached releases early, while the gap above the hero is still on screen
+    const onScroll = () => setScrolled(window.scrollY > (attached ? 4 : 24));
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [attached]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -77,6 +84,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
 
   const spring = { type: "spring", stiffness: 300, damping: 30 } as const;
   const animateLayout = !reduceMotion;
+  const fused = attached && !scrolled;
 
   const collapsed = reduceMotion
     ? { opacity: 0 }
@@ -113,10 +121,44 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
         style={{ borderRadius: 9999 }}
         className={cn(
           // the equal side columns keep the search bar centered on the navbar
-          "relative z-10 flex w-full max-w-5xl items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr] md:gap-3 md:liquid-glass",
+          "relative z-10 flex w-full max-w-5xl items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr] md:gap-3 md:transition-[background-color,border-color,box-shadow] md:duration-300",
+          fused ? "md:border md:border-transparent" : "md:liquid-glass",
           !scrolled && "md:w-auto",
         )}
       >
+        {attached && (
+          <>
+            <svg aria-hidden className="absolute size-0">
+              <filter id="nav-goo" x="-20%" y="-50%" width="140%" height="400%">
+                <feGaussianBlur stdDeviation="8" />
+                <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10" />
+              </filter>
+            </svg>
+            <motion.div
+              aria-hidden
+              initial={false}
+              animate={{ opacity: fused ? 1 : 0 }}
+              transition={{
+                duration: reduceMotion ? 0 : 0.25,
+                delay: fused || reduceMotion ? 0 : 0.15,
+              }}
+              className="pointer-events-none absolute -inset-px -z-10 hidden [filter:url(#nav-goo)] md:block"
+            >
+              <div className="absolute inset-0 rounded-full bg-[#F4F5F8] dark:bg-[#0F1011]" />
+              {/* 7px = the 6px gap to the hero card plus 1px to cancel the goo threshold bleeding upward */}
+              <motion.div
+                initial={false}
+                animate={{ y: fused ? 0 : 28 }}
+                transition={
+                  reduceMotion
+                    ? { duration: 0 }
+                    : { type: "spring", stiffness: 260, damping: 16 }
+                }
+                className="absolute -inset-x-10 top-[calc(100%+7px)] h-12 bg-[#F4F5F8] dark:bg-[#0F1011]"
+              />
+            </motion.div>
+          </>
+        )}
         <motion.div
           layout={animateLayout}
           transition={spring}

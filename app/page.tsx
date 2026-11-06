@@ -54,7 +54,7 @@ export default async function Home() {
 
   return (
     <>
-      <GooeyNavbar stars={stars} />
+      <GooeyNavbar stars={stars} attached />
       <section className="relative w-full p-2 pt-16">
         <div
           className="relative flex min-h-[min(100svh_-_4.5rem,60rem)] w-full items-center justify-center overflow-hidden rounded-[45px] border border-black/[0.04] bg-[#F4F5F8] dark:border-transparent dark:border-apple dark:bg-[#0F1011]"
