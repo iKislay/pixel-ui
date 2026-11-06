@@ -1,6 +1,5 @@
 import GooeyNavbar from "@/components/GooeyNavbar";
 import HeroIntro from "@/components/HeroIntro";
-import { PixelUILogo } from "@/components/logos";
 
 export default function PageHero({
   stars,
@@ -20,8 +19,6 @@ export default function PageHero({
         style={{ cornerShape: "squircle" } as React.CSSProperties}
       >
         <GooeyNavbar stars={stars} />
-
-        <PixelUILogo className="pointer-events-none absolute left-1/2 top-[68%] w-[860px] max-w-none -translate-x-1/2 -translate-y-1/2 select-none opacity-[0.05] dark:opacity-[0.07]" />
 
         <div className="pointer-events-none absolute inset-0 hidden bg-[radial-gradient(120%_75%_at_50%_-5%,rgba(255,255,255,0.07),transparent_60%)] dark:block" />
 
