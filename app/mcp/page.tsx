@@ -3,11 +3,11 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import Faq, { type FaqItem } from "@/components/Faq";
 import Footer from "@/components/Footer";
-import GooeyNavbar from "@/components/GooeyNavbar";
 import McpAsk from "@/components/mcp/McpAsk";
 import McpClients from "@/components/mcp/McpClients";
 import McpCode from "@/components/mcp/McpCode";
 import McpText from "@/components/mcp/McpText";
+import PageHero, { PageSection, ScrollCue } from "@/components/PageHero";
 import CodeBlock from "@/components/ui/code-block";
 import { fetchStarCount } from "@/lib/github";
 import { MCP_CLI, MCP_COMPONENTS_JSON } from "@/lib/mcp";
@@ -103,60 +103,81 @@ export default async function McpPage() {
 
   return (
     <>
-      <GooeyNavbar stars={stars} />
+      <PageHero
+        stars={stars}
+        headline={
+          <>
+            Pixel UI, <span className="italic">over MCP</span>
+          </>
+        }
+        sub={DESCRIPTION}
+      >
+        <ScrollCue href="#setup" label="Scroll to setup" />
+      </PageHero>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-5 pb-24 pt-32 sm:px-6 md:pt-40">
-        <header className="flex flex-col gap-3">
-          <h1 className="font-serif text-4xl font-normal tracking-tight sm:text-5xl">
-            MCP
-          </h1>
-          <p className="font-medium text-muted-foreground">{DESCRIPTION}</p>
-        </header>
+      <main className="flex-1 pb-20 md:pb-28">
+        <PageSection
+          id="setup"
+          label="Setup"
+          title={
+            <>
+              Three <span className="font-serif font-normal italic">steps</span>
+            </>
+          }
+        >
+          <ol className="flex flex-col">
+            {STEPS.map((step, index) => (
+              <li
+                key={step.heading}
+                className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-4 pb-12 last:pb-0"
+              >
+                <span className="flex size-6 items-center justify-center rounded-full bg-brand/10 font-mono text-xs font-medium text-brand">
+                  {index + 1}
+                </span>
+                <section className="flex flex-col gap-3">
+                  <h3 className="text-base font-medium leading-6">
+                    {step.heading}
+                  </h3>
+                  {step.content}
+                </section>
+              </li>
+            ))}
+          </ol>
+        </PageSection>
 
-        <ol className="mt-12 flex flex-col">
-          {STEPS.map((step, index) => (
-            <li
-              key={step.heading}
-              className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-4 pb-12 last:pb-0"
-            >
-              <span className="flex size-6 items-center justify-center rounded-full bg-brand/10 font-mono text-xs font-medium text-brand">
-                {index + 1}
-              </span>
-              <section className="flex flex-col gap-3">
-                <h2 className="text-base font-medium leading-6">
-                  {step.heading}
-                </h2>
-                {step.content}
-              </section>
-            </li>
-          ))}
-        </ol>
-
-        <section className="mt-16 flex flex-col gap-3 border-t border-foreground/10 pt-10">
-          <h2 className="text-2xl font-medium tracking-tight">
-            Without <span className="font-serif font-normal italic">MCP</span>
-          </h2>
-          <p className="text-[15px] leading-relaxed text-muted-foreground">
-            The shadcn CLI installs the same files. Browse everything on the{" "}
-            <Link
-              href="/components"
-              className="text-foreground underline decoration-foreground/25 underline-offset-4 transition-colors duration-150 ease-out hover:decoration-foreground"
-            >
-              components
-            </Link>{" "}
-            page.
-          </p>
-          <McpCode value={MCP_CLI} />
-        </section>
-
-        <section className="mt-16 flex flex-col gap-3 border-t border-foreground/10 pt-10">
-          <h2 className="text-2xl font-medium tracking-tight">
-            Common <span className="font-serif font-normal italic">questions</span>
-          </h2>
-          <div className="-mx-4">
-            <Faq items={FAQ} />
+        <PageSection
+          label="CLI"
+          title={
+            <>
+              Without <span className="font-serif font-normal italic">MCP</span>
+            </>
+          }
+        >
+          <div className="flex flex-col gap-3">
+            <p className="text-[15px] leading-relaxed text-muted-foreground">
+              The shadcn CLI installs the same files. Browse everything on the{" "}
+              <Link
+                href="/components"
+                className="text-foreground underline decoration-foreground/25 underline-offset-4 transition-colors duration-150 ease-out hover:decoration-foreground"
+              >
+                components
+              </Link>{" "}
+              page.
+            </p>
+            <McpCode value={MCP_CLI} />
           </div>
-        </section>
+        </PageSection>
+
+        <PageSection
+          label="FAQ"
+          title={
+            <>
+              Common <span className="font-serif font-normal italic">questions</span>
+            </>
+          }
+        >
+          <Faq items={FAQ} />
+        </PageSection>
       </main>
 
       <Footer />

@@ -12,6 +12,3 @@ export const SITE_DESCRIPTION =
 export const SITE_REPO = "https://github.com/ikislay/pixel-ui";
 
 export const LAUNCH_DATE = "2026-06-10";
-
-export const HALLOWEEN_LOGO_ENABLED = false;
-export const HALLOWEEN_WEBS_ENABLED = false;

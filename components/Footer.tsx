@@ -24,6 +24,7 @@ const LINKS: FooterLink[] = [
 ];
 
 const UTILITY_LINKS = [
+  { label: "Brand assets", href: "/brand-assets" },
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Service", href: "/terms" },
   { label: "Sitemap", href: "/sitemap.xml" },

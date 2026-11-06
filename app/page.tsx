@@ -8,7 +8,6 @@ import ComponentsShowcase from "@/components/ComponentsShowcase";
 import Faq, { type FaqItem } from "@/components/Faq";
 import Footer from "@/components/Footer";
 import { REGISTRY_REPO } from "@/lib/components";
-import SpiderWebs from "@/components/SpiderWebs";
 import { AsciiJellyfish } from "@/components/ui/ascii-jellyfish";
 import AmbientVeil from "@/components/preview/AmbientVeil";
 
@@ -61,7 +60,6 @@ export default async function Home() {
           style={{ cornerShape: "squircle" } as React.CSSProperties}
         >
           <GooeyNavbar stars={stars} />
-          <SpiderWebs />
           <AsciiJellyfish variant="color" count={4} className="absolute inset-0" />
 
           <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center gap-3 px-4 pb-20 pt-28 text-center sm:gap-4 sm:px-6">

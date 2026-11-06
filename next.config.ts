@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:dir(logos|assets|fonts)/:path*",
+        source: "/:dir(logos|assets|fonts|brand)/:path*",
         headers: PUBLIC_CACHE,
       },
       { source: "/ogimage.webp", headers: PUBLIC_CACHE },
