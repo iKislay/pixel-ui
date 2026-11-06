@@ -261,7 +261,8 @@ class Meadow {
         b.vx *= stop;
         b.vy *= stop;
         b.flap += dt * 0.7;
-        if (t > b.until) {
+        const crowded = flies.some((o) => o !== b && Math.hypot(o.x - b.x, o.y - b.y) < (o.size + b.size) * 0.9);
+        if (t > b.until || crowded) {
           b.resting = false;
           b.until = t + rand(8, 14);
           this.pickGoal(b);
@@ -277,13 +278,31 @@ class Meadow {
         // a gentle sideways weave on the way to a far goal
         b.wobble += dt * 0.8;
         const weave = Math.sin(b.wobble) * 0.35 + Math.sin(b.wobble * 2.1 + 1) * 0.15;
-        const dirX = gx / gd - (gy / gd) * weave;
-        const dirY = gy / gd + (gx / gd) * weave;
+        let ax = 0;
+        let ay = 0;
+        for (const o of flies) {
+          if (o === b) continue;
+          const dx = b.x - o.x;
+          const dy = b.y - o.y;
+          const d = Math.hypot(dx, dy) || 1;
+          const reach = (b.size + o.size) * 1.2;
+          if (d < reach) {
+            // the sideways share lets head-on pairs slide past instead of stalling nose to nose
+            const w = (1 - d / reach) / d;
+            ax += (dx - dy * 0.6) * w;
+            ay += (dy + dx * 0.6) * w;
+          }
+        }
+        const crowd = Math.hypot(ax, ay);
+        // avoidance lives in the wanted direction, not as a force, so the goal pull can't drag them back together
+        const dirX = gx / gd - (gy / gd) * weave + ax * 6;
+        const dirY = gy / gd + (gx / gd) * weave + ay * 6;
+        const dn = Math.hypot(dirX, dirY) || 1;
         const beat = 0.5 + 0.5 * Math.sin(b.flap);
         const speed = (40 + 20 * beat) * (1 + b.fright * 1.5);
-        const steer = Math.min(1, dt * (0.9 + b.fright * 2));
-        b.vx += (dirX * speed - b.vx) * steer;
-        b.vy += (dirY * speed - b.vy) * steer;
+        const steer = Math.min(1, dt * (0.9 + b.fright * 2 + crowd * 6));
+        b.vx += ((dirX / dn) * speed - b.vx) * steer;
+        b.vy += ((dirY / dn) * speed - b.vy) * steer;
 
         if (pointer.active) {
           const dx = b.x - pointer.x;
@@ -296,21 +315,7 @@ class Meadow {
             b.fright = Math.max(b.fright, w);
           }
         }
-        for (const o of flies) {
-          if (o === b) continue;
-          const dx = b.x - o.x;
-          const dy = b.y - o.y;
-          const d = Math.hypot(dx, dy) || 1;
-          const reach = (b.size + o.size) * 1.2;
-          if (d < reach) {
-            // the sideways share lets head-on pairs slide past instead of stalling nose to nose
-            const push = (150 * (1 - d / reach) * dt) / d;
-            b.vx += (dx - dy * 0.6) * push;
-            b.vy += (dy + dx * 0.6) * push;
-          }
-        }
-
-        if (t > b.until && b.fright < 0.05 && gd < b.size * 1.5) {
+        if (t > b.until && b.fright < 0.05 && crowd === 0 && gd < b.size * 1.5) {
           b.resting = true;
           b.until = t + rand(3, 6);
         }
