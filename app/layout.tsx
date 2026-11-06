@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { StarPrompt } from "@/components/StarPrompt";
 import { CommandMenuLoader } from "@/components/CommandMenuLoader";
 import { Databuddy } from '@databuddy/sdk/react';
+import { Analytics } from "@vercel/analytics/next";
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -139,6 +140,7 @@ export default function RootLayout({
           <div className="flex flex-1 flex-col">{children}</div>
           <StarPrompt />
           <CommandMenuLoader />
+          <Analytics />
           <Databuddy
             clientId={process.env.NEXT_PUBLIC_DATABUDDY_CLIENT_ID!}
             trackHashChanges={true}
