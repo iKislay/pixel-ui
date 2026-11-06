@@ -244,7 +244,6 @@ export default function DescriptionPanel({
   const cp4Y = midY + (containerHeight - midY) * 0.65;
 
   const clipPathD = `M ${apexPull} 0 C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, 0 ${midY} C ${cp3X} ${cp3Y}, ${cp4X} ${cp4Y}, ${apexPull} ${containerHeight} L ${width + 50} ${containerHeight} L ${width + 50} 0 Z`;
-  const curveBorderD = `M ${apexPull} 0 C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, 0 ${midY} C ${cp3X} ${cp3Y}, ${cp4X} ${cp4Y}, ${apexPull} ${containerHeight}`;
 
   const currentPanelX = open
     ? 0
@@ -297,7 +296,7 @@ export default function DescriptionPanel({
               scale: open ? 0.85 : 1,
             }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute inset-0 rounded-l-2xl bg-[#F4F4F9] shadow-[0_4px_24px_rgba(0,0,0,0.1),-4px_0_16px_rgba(0,0,0,0.06)] dark:bg-neutral-900 dark:shadow-[0_4px_24px_rgba(0,0,0,0.6),-4px_0_16px_rgba(0,0,0,0.4)]"
+            className="absolute inset-0 rounded-l-2xl bg-[#F4F4F9] dark:bg-neutral-900"
           />
 
           <div
@@ -345,24 +344,9 @@ export default function DescriptionPanel({
           }}
           className={cn(
             "relative flex h-full flex-col overflow-hidden bg-background",
-            open && "rounded-2xl shadow-[-4px_0_24px_rgba(0,0,0,0.06)] dark:shadow-[-4px_0_32px_rgba(0,0,0,0.5)]",
+            open && "rounded-2xl",
           )}
         >
-          {isPullActive && (
-            <svg
-              width={width}
-              height={containerHeight}
-              className="pointer-events-none absolute inset-0 overflow-visible"
-            >
-              <path
-                d={curveBorderD}
-                fill="none"
-                className="drop-shadow-[0_4px_24px_rgba(0,0,0,0.1),-4px_0_16px_rgba(0,0,0,0.06)] dark:drop-shadow-[0_4px_24px_rgba(0,0,0,0.6),-4px_0_16px_rgba(0,0,0,0.4)]"
-                strokeWidth={0}
-              />
-            </svg>
-          )}
-
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-gradient-to-t from-background to-transparent" />
 
           <div
