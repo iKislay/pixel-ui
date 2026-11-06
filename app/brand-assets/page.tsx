@@ -11,7 +11,7 @@ import { SITE_NAME } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const DESCRIPTION =
-  "The Pixel UI logo and colors. Download a file or copy it straight into your design tool.";
+  "The Pixel UI logo and colors. Download an SVG or PNG, or copy the SVG straight into your design tool.";
 
 export const metadata: Metadata = {
   title: "Brand assets",
@@ -121,10 +121,17 @@ export default async function BrandAssetsPage() {
                     >
                       Copy
                     </CopyButton>
-                    <a href={`/brand/${logo.file}`} download className={ACTION}>
-                      <Download className="size-3.5" strokeWidth={2} />
-                      SVG
-                    </a>
+                    {["svg", "png"].map((ext) => (
+                      <a
+                        key={ext}
+                        href={`/brand/${logo.file.replace(".svg", `.${ext}`)}`}
+                        download
+                        className={ACTION}
+                      >
+                        <Download className="size-3.5" strokeWidth={2} />
+                        {ext.toUpperCase()}
+                      </a>
+                    ))}
                   </span>
                 </div>
               </li>
