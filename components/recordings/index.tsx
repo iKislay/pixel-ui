@@ -8,6 +8,7 @@ import type { RecordingProps } from "./Player";
 const RECORDINGS: Record<string, ComponentType<RecordingProps>> = {
   "theme-toggle": dynamic(() => import("./theme-toggle"), { ssr: false }),
   "audio-chat-room": dynamic(() => import("./audio-chat-room"), { ssr: false }),
+  "otp-input": dynamic(() => import("./otp-input"), { ssr: false }),
   toast: dynamic(() => import("./toast"), { ssr: false }),
   "member-selector": dynamic(() => import("./member-selector"), { ssr: false }),
   "ascii-jellyfish": dynamic(() => import("./ascii").then((m) => m.Jellyfish), { ssr: false }),

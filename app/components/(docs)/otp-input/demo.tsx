@@ -2,7 +2,7 @@
 
 import { OtpInput } from "@/components/ui/otp-input";
 
-const verify = (code: string) =>
+export const verify = (code: string) =>
   new Promise<boolean>((resolve) =>
     setTimeout(() => resolve(code === "123456"), 1400),
   );
