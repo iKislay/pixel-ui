@@ -7,12 +7,23 @@ import { OPEN_EVENT } from "./CommandMenuTrigger";
 const CommandMenu = dynamic(() => import("./CommandMenu"), { ssr: false });
 
 export function CommandMenuLoader() {
-  const [requested, setRequested] = useState(false);
+  const [state, setState] = useState<"idle" | "warm" | "open">("idle");
 
-  // once loaded, the menu owns these shortcuts, so this listener steps aside
+  // mounting closed ahead of time makes the first open a plain state flip instead of a chunk load
   useEffect(() => {
-    if (requested) return;
-    const request = () => setRequested(true);
+    const warm = () => setState((s) => (s === "idle" ? "warm" : s));
+    if (!("requestIdleCallback" in window)) {
+      const timer = setTimeout(warm, 1500);
+      return () => clearTimeout(timer);
+    }
+    const id = requestIdleCallback(warm, { timeout: 2000 });
+    return () => cancelIdleCallback(id);
+  }, []);
+
+  // stays on until the menu is open so a click during the warm load is not lost; initialOpen is read on the menu's first render only
+  useEffect(() => {
+    if (state === "open") return;
+    const request = () => setState("open");
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key?.toLowerCase() !== "k" || !(e.metaKey || e.ctrlKey)) return;
       e.preventDefault();
@@ -25,7 +36,7 @@ export function CommandMenuLoader() {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener(OPEN_EVENT, request);
     };
-  }, [requested]);
+  }, [state]);
 
-  return requested ? <CommandMenu initialOpen /> : null;
+  return state === "idle" ? null : <CommandMenu initialOpen={state === "open"} />;
 }
