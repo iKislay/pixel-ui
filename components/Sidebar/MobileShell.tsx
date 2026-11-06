@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { activeComponent } from "@/lib/components";
+import { useOpenSound } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
 import MobileSidebar from "./MobileSidebar";
 import DescriptionContent from "../Description/DescriptionContent";
@@ -21,6 +22,7 @@ export default function MobileShell({
   const pathname = usePathname();
   const item = activeComponent(pathname);
   const [codeDrawerOpen, setCodeDrawerOpen] = useState(false);
+  useOpenSound(codeDrawerOpen);
 
   return (
     <div className="flex h-full flex-col gap-2">

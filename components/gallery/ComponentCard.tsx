@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { ComponentItem } from "@/lib/components";
+import { feedback } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
 import Recording from "@/components/recordings";
 
@@ -37,6 +38,7 @@ export default function ComponentCard({
       <Link
         href={item.href}
         prefetch={active ? null : false}
+        onClick={() => feedback("tick")}
         onMouseEnter={() => setActive(true)}
         onMouseLeave={() => setActive(false)}
         onFocus={() => setActive(true)}

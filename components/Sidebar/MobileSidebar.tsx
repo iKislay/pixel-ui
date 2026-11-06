@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { useOpenSound } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
 import SidebarNav from "./SidebarNav";
 import SidebarHeader from "./SidebarHeader";
@@ -15,6 +16,7 @@ export default function MobileSidebar({
   triggerClassName?: string;
 } = {}) {
   const [open, setOpen] = useState(false);
+  useOpenSound(open);
 
   useEffect(() => {
     if (!open) return;

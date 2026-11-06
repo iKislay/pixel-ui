@@ -2,6 +2,7 @@
 
 import { useState, type ComponentProps, type ReactNode } from "react";
 import { motion } from "motion/react";
+import { feedback } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
 
 const CopyGlyph = () => (
@@ -59,6 +60,7 @@ export default function CopyButton({
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
+      feedback("copy");
       setTimeout(() => setCopied(false), 1500);
     } catch {}
   };

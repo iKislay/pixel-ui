@@ -1,10 +1,5 @@
-"use client";
-
-import { useEffect, useRef, type ComponentProps } from "react";
-import { cn } from "@/lib/utils";
-
-const COLS = 240;
-const ROWS = 18;
+import type { ComponentProps } from "react";
+import AsciiArt from "./AsciiArt";
 
 const SKYLINE: string[] = [
   "                                       \\\\/                 \\\\/                                                                                                                                                                                  ",
@@ -27,91 +22,13 @@ const SKYLINE: string[] = [
   "|B#H|@8W%&X&M@8|      |W%B#SM@8W%|#&# |&X*#HM%|W%B#&M@|%%S#|X-|WZ%#&M&XO8HZ%MS8&XO8HZ%#S*BXO8@8%#S#|X@8WZ%#S*&8O8BZ%MS*W%| |M@8S |#&8H8%#S*&XO8HZ%#&M@X |H   |*&       S:&   |Z |S\\\\XO\\\\\\B\\\\\\& O%B#&M@8W%B#&M@8W%B#&M@8W%B#&M@8W%B#&M@8W%B#&M@8W"
 ];
 
-export default function AsciiSkyline({ className, ...props }: ComponentProps<"div">) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const render = () => {
-      const rect = canvas.getBoundingClientRect();
-      const cssW = rect.width;
-      const cssH = rect.height;
-      if (cssW <= 0 || cssH <= 0) return;
-
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const widthPx = Math.floor(cssW * dpr);
-      const heightPx = Math.floor(cssH * dpr);
-
-      if (canvas.width !== widthPx || canvas.height !== heightPx) {
-        canvas.width = widthPx;
-        canvas.height = heightPx;
-      }
-
-      ctx.save();
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, cssW, cssH);
-
-      const isDark = document.documentElement.classList.contains("dark");
-      const baseRgb = isDark ? "255, 255, 255" : "0, 0, 0";
-
-      const cw = cssW / COLS;
-      const ch = cssH / ROWS;
-      const fontSize = Math.max(5, Math.min(cw * 1.6, ch * 0.95));
-
-      ctx.font = `${fontSize}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      for (let r = 0; r < ROWS; r++) {
-        const line = SKYLINE[r] || "";
-        const y = r * ch + ch / 2;
-        for (let c = 0; c < COLS; c++) {
-          const char = line[c] || " ";
-          if (char === " ") continue;
-
-          let alpha = 0.55;
-          if ("@#WMB8%&".includes(char)) alpha = 0.8;
-          else if ("S*XOHZ".includes(char)) alpha = 0.65;
-          else if ("|/\\_^~-+=".includes(char)) alpha = 0.45;
-          else if (":.".includes(char)) alpha = 0.3;
-
-          ctx.fillStyle = `rgba(${baseRgb}, ${alpha})`;
-          ctx.fillText(char, c * cw + cw / 2, y);
-        }
-      }
-
-      ctx.restore();
-    };
-
-    render();
-
-    const resizeObserver = new ResizeObserver(render);
-    resizeObserver.observe(canvas);
-
-    const themeObserver = new MutationObserver(render);
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => {
-      resizeObserver.disconnect();
-      themeObserver.disconnect();
-    };
-  }, []);
-
+export default function AsciiSkyline(props: ComponentProps<"div">) {
   return (
-    <div
+    <AsciiArt
+      lines={SKYLINE}
       role="img"
       aria-label="Indian monuments skyline ascii art: Gateway of India, Charminar, Golden Temple, Jama Masjid, India Gate, Lotus Temple, Taj Mahal"
-      className={cn("relative w-full select-none overflow-hidden", className)}
       {...props}
-    >
-      <canvas ref={canvasRef} className="block h-full w-full" />
-    </div>
+    />
   );
 }

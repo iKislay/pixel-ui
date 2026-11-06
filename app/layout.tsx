@@ -95,7 +95,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/ogimage.webp",
+        url: "/ogimage.webp?v=2",
         width: 2400,
         height: 1260,
         alt: "Pixel UI: pixel-perfect animated React components",
@@ -108,7 +108,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TAGLINE,
     description: SITE_DESCRIPTION,
-    images: ["/ogimage.webp"],
+    images: ["/ogimage.webp?v=2"],
   },
 };
 

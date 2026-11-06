@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { activeComponent } from "@/lib/components";
+import { useOpenSound } from "@/lib/feedback";
 import Sidebar from "./Sidebar";
 import { DescriptionPanel } from "../Description/DescriptionPanel";
 import DescriptionContent from "../Description/DescriptionContent";
@@ -28,6 +29,9 @@ export default function DesktopShell({
   const [infoWidth, setInfoWidth] = useState(DEFAULT_INFO_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
   const [codeDrawerOpen, setCodeDrawerOpen] = useState(false);
+  useOpenSound(navOpen);
+  useOpenSound(infoOpen);
+  useOpenSound(codeDrawerOpen);
 
   const handleOpenCode = () => {
     setInfoOpen(true);

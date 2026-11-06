@@ -15,6 +15,7 @@ import {
   components,
   type ComponentItem,
 } from "@/lib/components";
+import { useOpenSound } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
 import {
   CLOSE_EVENT,
@@ -110,6 +111,7 @@ export default function CommandMenu({
   const router = useRouter();
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(initialOpen);
+  useOpenSound(open);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category | null>(null);
   const [active, setActive] = useState(0);
