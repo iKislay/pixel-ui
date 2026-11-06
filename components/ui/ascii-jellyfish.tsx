@@ -182,8 +182,8 @@ class Sea {
     for (let i = 0; i < this.count; i++) {
       const depth = rand(0.55, 1);
       this.jellies.push({
-        x: ((i + 0.5) / this.count) * W + rand(-0.08, 0.08) * W,
-        y: rand(H * 0.3, H * 0.85),
+        x: rand(0, W),
+        y: rand(0, H),
         vx: 0,
         vy: 0,
         axis: UP + rand(-0.3, 0.3),
@@ -302,7 +302,7 @@ class Sea {
         j.retarget = t + rand(8, 14);
       }
       const toGoal = Math.atan2(j.goalY - j.y, j.goalX - j.x);
-      let lean = clamp(angleDiff(UP, toGoal), -0.7, 0.7);
+      let lean = clamp(angleDiff(UP, toGoal), -1.1, 1.1);
       let speedUp = 1 + j.rush * 3;
 
       if (pointer.active) {
@@ -342,10 +342,10 @@ class Sea {
 
       // a goal below means resting between pulses and sinking toward it
       const sinking = j.goalY > j.y + j.size * 0.5;
-      const thrust = j.squeeze * j.size * (sinking ? 0.25 : 0.9);
+      const thrust = j.squeeze * j.size * (sinking ? 0.4 : 1.8);
       j.vx += Math.cos(j.axis) * thrust * dt;
       j.vy += Math.sin(j.axis) * thrust * dt + (sinking ? 14 : 4) * dt;
-      const drag = Math.exp(-dt * 1.2);
+      const drag = Math.exp(-dt * 0.7);
       j.vx *= drag;
       j.vy *= drag;
       j.x += j.vx * dt;

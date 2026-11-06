@@ -161,11 +161,11 @@ class Meadow {
       const depth = rand(0.65, 1);
       const heading = Math.random() < 0.5 ? rand(-0.4, 0.4) : Math.PI + rand(-0.4, 0.4);
       this.flies.push({
-        x: ((i + 0.5) / this.count) * W,
-        y: rand(H * 0.25, H * 0.75),
+        x: rand(0, W),
+        y: rand(0, H),
         heading,
-        vx: Math.cos(heading) * 12,
-        vy: Math.sin(heading) * 12,
+        vx: Math.cos(heading) * 40,
+        vy: Math.sin(heading) * 40,
         scale: 0.75 + depth * 0.35,
         size: 60,
         depth,
@@ -213,8 +213,8 @@ class Meadow {
       const d = Math.hypot(b.x - x, b.y - y);
       if (d > 260) continue;
       const away = Math.atan2(b.y - y, b.x - x);
-      b.vx = Math.cos(away) * 60;
-      b.vy = Math.sin(away) * 60;
+      b.vx = Math.cos(away) * 140;
+      b.vy = Math.sin(away) * 140;
       b.fright = 1;
       b.resting = false;
       b.until = this.time + rand(4, 7);
@@ -238,7 +238,7 @@ class Meadow {
           this.pickGoal(b);
         }
       } else {
-        b.flap += dt * (7 + b.fright * 8);
+        b.flap += dt * (4.5 + b.fright * 5);
         if (t > b.retarget || Math.hypot(b.goalX - b.x, b.goalY - b.y) < b.size) {
           this.pickGoal(b);
         }
@@ -251,7 +251,7 @@ class Meadow {
         const dirX = gx / gd - (gy / gd) * weave;
         const dirY = gy / gd + (gx / gd) * weave;
         const beat = 0.5 + 0.5 * Math.sin(b.flap);
-        const speed = (9 + 6 * beat) * (1 + b.fright * 2.5);
+        const speed = (40 + 20 * beat) * (1 + b.fright * 1.5);
         const steer = Math.min(1, dt * (0.9 + b.fright * 2));
         b.vx += (dirX * speed - b.vx) * steer;
         b.vy += (dirY * speed - b.vy) * steer;
