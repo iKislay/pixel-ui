@@ -141,10 +141,9 @@ function buildTheme(accent: string, mode: 'dark' | 'light' = 'dark') {
     const colors = dark
         ? {
               accent: accentTone,
-              // Neutral chrome — matches the Pixel UI preview surface (dark --card).
-              bg: 'oklch(0.1822 0 0)',
+              bg: '#0F1011',
               border: 'rgb(255 255 255 / 0.08)',
-              headerBg: 'rgb(255 255 255 / 0.03)',
+              frame: 'inset 0 0 0 1px rgb(255 255 255 / 0.07), inset 0 1px 0 0 rgb(80 80 80 / 0.3), inset 0 -1px 0 0 rgb(0 0 0 / 0.3)',
               plain: '#ffffff',
               muted: 'rgb(255 255 255 / 0.6)',
               gutter: 'rgb(255 255 255 / 0.28)',
@@ -155,9 +154,9 @@ function buildTheme(accent: string, mode: 'dark' | 'light' = 'dark') {
           }
         : {
               accent: accentTone,
-              bg: 'oklch(0.985 0 0)',
+              bg: '#F4F5F8',
               border: 'rgb(0 0 0 / 0.08)',
-              headerBg: 'rgb(0 0 0 / 0.03)',
+              frame: 'inset 0 0 0 1px rgb(0 0 0 / 0.04)',
               plain: '#171717',
               muted: 'rgb(0 0 0 / 0.6)',
               gutter: 'rgb(0 0 0 / 0.32)',
@@ -246,7 +245,7 @@ function CopyButton({ code, floating }: { code: string; floating?: boolean }) {
                 copied &&
                     'bg-(--cb-accent)/12 text-(--cb-accent) hover:bg-(--cb-accent)/12 hover:text-(--cb-accent)',
                 floating &&
-                    'absolute top-2.5 right-2.5 z-10 border border-(--cb-border) bg-(--cb-float-bg) backdrop-blur-md',
+                    'absolute top-2 right-2 z-10 bg-(--cb-float-bg) backdrop-blur-md',
             )}
         >
             <AnimatePresence initial={false}>
@@ -328,7 +327,7 @@ export function CodeBlock({
         '--cb-accent': colors.accent,
         '--cb-bg': colors.bg,
         '--cb-border': colors.border,
-        '--cb-header-bg': colors.headerBg,
+        '--cb-frame': colors.frame,
         '--cb-plain': colors.plain,
         '--cb-muted': colors.muted,
         '--cb-gutter': colors.gutter,
@@ -343,18 +342,18 @@ export function CodeBlock({
             data-slot='code-block'
             className={cn(
                 'group relative flex flex-col overflow-hidden text-left',
-                showFrame && 'rounded-2xl border border-(--cb-border) bg-(--cb-bg)',
+                showFrame && 'rounded-[20px] bg-(--cb-bg) shadow-(--cb-frame)',
                 className,
             )}
-            style={{ ...cssVars, ...style }}
+            style={{ ...cssVars, cornerShape: 'squircle', ...style } as React.CSSProperties}
             {...props}
         >
             {showFrame && showHeader && (
                 <div
                     data-slot='code-block-header'
-                    className='flex h-10 shrink-0 items-center gap-3 border-b border-(--cb-border) bg-(--cb-header-bg) px-3.5 backdrop-blur-md'
+                    className='flex h-10 shrink-0 items-center gap-3 pr-2 pl-4'
                 >
-                    <span className='min-w-0 flex-1 truncate font-mono text-xs text-(--cb-muted)'>
+                    <span className='min-w-0 flex-1 truncate font-mono text-[11px] text-(--cb-gutter)'>
                         {filename ?? safeLanguage}
                     </span>
                     {showCopyButton && <CopyButton code={copySource} />}
@@ -370,7 +369,7 @@ export function CodeBlock({
                 tabIndex={0}
                 className={cn(
                     'min-h-0 flex-1 overflow-auto outline-none selection:bg-(--cb-selection) focus-visible:ring-2 focus-visible:ring-(--cb-accent)/40 [scrollbar-width:thin] [scrollbar-color:var(--cb-border)_transparent]',
-                    showFrame && 'py-3',
+                    showFrame && (showHeader ? 'pb-3.5' : 'py-3.5'),
                 )}
             >
                 <Highlight code={trimmed} language={safeLanguage} theme={theme}>
@@ -379,7 +378,7 @@ export function CodeBlock({
                         return (
                             <pre
                                 data-slot='code-block-pre'
-                                className='w-max min-w-full font-mono text-[13px] leading-6 [tab-size:4]'
+                                className='w-max min-w-full font-mono text-[12.5px] leading-5 [tab-size:2]'
                             >
                                 {tokens.map((line, i) => {
                                     const lineProps = getLineProps({ line })
@@ -389,7 +388,7 @@ export function CodeBlock({
                                             {...lineProps}
                                             className={cn(
                                                 'relative flex min-w-full',
-                                                showFrame && 'px-3.5',
+                                                showFrame && 'px-4',
                                                 highlighted.has(i + 1) && 'bg-(--cb-line-wash)',
                                                 lineProps.className,
                                             )}
@@ -397,13 +396,13 @@ export function CodeBlock({
                                             {showLineNumbers && (
                                                 <span
                                                     aria-hidden
-                                                    className='mr-4 shrink-0 text-right text-(--cb-gutter) select-none'
+                                                    className='mr-3.5 shrink-0 text-right text-(--cb-gutter) select-none'
                                                     style={{ width: gutterWidth }}
                                                 >
                                                     {i + 1}
                                                 </span>
                                             )}
-                                            <span className='pr-3.5'>
+                                            <span className='pr-4'>
                                                 {line.map((token, key) => (
                                                     <span key={key} {...getTokenProps({ token })} />
                                                 ))}

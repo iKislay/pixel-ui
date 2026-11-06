@@ -49,9 +49,8 @@ export default function McpClients() {
           <CodeBlock
             code={current.config}
             language="toml"
-            showFrame={false}
+            showHeader={false}
             showLineNumbers={false}
-            className="rounded-lg bg-muted p-3"
           />
         ) : null}
       </div>

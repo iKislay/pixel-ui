@@ -45,9 +45,8 @@ const STEPS: { heading: string; content: ReactNode }[] = [
         <CodeBlock
           code={MCP_COMPONENTS_JSON}
           language="json"
-          showFrame={false}
+          showHeader={false}
           showLineNumbers={false}
-          className="rounded-lg bg-muted p-3"
         />
       </>
     ),

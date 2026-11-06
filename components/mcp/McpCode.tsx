@@ -14,11 +14,12 @@ export default function McpCode({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 rounded-lg bg-muted p-2 pl-3",
+        "flex items-center gap-2 rounded-[14px] bg-[#F4F5F8] py-1.5 pr-1.5 pl-4 shadow-[inset_0_0_0_1px_rgb(0_0_0/0.04)] dark:bg-[#0F1011] dark:border-apple",
         className,
       )}
+      style={{ cornerShape: "squircle" } as React.CSSProperties}
     >
-      <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-xs text-foreground/80 [scrollbar-width:none]">
+      <code className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-[12.5px] text-foreground/80 [scrollbar-width:none]">
         {value}
       </code>
       <Tooltip label="Copy" align="end">
