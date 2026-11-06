@@ -14,7 +14,6 @@ const nextConfig: NextConfig = {
         source: "/:dir(logos|assets|fonts|brand)/:path*",
         headers: PUBLIC_CACHE,
       },
-      { source: "/ogimage.webp", headers: PUBLIC_CACHE },
     ];
   },
 };

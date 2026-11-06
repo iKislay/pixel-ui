@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ComponentProps } from "react";
+import { charAlpha } from "@/lib/ascii";
 import { cn } from "@/lib/utils";
 
 export default function AsciiArt({
@@ -54,13 +55,7 @@ export default function AsciiArt({
           const char = line[c];
           if (char === " ") continue;
 
-          let alpha = 0.55;
-          if ("@#WMB8%&".includes(char)) alpha = 0.8;
-          else if ("S*XOHZ".includes(char)) alpha = 0.65;
-          else if ("|/\\_^~-+=".includes(char)) alpha = 0.45;
-          else if (":.".includes(char)) alpha = 0.3;
-
-          ctx.fillStyle = `rgba(${baseRgb}, ${alpha})`;
+          ctx.fillStyle = `rgba(${baseRgb}, ${charAlpha(char)})`;
           ctx.fillText(char, c * cw + cw / 2, y);
         }
       }

@@ -94,22 +94,12 @@ export const metadata: Metadata = {
     url: "/",
     siteName: SITE_NAME,
     locale: "en_US",
-    images: [
-      {
-        url: "/ogimage.webp?v=2",
-        width: 2400,
-        height: 1260,
-        alt: "Pixel UI: pixel-perfect animated React components",
-        type: "image/webp",
-      },
-    ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: SITE_TAGLINE,
     description: SITE_DESCRIPTION,
-    images: ["/ogimage.webp?v=2"],
   },
 };
 
