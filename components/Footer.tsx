@@ -37,7 +37,7 @@ const HOVER =
 const MUTED = "text-black/50 dark:text-white/50";
 
 function NavLink({ label, href, external, icon: Icon }: FooterLink) {
-  const className = `w-fit ${Icon ? "flex items-center" : "text-lg"} ${MUTED} ${HOVER}`;
+  const className = `w-fit ${Icon ? "flex items-center" : "font-runde text-sm font-medium"} ${MUTED} ${HOVER}`;
   const content = Icon ? <Icon className="h-[1.375rem] w-[1.375rem]" /> : label;
 
   if (external) {
@@ -86,7 +86,7 @@ export default function Footer() {
                   {link.icon && !LINKS[index - 1]?.icon && (
                     <span
                       aria-hidden="true"
-                      className="-mx-3 text-lg text-black/25 dark:text-white/25"
+                      className="-mx-3 text-sm text-black/25 dark:text-white/25"
                     >
                       |
                     </span>
