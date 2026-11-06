@@ -39,6 +39,26 @@
       ]
     },
     {
+      "name": "otp-input",
+      "type": "registry:ui",
+      "title": "OTP Input",
+      "description": "A one-time code input that grows out of a button and settles into a verified badge.",
+      "dependencies": [
+        "motion",
+        "lucide-react",
+        "react-use-measure"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/otp-input.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "toast",
       "type": "registry:ui",
       "title": "Toast",

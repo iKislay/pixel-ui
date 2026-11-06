@@ -96,6 +96,66 @@ export default function Demo() {
     ],
   },
   {
+    name: "OTP Input",
+    href: "/components/otp-input",
+    category: "inputs",
+    isNew: true,
+    registry: "otp-input",
+    description:
+      "A one-time code input that grows out of a button and settles into a verified badge.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/otp-input.tsx`,
+    dependencies: [
+      {
+        name: "motion",
+        icon: createElement(MotionIcon, { className: "h-4 w-4" }),
+      },
+      { name: "lucide-react" },
+      { name: "react-use-measure" },
+    ],
+    interaction:
+      "Click Enter code and the pill stretches into a row of slots. Type or paste your code: each digit rises into place and the outline follows the next empty slot. The full code collapses into a Verifying pill. A wrong code turns the slots red, shakes, and drops the digits so you can retry. A right one turns the pill green with a quick shine. Honors prefers-reduced-motion: states swap instantly without blur, shake or shine.",
+    usage: `import { OtpInput } from "@/components/ui/otp-input";
+
+export default function Demo() {
+  return (
+    <OtpInput
+      onVerify={async (code) => {
+        const res = await fetch("/api/verify", {
+          method: "POST",
+          body: JSON.stringify({ code }),
+        });
+        return res.ok;
+      }}
+    />
+  );
+}`,
+    props: [
+      {
+        name: "onVerify",
+        type: "(code: string) => boolean | Promise<boolean>",
+        description:
+          "Runs once every slot is filled. Return true to show Verified, or false to reject the code. A thrown error counts as false. Without it, every code passes.",
+      },
+      {
+        name: "length",
+        type: "number",
+        default: "6",
+        description: "How many digits the code has.",
+      },
+      {
+        name: "label",
+        type: "string",
+        default: '"Enter code"',
+        description: "Text of the button shown before the slots open.",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root element.",
+      },
+    ],
+  },
+  {
     name: "Audio Chat Room",
     href: "/components/audio-chat-room",
     category: "display",

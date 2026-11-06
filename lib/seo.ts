@@ -39,6 +39,8 @@ const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
     "Flits away on pointer proximity and scatters on click.",
   "/components/theme-toggle":
     "Click the button to switch themes with an expanding circular reveal.",
+  "/components/otp-input":
+    "Type a code into animated slots and watch it verify in place.",
 };
 
 export function componentMetaDescription(item: ComponentItem): string {
