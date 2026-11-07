@@ -143,6 +143,21 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "swarm-reveal",
+      "type": "registry:ui",
+      "title": "Swarm Reveal",
+      "description": "A wrapper that has a swarm of cursors build your page in front of the visitor when it loads.",
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/swarm-reveal.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

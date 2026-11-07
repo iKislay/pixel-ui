@@ -37,6 +37,8 @@ const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
     "Swims away from pointers and ripples on click.",
   "/components/ascii-butterflies":
     "Flits away on pointer proximity and scatters on click.",
+  "/components/swarm-reveal":
+    "Cursors fly in, draw selection boxes, and build each element.",
   "/components/theme-toggle":
     "Click the button to switch themes with an expanding circular reveal.",
   "/components/otp-input":

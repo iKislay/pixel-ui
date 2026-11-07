@@ -220,6 +220,98 @@ function JellyfishControls() {
   );
 }
 
+function SwarmControls() {
+  const [cursorsStr, setCursors] = usePreviewControl("cursors", "24");
+  const [replay, setReplay] = usePreviewControl("replay", "0");
+  const [variant, setVariant] = usePreviewControl("variant", "color");
+  const [status, setStatus] = usePreviewControl("status", "on");
+  const cursors = Number(cursorsStr) || 24;
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <SectionHeader title="Style" />
+        <div className="flex rounded-xl bg-muted/60 p-1">
+          {(["color", "mono"] as const).map((v) => {
+            const active = variant === v;
+            return (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setVariant(v)}
+                className={cn(
+                  "flex-1 py-1.5 px-3 text-xs font-medium rounded-lg capitalize transition-all",
+                  active
+                    ? "bg-popover text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {v}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <SectionHeader title="Status Pill" />
+        <div className="flex rounded-xl bg-muted/60 p-1">
+          {(["on", "off"] as const).map((v) => {
+            const active = status === v;
+            return (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setStatus(v)}
+                className={cn(
+                  "flex-1 py-1.5 px-3 text-xs font-medium rounded-lg capitalize transition-all",
+                  active
+                    ? "bg-popover text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {v}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <SectionHeader title="Number of Cursors" />
+        <div className="flex gap-1.5 rounded-xl bg-muted/60 p-1">
+          {[8, 16, 24, 40].map((n) => {
+            const active = cursors === n;
+            return (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setCursors(String(n))}
+                className={cn(
+                  "h-8 flex-1 rounded-lg text-xs font-medium transition-all",
+                  active
+                    ? "bg-popover text-foreground shadow-xs font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {n}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setReplay(String(Number(replay) + 1))}
+        className="rounded-xl bg-muted/40 py-2.5 px-3 text-xs font-semibold text-foreground transition-all hover:bg-muted/80"
+      >
+        Replay reveal
+      </button>
+    </div>
+  );
+}
+
 function ToastControls() {
   return (
     <div className="flex flex-col gap-2">
@@ -383,6 +475,7 @@ export default function SidebarControls({
 
       {pathname === "/components/ascii-butterflies" && <ButterfliesControls />}
       {pathname === "/components/ascii-jellyfish" && <JellyfishControls />}
+      {pathname === "/components/swarm-reveal" && <SwarmControls />}
       {pathname === "/components/toast" && <ToastControls />}
       {pathname === "/components/member-selector" && <MemberSelectorControls />}
       {pathname === "/components/audio-chat-room" && <AudioChatControls />}

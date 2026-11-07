@@ -531,6 +531,60 @@ export function Demo() {
 }`,
     credits: ["Inspired by stackedlol/ascii-sharks"],
   },
+  {
+    name: "Swarm Reveal",
+    href: "/components/swarm-reveal",
+    category: "display",
+    isNew: true,
+    registry: "swarm-reveal",
+    description:
+      "A wrapper that has a swarm of cursors build your page in front of the visitor when it loads.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/swarm-reveal.tsx`,
+    interaction:
+      "Colored cursors stream in from every side while the screen turns into a design canvas. Each cursor claims an element, drags a selection box over it, and builds it: text types in line by line, images paint over a grey placeholder, and cards are carried in from the edge. Once the screen is built the cursors fly away. Scroll to a part that is not built yet and they come back to build it. Honors prefers-reduced-motion.",
+    props: [
+      {
+        name: "cursors",
+        type: "number",
+        default: "24",
+        description:
+          "How many cursors build the page at once.",
+      },
+      {
+        name: "variant",
+        type: '"color" | "mono"',
+        default: '"color"',
+        options: ["color", "mono"],
+        description:
+          "Color gives every cursor its own bright hue. Mono uses greys only.",
+      },
+      {
+        name: "status",
+        type: "boolean",
+        default: "true",
+        description:
+          "Shows a pill at the bottom with how many cursors are building and how far along the page is.",
+      },
+      {
+        name: "data-swarm",
+        type: '"" | "text" | "image" | "carry"',
+        description:
+          "Put it on any child to have a cursor build it. Leave it empty to pop the element in; images, videos and svgs paint in by default.",
+      },
+    ],
+    usage: `import { SwarmReveal } from "@/components/ui/swarm-reveal"
+
+export function Demo() {
+  return (
+    <SwarmReveal className="flex flex-col gap-4 p-8">
+      <img data-swarm src="/banner.png" alt="" className="rounded-xl" />
+      <h1 data-swarm className="text-2xl font-semibold">Mira Okafor</h1>
+      <p data-swarm="text">I build playful interfaces that feel alive.</p>
+      <article data-swarm="carry" className="rounded-xl border p-4">Tidepool</article>
+    </SwarmReveal>
+  )
+}`,
+  },
 ];
 
 export type PackageManager = "npm" | "pnpm" | "yarn" | "bun";
