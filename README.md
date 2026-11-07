@@ -85,6 +85,12 @@ Components live in `components/ui`. After changing a component or `registry.json
 
 Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the full walkthrough, from creating a component to a working install command.
 
+## About the author
+
+Hi, I'm Kislay, a full-stack developer in Bengaluru, India, building a founder's community. I'm the founder and lead engineer of [Fenlo](https://forg.to/projects/fenlo), an AI knowledge base for engineering teams, and I also build [Forg](https://forg.to/projects/forg) and [Copium](https://forg.to/projects/copium), a context optimization layer for LLMs. I work mostly with TypeScript, React, Next.js and Node.js.
+
+[Portfolio](https://kislay.forg.to) · [GitHub](https://github.com/iKislay) · [X](https://x.com/whykislay) · [LinkedIn](https://linkedin.com/in/kislayy) · [Book a call](https://cal.com/whykislay)
+
 ## License
 
 MIT with the [Commons Clause and an attribution requirement](LICENSE). Use, modify and ship the components in anything you build, personal or commercial, closed source included.
