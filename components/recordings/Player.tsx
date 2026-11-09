@@ -39,11 +39,13 @@ export default function Player({
   height,
   playing = false,
   autoPlay = false,
+  showCursor = true,
   children,
 }: RecordingProps & {
   script: Script;
   width?: number;
   height?: number;
+  showCursor?: boolean;
   children: ReactNode;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -198,7 +200,7 @@ export default function Player({
     place(at);
 
     (async () => {
-      await step(animate(pointer, { opacity: 1 }, { duration: 0.3 }));
+      if (showCursor) await step(animate(pointer, { opacity: 1 }, { duration: 0.3 }));
       for (;;) {
         await scriptRef.current(cursor);
         await move(REST);

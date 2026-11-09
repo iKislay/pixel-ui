@@ -9,7 +9,7 @@ const script: Script = async (cursor) => {
 
 export default function SwarmRevealRecording(props: RecordingProps) {
   return (
-    <Player width={420} height={320} script={script} {...props}>
+    <Player width={420} height={320} script={script} showCursor={false} {...props}>
       <SwarmReveal
         cursors={10}
         status={false}
