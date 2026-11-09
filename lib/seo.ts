@@ -41,6 +41,8 @@ const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
     "Cursors fly in, draw selection boxes, and build each element.",
   "/components/theme-toggle":
     "Click the button to switch themes with an expanding circular reveal.",
+  "/components/pull-to-refresh":
+    "Pull down to watch a masked pixel hero climb in and hold up the page.",
   "/components/otp-input":
     "Type a code into animated slots and watch it verify in place.",
 };

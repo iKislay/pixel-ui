@@ -158,6 +158,24 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "pull-to-refresh",
+      "type": "registry:ui",
+      "title": "Pull to Refresh",
+      "description": "A pull-to-refresh container with a masked pixel hero who climbs into the gap and holds up the page.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/pull-to-refresh.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

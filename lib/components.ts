@@ -265,6 +265,46 @@ export function Demo() {
 }`,
   },
   {
+    name: "Pull to Refresh",
+    href: "/components/pull-to-refresh",
+    category: "feedback",
+    isNew: true,
+    registry: "pull-to-refresh",
+    description:
+      "A pull-to-refresh container with a masked pixel hero who climbs into the gap and holds up the page.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/pull-to-refresh.tsx`,
+    dependencies: [
+      {
+        name: "motion",
+        icon: createElement(MotionIcon, { className: "h-4 w-4" }),
+      },
+    ],
+    interaction:
+      "Drag the content down from the top, or scroll up while it is already at the top. A masked pixel hero's hands appear on the edge, then he leaps up and grabs the ceiling, hangs for a moment, and drops onto the page. Let go, or pause your scroll, and the page rises: he pushes back against the ceiling while it refreshes, then gets squashed flat as the gap closes. Let go before he jumps and the page just springs back. Honors prefers-reduced-motion: poses swap instantly without the shake or dust.",
+    usage: `import { PullToRefresh } from "@/components/ui/pull-to-refresh";
+
+export default function Demo() {
+  return (
+    <PullToRefresh className="h-96" onRefresh={() => fetch("/api/feed")}>
+      {/* your scrollable content */}
+    </PullToRefresh>
+  );
+}`,
+    props: [
+      {
+        name: "onRefresh",
+        type: "() => void | Promise<void>",
+        description:
+          "Runs when you let go after the hero jumps. The page stays open until it settles, for at least 1.1 seconds.",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root. Give it a height; the content scrolls inside it.",
+      },
+    ],
+  },
+  {
     name: "Toast",
     href: "/components/toast",
     category: "feedback",
