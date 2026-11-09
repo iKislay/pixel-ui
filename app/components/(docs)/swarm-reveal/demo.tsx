@@ -4,7 +4,6 @@ import { SwarmReveal } from "@/components/ui/swarm-reveal";
 import { usePreviewControl } from "@/components/preview/PreviewControls";
 
 const PROJECTS = [
-  { name: "Fenlo", note: "AI knowledge base for engineering teams.", art: "linear-gradient(135deg,#40c8e0,#5e5ce6)" },
   { name: "Forg", note: "A place for builders to share what they are making.", art: "linear-gradient(135deg,#ff9f0a,#ff375f)" },
   { name: "Forg Discover", note: "Find the builders, projects, and companies.", art: "linear-gradient(135deg,#30d158,#0a84ff)" },
   { name: "Copium", note: "Context optimization layer for LLMs with 65-90% token savings.", art: "linear-gradient(135deg,#bf5af2,#40c8e0)" },
@@ -46,9 +45,8 @@ export default function Demo() {
           <section className="flex flex-col gap-2">
             <h2 data-swarm className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">About</h2>
             <p data-swarm="text" className="text-sm leading-6 text-foreground/80">
-              I am building a community for founders. I am the founder and lead engineer of Fenlo, an AI knowledge base
-              for engineering teams, and I also make Forg and Copium. Most of my work is full-stack: TypeScript, React,
-              Next.js and Node.js, from the first prototype to production.
+              I am building a community for founders. I make Forg, Forg Discover and Copium. Most of my work is
+              full-stack: TypeScript, React, Next.js and Node.js, from the first prototype to production.
             </p>
           </section>
           <section className="flex flex-col gap-2">

@@ -87,7 +87,7 @@ Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) fo
 
 ## About the author
 
-Hi, I'm Kislay, a full-stack developer in Bengaluru, India, building a founder's community. I'm the founder and lead engineer of [Fenlo](https://forg.to/projects/fenlo), an AI knowledge base for engineering teams, and I also build [Forg](https://forg.to/projects/forg) and [Copium](https://forg.to/projects/copium), a context optimization layer for LLMs. I work mostly with TypeScript, React, Next.js and Node.js.
+Hi, I'm Kislay, a full-stack developer in Bengaluru, India, building a founder's community. I build [Forg](https://forg.to/projects/forg), [Forg Discover](https://forg.to/projects/discover) and [Copium](https://forg.to/projects/copium), a context optimization layer for LLMs. I work mostly with TypeScript, React, Next.js and Node.js.
 
 [Portfolio](https://kislay.forg.to) · [GitHub](https://github.com/iKislay) · [X](https://x.com/whykislay) · [LinkedIn](https://linkedin.com/in/kislayy) · [Book a call](https://cal.com/whykislay)
 

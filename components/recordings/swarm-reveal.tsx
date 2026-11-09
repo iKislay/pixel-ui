@@ -24,8 +24,8 @@ export default function SwarmRevealRecording(props: RecordingProps) {
           </div>
         </div>
         <p data-swarm="text" className="text-xs leading-5 text-foreground/80">
-          I am building a community for founders. I lead Fenlo, an AI knowledge base for engineering teams,
-          and also make Forg and Copium, mostly in TypeScript, React and Next.js.
+          I am building a community for founders. I make Forg, Forg Discover and Copium,
+          mostly in TypeScript, React and Next.js.
         </p>
       </SwarmReveal>
     </Player>
