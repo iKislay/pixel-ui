@@ -4,13 +4,13 @@ import { SwarmReveal } from "@/components/ui/swarm-reveal";
 import { usePreviewControl } from "@/components/preview/PreviewControls";
 
 const PROJECTS = [
-  { name: "Tidepool", note: "A shared canvas for sketching with friends.", art: "linear-gradient(135deg,#40c8e0,#5e5ce6)" },
-  { name: "Night Market", note: "A pixel game about selling noodles after dark.", art: "linear-gradient(135deg,#ff9f0a,#ff375f)" },
-  { name: "Hollow", note: "A tiny journaling app that only opens at dusk.", art: "linear-gradient(135deg,#30d158,#0a84ff)" },
-  { name: "Driftwood", note: "Ambient soundscapes generated from tide charts.", art: "linear-gradient(135deg,#bf5af2,#40c8e0)" },
+  { name: "Fenlo", note: "AI knowledge base for engineering teams.", art: "linear-gradient(135deg,#40c8e0,#5e5ce6)" },
+  { name: "Forg", note: "A place for builders to share what they are making.", art: "linear-gradient(135deg,#ff9f0a,#ff375f)" },
+  { name: "Forg Discover", note: "Find the builders, projects, and companies.", art: "linear-gradient(135deg,#30d158,#0a84ff)" },
+  { name: "Copium", note: "Context optimization layer for LLMs with 65-90% token savings.", art: "linear-gradient(135deg,#bf5af2,#40c8e0)" },
 ];
 
-const STACK = ["TypeScript", "React", "Rust", "WebGL", "Figma"];
+const STACK = ["TypeScript", "React", "Next.js", "Node.js", "MongoDB"];
 
 export default function Demo() {
   const [cursors] = usePreviewControl("cursors", "24");
@@ -39,16 +39,16 @@ export default function Demo() {
           <div className="flex items-center gap-4">
             <div data-swarm="image" className="size-14 shrink-0 rounded-full bg-[conic-gradient(#ff5f57,#ffd60a,#30d158,#0a84ff,#bf5af2,#ff5f57)]" />
             <div className="flex flex-col gap-0.5">
-              <h1 data-swarm className="text-xl font-semibold tracking-tight">Mira Okafor</h1>
-              <p data-swarm className="text-sm text-muted-foreground">Creative developer, Lagos</p>
+              <h1 data-swarm className="text-xl font-semibold tracking-tight">Kislay</h1>
+              <p data-swarm className="text-sm text-muted-foreground">Full-stack developer, Bengaluru</p>
             </div>
           </div>
           <section className="flex flex-col gap-2">
             <h2 data-swarm className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">About</h2>
             <p data-swarm="text" className="text-sm leading-6 text-foreground/80">
-              I build playful interfaces that feel alive. Most of my work sits between design and engineering: small tools,
-              odd games, and websites that reward a second look. Right now I am exploring multiplayer canvases and
-              generative sound.
+              I am building a community for founders. I am the founder and lead engineer of Fenlo, an AI knowledge base
+              for engineering teams, and I also make Forg and Copium. Most of my work is full-stack: TypeScript, React,
+              Next.js and Node.js, from the first prototype to production.
             </p>
           </section>
           <section className="flex flex-col gap-2">
@@ -78,7 +78,7 @@ export default function Demo() {
           <section className="flex flex-col gap-2">
             <h2 data-swarm className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Contact</h2>
             <p data-swarm="text" className="text-sm leading-6 text-foreground/80">
-              Say hi at mira@example.com. I reply to every note, usually with a sketch.
+              Find me on GitHub at iKislay or on X at @whykislay, or book a call at cal.com/whykislay.
             </p>
           </section>
         </SwarmReveal>

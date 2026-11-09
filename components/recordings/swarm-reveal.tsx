@@ -19,13 +19,13 @@ export default function SwarmRevealRecording(props: RecordingProps) {
         <div className="flex items-center gap-3">
           <div data-swarm="image" className="size-10 shrink-0 rounded-full bg-[conic-gradient(#ff5f57,#ffd60a,#30d158,#0a84ff,#bf5af2,#ff5f57)]" />
           <div>
-            <h1 data-swarm className="text-base font-semibold">Mira Okafor</h1>
-            <p data-swarm className="text-xs text-muted-foreground">Creative developer, Lagos</p>
+            <h1 data-swarm className="text-base font-semibold">Kislay</h1>
+            <p data-swarm className="text-xs text-muted-foreground">Full-stack developer, Bengaluru</p>
           </div>
         </div>
         <p data-swarm="text" className="text-xs leading-5 text-foreground/80">
-          I build playful interfaces that feel alive. Most of my work sits between design and engineering: small tools,
-          odd games, and websites that reward a second look.
+          I am building a community for founders. I lead Fenlo, an AI knowledge base for engineering teams,
+          and also make Forg and Copium, mostly in TypeScript, React and Next.js.
         </p>
       </SwarmReveal>
     </Player>
