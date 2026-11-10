@@ -176,6 +176,24 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "spider-cursor",
+      "type": "registry:ui",
+      "title": "Spider Cursor",
+      "description": "A scroll container whose cursor is a red spider mask that swings the page on a web line, webs up what you click, and hauls draggable items around on a thread.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/spider-cursor.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

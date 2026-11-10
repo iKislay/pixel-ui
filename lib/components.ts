@@ -265,6 +265,52 @@ export function Demo() {
 }`,
   },
   {
+    name: "Spider Cursor",
+    href: "/components/spider-cursor",
+    category: "display",
+    isNew: true,
+    registry: "spider-cursor",
+    description:
+      "A scroll container whose cursor is a red spider mask that swings the page on a web line, webs up what you click, and hauls draggable items around on a thread.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/spider-cursor.tsx`,
+    dependencies: [
+      {
+        name: "motion",
+        icon: createElement(MotionIcon, { className: "h-4 w-4" }),
+      },
+    ],
+    interaction:
+      "Move the mouse inside and the pointer becomes the mask. Scroll and it shoots a web onto a spot further down the page, stretches, and pulls the page until that spot reaches it; scroll faster for a longer web, and keep scrolling to chain the next one. Click and the mask squishes while a web spins out from the spot, cycling between a net, a splat, and a loose spray. Click a button or link and one wide web lands over all of it. Hover text and the mask turns into a thin red line; press there to select text in a light red highlight, and no web is thrown. Hover a button or link and it shrinks to a small red dot. Press a draggable item and the mask grabs it with a web: the item trails behind, tilts as it swings, and reels in until it hangs just below the mask. Let go and it flies into the spot it lands in, or back home. Webs fade after 1.6 seconds, button covers after 2.6. Honors prefers-reduced-motion: scrolling stays native, webs appear fully drawn, and dragged items follow without lag.",
+    usage: `import { SpiderCursor } from "@/components/ui/spider-cursor";
+
+export default function Demo() {
+  return (
+    <SpiderCursor
+      className="h-96"
+      onWebDrop={(item, zone) => console.log(item.dataset.webDrag, zone?.dataset.webDrop)}
+    >
+      <div data-web-drop="inbox">
+        <div data-web-drag="card-1">Drag me</div>
+      </div>
+      <div data-web-drop="done" />
+    </SpiderCursor>
+  );
+}`,
+    props: [
+      {
+        name: "onWebDrop",
+        type: "(item: HTMLElement, zone: HTMLElement | null) => void",
+        description:
+          "Runs when a dragged item is released. Mark draggable items with data-web-drag set to a unique id and drop zones with data-web-drop. The zone is null when the item lands outside one.",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root. Give it a height; the content scrolls inside it.",
+      },
+    ],
+  },
+  {
     name: "Pull to Refresh",
     href: "/components/pull-to-refresh",
     category: "feedback",
