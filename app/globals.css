@@ -320,6 +320,25 @@ html {
   }
 }
 
+/* forced by the preview switch, which the prefers-reduced-motion media query cannot see */
+.preview-reduced-motion,
+.preview-reduced-motion *,
+.preview-reduced-motion *::before,
+.preview-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* walker marker, separate from the focus styles each component ships */
+[data-preview-step] {
+  outline: 2px solid var(--brand) !important;
+  outline-offset: 3px !important;
+}
+
 /* primary brand button styling */
 .bg-brand,
 .bg-primary,

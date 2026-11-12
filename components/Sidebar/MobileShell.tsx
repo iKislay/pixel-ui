@@ -11,6 +11,7 @@ import DescriptionContent from "../Description/DescriptionContent";
 import SidebarControls from "../Description/SidebarControls";
 import CodeDrawer from "../Description/CodeDrawer";
 import { CommandSearchBar } from "../CommandSearchBar";
+import PreviewStage from "../preview/PreviewStage";
 
 const CARD = "rounded-[32px] bg-card";
 
@@ -35,14 +36,14 @@ export default function MobileShell({
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar scroll-smooth flex flex-col gap-3 pb-16">
-        <div
+        <PreviewStage
           className={cn(
             CARD,
             "relative shrink-0 min-h-[72svh] p-4 flex flex-col justify-center overflow-hidden",
           )}
         >
           {children}
-        </div>
+        </PreviewStage>
 
         {item && (
           <div className={cn(CARD, "p-5 sm:p-6")}>

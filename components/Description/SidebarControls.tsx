@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { usePreviewControl } from "../preview/PreviewControls";
 import { toast } from "../ui/toast";
 import ColorSwatches from "../preview/ColorSwatches";
+import PreviewBehaviorControls from "../preview/PreviewBehaviorControls";
+import SectionHeader from "../preview/SectionHeader";
 
 type SidebarControlsProps = {
   item?: ComponentItem;
@@ -95,14 +97,6 @@ const TOAST_ACTIONS = [
       }),
   },
 ];
-
-function SectionHeader({ title }: { title: string }) {
-  return (
-    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground/45 select-none">
-      {title}
-    </span>
-  );
-}
 
 function ButterfliesControls() {
   const [variant, setVariant] = usePreviewControl("variant", "color");
@@ -481,6 +475,8 @@ export default function SidebarControls({
       {pathname === "/components/audio-chat-room" && <AudioChatControls />}
 
       <ColorSwatches showLabel />
+
+      <PreviewBehaviorControls />
 
       <div className="flex flex-col gap-2 pt-4">
         {onOpenCode && (

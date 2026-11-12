@@ -9,6 +9,7 @@ import Sidebar from "./Sidebar";
 import { DescriptionPanel } from "../Description/DescriptionPanel";
 import DescriptionContent from "../Description/DescriptionContent";
 import { CommandSearchBar } from "../CommandSearchBar";
+import PreviewStage from "../preview/PreviewStage";
 
 const DEFAULT_NAV_WIDTH = 288;
 const DEFAULT_INFO_WIDTH = 300;
@@ -77,12 +78,12 @@ export default function DesktopShell({
       >
         <CommandSearchBar className="relative z-40 shrink-0" />
         <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar scroll-smooth flex flex-col gap-8">
-          <div
+          <PreviewStage
             className="relative z-0 shrink-0 min-h-[calc(100vh-140px)] rounded-[45px] bg-card p-4 flex flex-col justify-center"
             style={{ cornerShape: "squircle" } as React.CSSProperties}
           >
             {children}
-          </div>
+          </PreviewStage>
 
           {item && (
             <div
