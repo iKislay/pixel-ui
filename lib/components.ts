@@ -22,7 +22,8 @@ export type ComponentCategory =
   | "navigation"
   | "inputs"
   | "feedback"
-  | "display";
+  | "display"
+  | "text";
 
 export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   ai: "AI kit",
@@ -30,10 +31,12 @@ export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   inputs: "Inputs",
   feedback: "Feedback",
   display: "Display",
+  text: "Text",
 };
 
 export const CATEGORY_ORDER: ComponentCategory[] = [
   "display",
+  "text",
   "ai",
   "navigation",
   "inputs",
@@ -272,7 +275,7 @@ export function Demo() {
     name: "Comic Glitch Text",
     href: "/components/comic-glitch-text",
     released: "2026-11-13",
-    category: "display",
+    category: "text",
     isNew: true,
     registry: "comic-glitch-text",
     description:
