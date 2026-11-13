@@ -215,6 +215,25 @@
       ]
     },
     {
+      "name": "gallery-corridor",
+      "type": "registry:ui",
+      "title": "Gallery Corridor",
+      "description": "A portfolio hero that walks you down a bending wireframe corridor hung with glowing pieces of work.",
+      "dependencies": [
+        "three",
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/gallery-corridor.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "comic-glitch-text",
       "type": "registry:ui",
       "title": "Comic Glitch Text",
