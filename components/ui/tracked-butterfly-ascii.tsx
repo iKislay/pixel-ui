@@ -192,7 +192,7 @@ const isDark = (el: Element) => {
   return 0.299 * r + 0.587 * g + 0.114 * b > 128;
 };
 
-function TrackedButterfly({ className, ...props }: ComponentProps<"div">) {
+function TrackedButterflyAscii({ className, ...props }: ComponentProps<"div">) {
   const glRef = useRef<HTMLCanvasElement>(null);
   const hudRef = useRef<HTMLCanvasElement>(null);
 
@@ -513,7 +513,7 @@ function TrackedButterfly({ className, ...props }: ComponentProps<"div">) {
 
   return (
     <div
-      data-slot="tracked-butterfly"
+      data-slot="tracked-butterfly-ascii"
       role="img"
       aria-label="A pixel butterfly with tracking markers on its wings"
       className={cn("relative overflow-hidden font-mono select-none", className)}
@@ -525,4 +525,4 @@ function TrackedButterfly({ className, ...props }: ComponentProps<"div">) {
   );
 }
 
-export { TrackedButterfly };
+export { TrackedButterflyAscii };

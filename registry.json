@@ -196,16 +196,16 @@
       ]
     },
     {
-      "name": "tracked-butterfly",
+      "name": "tracked-butterfly-ascii",
       "type": "registry:ui",
-      "title": "Tracked Butterfly",
+      "title": "Tracked Butterfly Ascii",
       "description": "A butterfly drawn in WebGL as a fine grid of glowing cells, under a motion tracking overlay that marks points on its wings.",
       "registryDependencies": [
         "utils"
       ],
       "files": [
         {
-          "path": "components/ui/tracked-butterfly.tsx",
+          "path": "components/ui/tracked-butterfly-ascii.tsx",
           "type": "registry:ui"
         },
         {

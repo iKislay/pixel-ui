@@ -2,7 +2,7 @@ import { componentOgAlt, componentOgImage } from "@/lib/og";
 
 export { size, contentType } from "@/lib/og";
 
-const HREF = "/components/tracked-butterfly";
+const HREF = "/components/tracked-butterfly-ascii";
 
 export const alt = componentOgAlt(HREF);
 
