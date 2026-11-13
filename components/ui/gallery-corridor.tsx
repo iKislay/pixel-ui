@@ -44,16 +44,16 @@ type Piece = {
 };
 
 const DEFAULT_ITEMS: CorridorItem[] = [
-  { title: "Ember Field", meta: "Live visuals · Lowlands · 2026", color: "#ff6a3d" },
-  { title: "Velvet Static", meta: "LED ceiling · Hamburg · 2026", color: "#8b7bff" },
-  { title: "Night Rain", meta: "Station wall · Utrecht · 2025", color: "#3dd6ff" },
-  { title: "Beat Rings", meta: "Floor projection · Amsterdam · 2025", color: "#f2f2f2" },
-  { title: "Tidewater", meta: "Live data · Rotterdam · 2025", color: "#46f0b4" },
-  { title: "Afterburn", meta: "Stage backdrop · Brussels · 2024", color: "#ff3d6e" },
-  { title: "Lilac Hour", meta: "Immersive room · Paris · 2024", color: "#c9a7ff" },
-  { title: "Signal Loss", meta: "Video wall · Hilversum · 2024", color: "#ffb23d" },
-  { title: "Halo", meta: "Exhibition identity · Ghent · 2023", color: "#9fd7c8" },
-  { title: "Groundwater", meta: "Generative print · Antwerp · 2023", color: "#7cff6b" },
+  { title: "Sunset, Extended", meta: "Live visuals · Ran 40 minutes over · 2026", color: "#ff6a3d" },
+  { title: "Weather for Indoors", meta: "LED ceiling · No umbrella required · 2026", color: "#8b7bff" },
+  { title: "Buffering, Lovingly", meta: "Station wall · Trains still late · 2025", color: "#3dd6ff" },
+  { title: "Two Dogs Disagreeing", meta: "Floor projection · Neither backed down · 2025", color: "#f2f2f2" },
+  { title: "Map of a Nap", meta: "Live data · Sponsored by a sofa · 2025", color: "#46f0b4" },
+  { title: "Toaster at Dusk", meta: "Stage backdrop · Bread not included · 2024", color: "#ff3d6e" },
+  { title: "Lavender, Unsupervised", meta: "Immersive room · Smells faintly of it · 2024", color: "#c9a7ff" },
+  { title: "Please Stand By", meta: "Video wall · Still standing by · 2024", color: "#ffb23d" },
+  { title: "Halo, Slightly Used", meta: "Exhibition identity · One previous owner · 2023", color: "#9fd7c8" },
+  { title: "The Floor Is Thinking", meta: "Generative print · Do not interrupt · 2023", color: "#7cff6b" },
 ];
 
 const CELL = 0.8;
