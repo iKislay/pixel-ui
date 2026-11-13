@@ -16,6 +16,7 @@ const RECORDINGS: Record<string, ComponentType<RecordingProps>> = {
   "tracked-butterfly-ascii": dynamic(() => import("./ascii").then((m) => m.TrackedButterfly), { ssr: false }),
   "swarm-reveal": dynamic(() => import("./swarm-reveal"), { ssr: false }),
   "comic-glitch-text": dynamic(() => import("./comic-glitch-text"), { ssr: false }),
+  "gallery-corridor": dynamic(() => import("./gallery-corridor"), { ssr: false }),
 };
 
 export default function Recording({
