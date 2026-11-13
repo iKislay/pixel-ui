@@ -213,6 +213,21 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "comic-glitch-text",
+      "type": "registry:ui",
+      "title": "Comic Glitch Text",
+      "description": "A paragraph that glitches in word by word through comic panels, torn color slices and print misregistration.",
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/comic-glitch-text.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
