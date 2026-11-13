@@ -13,8 +13,8 @@ type Fx = "hide" | "panel" | "slice" | "chroma" | "bold" | "rest";
 type Word = { el: HTMLSpanElement; queue: Fx[]; enterAt: number; exitAt: number };
 
 const FPS = 24;
-const HOLD = 4.2 * FPS;
-const GAP = 0.6 * FPS;
+const HOLD = Math.round(4.2 * FPS);
+const GAP = Math.round(0.6 * FPS);
 const PANELS = [
   { fill: "#22e04a", ink: "#000" },
   { fill: "#d61cf0", ink: "#fff" },
