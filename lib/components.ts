@@ -23,6 +23,7 @@ export type ComponentCategory =
   | "inputs"
   | "feedback"
   | "display"
+  | "sections"
   | "text";
 
 export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
@@ -31,11 +32,13 @@ export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   inputs: "Inputs",
   feedback: "Feedback",
   display: "Display",
+  sections: "Sections",
   text: "Text",
 };
 
 export const CATEGORY_ORDER: ComponentCategory[] = [
   "display",
+  "sections",
   "text",
   "ai",
   "navigation",
@@ -338,7 +341,7 @@ export function Demo() {
     name: "Gallery Corridor",
     href: "/components/gallery-corridor",
     released: "2026-11-13",
-    category: "display",
+    category: "sections",
     registry: "gallery-corridor",
     description:
       "A portfolio hero that walks you down a bending wireframe corridor hung with glowing pieces of work.",
