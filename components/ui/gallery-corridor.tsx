@@ -9,7 +9,9 @@ import {
   Float32BufferAttribute,
   LinearSRGBColorSpace,
   Mesh,
+  OrthographicCamera,
   PerspectiveCamera,
+  PlaneGeometry,
   Raycaster,
   Scene,
   ShaderMaterial,
@@ -17,6 +19,7 @@ import {
   Vector3,
   Vector4,
   WebGLRenderer,
+  WebGLRenderTarget,
 } from "three";
 import { cn } from "@/lib/utils";
 
@@ -65,7 +68,7 @@ const EYE = 0.12;
 const LIGHTS = 24;
 const INTRO = 2.3;
 const OPEN = 1.05;
-const VEIL = 0.18;
+const FADE = 0.45;
 const SURFACES: Surface[] = ["right", "left", "ceil", "floor"];
 const ECHO: Record<Surface, [Surface, Surface]> = {
   left: ["floor", "ceil"],
@@ -412,6 +415,23 @@ void main() {
   gl_FragColor = vec4(c, 1.0);
 }`;
 
+const FADE_VERTEX = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = vec4(position.xy, 0.0, 1.0);
+}`;
+
+const FADE_FRAGMENT = /* glsl */ `
+uniform sampler2D uTex;
+uniform float uUseTex;
+uniform vec3 uFrom;
+uniform float uA;
+varying vec2 vUv;
+void main() {
+  gl_FragColor = vec4(mix(uFrom, texture2D(uTex, vUv).rgb, uUseTex), uA);
+}`;
+
 const isDark = (el: Element) => {
   const probe = document.createElement("canvas").getContext("2d");
   if (!probe) return true;
@@ -532,10 +552,12 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
     let shown = 0;
     let openT = 0;
     let openDir = 0;
-    let veil = motionQuery.matches ? 1 : 0;
-    let veilDir = motionQuery.matches ? -1 : 0;
-    let onCut: (() => void) | null = null;
+    let fade = 0;
+    let snapI = 0;
     let snapTimer = 0;
+    let wheelTimer = 0;
+    let wheelAcc = 0;
+    let wheelLock = false;
     let dimK = THEMES.dark.dim;
     let dark = true;
     const pointer = new Vector2();
@@ -547,11 +569,45 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
     const gaze = new Vector3();
     const ZERO = new Vector2();
 
-    // reduced motion swaps every camera move for a quick fade through the background
+    const snaps = [0, 1].map(() => new WebGLRenderTarget(1, 1, { samples: 4 }));
+    const fadeQuad = new Mesh(
+      new PlaneGeometry(2, 2),
+      new ShaderMaterial({
+        vertexShader: FADE_VERTEX,
+        fragmentShader: FADE_FRAGMENT,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        uniforms: { uTex: { value: snaps[0].texture }, uUseTex: { value: 1 }, uFrom: { value: new Color() }, uA: { value: 0 } },
+      }),
+    );
+    fadeQuad.frustumCulled = false;
+    const fadeScene = new Scene().add(fadeQuad);
+    const fadeCam = new OrthographicCamera();
+    const fu = fadeQuad.material.uniforms;
+
+    const draw = (into: WebGLRenderTarget | null) => {
+      renderer.setRenderTarget(into);
+      renderer.render(scene, camera);
+      if (fade > 0) {
+        fu.uA.value = smooth(fade);
+        renderer.autoClear = false;
+        renderer.render(fadeScene, fadeCam);
+        renderer.autoClear = true;
+      }
+      renderer.setRenderTarget(null);
+    };
+
+    // reduced motion never moves through space: it freezes the frame on screen and cross-fades to the change
     const cut = (fn: () => void) => {
       if (!motionQuery.matches) return fn();
-      onCut = fn;
-      veilDir = 1;
+      const into = snaps[1 - snapI];
+      draw(into);
+      snapI = 1 - snapI;
+      fu.uTex.value = into.texture;
+      fu.uUseTex.value = 1;
+      fade = 1;
+      fn();
     };
 
     const settle = () => {
@@ -593,6 +649,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
       dark = isDark(root);
       const t = dark ? THEMES.dark : THEMES.light;
       dimK = t.dim;
+      fu.uFrom.value.setStyle(t.bg, RAW);
       renderer.setClearColor(t.bg, 1);
       const u = tunnel.material.uniforms;
       u.uBg.value.setStyle(t.bg, RAW);
@@ -621,18 +678,11 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
       const still = motionQuery.matches;
       if (!still) artTime += dt;
 
-      if (veilDir) {
-        veil = clamp(veil + (veilDir * dt) / VEIL, 0, 1);
-        if (veil === 1) {
-          onCut?.();
-          onCut = null;
-          veilDir = -1;
-        } else if (veil === 0) veilDir = 0;
-      }
+      fade = Math.max(0, fade - dt / FADE);
 
       const prev = p;
       if (still) {
-        if (Math.abs(settled - p) > 1e-3 && !veilDir) cut(() => (p = settled));
+        if (p !== settled) cut(() => (p = settled));
       } else p += (target - p) * (1 - Math.exp(-dt * 4));
       vel += ((p - prev) / Math.max(dt, 1e-4) - vel) * (1 - Math.exp(-dt * 6));
       const nearest = clamp(Math.round(p), 0, n - 1);
@@ -702,7 +752,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
         u.uOn.value = Math.max(pc.on, u.uK.value);
         u.uHover.value = pc.hover;
         u.uTime.value = pc.echo ? artTime * 0.8 + pc.index * 3.1 + 40 : artTime + pc.index * 7.3;
-        u.uDim.value = Math.max(isOpen ? 0 : ob * (dimK + 0.08), veil);
+        u.uDim.value = isOpen ? 0 : ob * (dimK + 0.08);
         pc.mesh.renderOrder = isOpen ? 2 : 0;
         pc.mesh.material.depthTest = !isOpen;
         if (!pc.echo && k < LIGHTS) {
@@ -717,8 +767,8 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
       tu.uOpenCol.value.copy(pieces[shown].color);
       tu.uCamT.value = camT;
       tu.uReveal.value = reveal;
-      tu.uDim.value = Math.max(ob * dimK, veil);
-      renderer.render(scene, camera);
+      tu.uDim.value = ob * dimK;
+      draw(null);
     };
 
     const run = () => {
@@ -735,6 +785,8 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      const size = renderer.getDrawingBufferSize(new Vector2());
+      for (const snap of snaps) snap.setSize(size.x, size.y);
     };
 
     const pick = (x: number, y: number) => {
@@ -749,6 +801,24 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
     const onWheel = (e: WheelEvent) => {
       if (openIdx !== null) return e.preventDefault();
       const delta = (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * (e.deltaMode === 1 ? 16 : 1);
+      if (motionQuery.matches) {
+        // one swipe or notch is one step, so a trackpad's momentum tail cannot skip pieces
+        const next = clamp(settled + Math.sign(delta), 0, n - 1);
+        if (next === settled && !wheelLock) return;
+        e.preventDefault();
+        clearTimeout(wheelTimer);
+        wheelTimer = window.setTimeout(() => {
+          wheelLock = false;
+          wheelAcc = 0;
+        }, 220);
+        if (wheelLock) return;
+        wheelAcc += delta;
+        if (Math.abs(wheelAcc) >= 40) {
+          wheelLock = true;
+          go(next);
+        }
+        return;
+      }
       const next = clamp(target + delta / 700, 0, n - 1);
       // at either end, hand the wheel back to the page
       if (next === target) return;
@@ -758,21 +828,27 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
       snapTimer = window.setTimeout(settle, 180);
     };
 
-    const drag = { id: -1, y: 0, moved: false };
+    const drag = { id: -1, y: 0, moved: false, dragged: false };
     const onDown = (e: PointerEvent) => {
       drag.id = e.pointerId;
       drag.y = e.clientY;
-      drag.moved = false;
-      canvas.setPointerCapture(e.pointerId);
+      drag.moved = drag.dragged = false;
     };
     const onMove = (e: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
       pointer.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -(((e.clientY - rect.top) / rect.height) * 2 - 1));
       if (drag.id === e.pointerId && e.buttons) {
         const dy = e.clientY - drag.y;
-        if (!drag.moved && Math.abs(dy) > 5) drag.moved = true;
-        if (drag.moved && openIdx === null) {
+        if (!drag.moved && Math.abs(dy) > 5) {
+          drag.moved = true;
+          canvas.setPointerCapture(e.pointerId);
+        }
+        if (!drag.moved || openIdx !== null) return;
+        if (!motionQuery.matches) {
           target = clamp(target - (dy * 2.2) / h, 0, n - 1);
+          drag.y = e.clientY;
+        } else if (Math.abs(dy) >= 60) {
+          go(settled - Math.sign(dy));
           drag.y = e.clientY;
         }
         return;
@@ -782,7 +858,11 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
     const onUp = (e: PointerEvent) => {
       if (drag.id !== e.pointerId) return;
       drag.id = -1;
-      if (drag.moved) return settle();
+      drag.dragged = drag.moved;
+      if (drag.moved) settle();
+    };
+    const onClick = (e: MouseEvent) => {
+      if (drag.dragged) return;
       if (openIdx !== null) return open(null);
       const i = pick(e.clientX, e.clientY);
       if (i >= 0) open(i);
@@ -824,8 +904,14 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
     canvas.addEventListener("pointerup", onUp);
     canvas.addEventListener("pointercancel", onUp);
     canvas.addEventListener("pointerleave", onLeave);
+    canvas.addEventListener("click", onClick);
     syncTheme();
     resize();
+    if (motionQuery.matches) {
+      // arrive by fading up from the background
+      fu.uUseTex.value = 0;
+      fade = 1;
+    }
     run();
 
     return () => {
@@ -842,7 +928,10 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
       canvas.removeEventListener("pointerup", onUp);
       canvas.removeEventListener("pointercancel", onUp);
       canvas.removeEventListener("pointerleave", onLeave);
-      for (const m of [tunnel, ...all.map((pc) => pc.mesh)]) {
+      canvas.removeEventListener("click", onClick);
+      clearTimeout(wheelTimer);
+      for (const snap of snaps) snap.dispose();
+      for (const m of [tunnel, fadeQuad, ...all.map((pc) => pc.mesh)]) {
         m.geometry.dispose();
         m.material.dispose();
       }
@@ -921,7 +1010,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
                 </span>
                 <span
                   className={cn(
-                    "h-px bg-current transition-[width,opacity] duration-300",
+                    "h-px bg-current transition-[width,opacity] duration-300 motion-reduce:transition-opacity",
                     i === active ? "w-6 opacity-100 sm:w-8" : "w-3 opacity-40 group-hover:opacity-80",
                   )}
                 />
