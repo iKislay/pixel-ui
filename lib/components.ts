@@ -308,7 +308,6 @@ export function Demo() {
     </ComicGlitchText>
   )
 }`,
-    credits: ["Inspired by sethihq on X"],
   },
   {
     name: "Tracked Butterfly Ascii",
