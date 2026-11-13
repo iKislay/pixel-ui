@@ -43,6 +43,7 @@ export const CATEGORY_ORDER: ComponentCategory[] = [
 export type ComponentItem = {
   name: string;
   href: string;
+  released: string;
   category: ComponentCategory;
   isNew?: boolean;
   description?: string;
@@ -64,6 +65,7 @@ export const components: ComponentItem[] = [
   {
     name: "Theme Toggle",
     href: "/components/theme-toggle",
+    released: "2026-11-05",
     category: "inputs",
     isNew: true,
     registry: "theme-toggle",
@@ -98,6 +100,7 @@ export default function Demo() {
   {
     name: "OTP Input",
     href: "/components/otp-input",
+    released: "2026-11-06",
     category: "inputs",
     isNew: true,
     registry: "otp-input",
@@ -158,6 +161,7 @@ export default function Demo() {
   {
     name: "Audio Chat Room",
     href: "/components/audio-chat-room",
+    released: "2026-11-05",
     category: "display",
     isNew: true,
     registry: "audio-chat-room",
@@ -267,6 +271,7 @@ export function Demo() {
   {
     name: "Tracked Butterfly Ascii",
     href: "/components/tracked-butterfly-ascii",
+    released: "2026-11-13",
     category: "display",
     isNew: true,
     registry: "tracked-butterfly-ascii",
@@ -292,6 +297,7 @@ export function Demo() {
   {
     name: "Spider Cursor",
     href: "/components/spider-cursor",
+    released: "2026-11-10",
     category: "display",
     isNew: true,
     registry: "spider-cursor",
@@ -338,6 +344,7 @@ export default function Demo() {
   {
     name: "Pull to Refresh",
     href: "/components/pull-to-refresh",
+    released: "2026-11-09",
     category: "feedback",
     isNew: true,
     registry: "pull-to-refresh",
@@ -378,6 +385,7 @@ export default function Demo() {
   {
     name: "Toast",
     href: "/components/toast",
+    released: "2026-11-05",
     category: "feedback",
     isNew: true,
     registry: "toast",
@@ -486,6 +494,7 @@ export function Demo() {
   {
     name: "Member Selector",
     href: "/components/member-selector",
+    released: "2026-11-05",
     category: "inputs",
     isNew: true,
     registry: "member-selector",
@@ -575,6 +584,7 @@ export function Demo() {
   {
     name: "Ascii Jellyfish",
     href: "/components/ascii-jellyfish",
+    released: "2026-11-05",
     category: "display",
     isNew: true,
     registry: "ascii-jellyfish",
@@ -610,6 +620,7 @@ export function Demo() {
   {
     name: "Ascii Butterflies",
     href: "/components/ascii-butterflies",
+    released: "2026-11-05",
     category: "display",
     isNew: true,
     registry: "ascii-butterflies",
@@ -645,6 +656,7 @@ export function Demo() {
   {
     name: "Swarm Reveal",
     href: "/components/swarm-reveal",
+    released: "2026-11-07",
     category: "display",
     isNew: true,
     registry: "swarm-reveal",
@@ -724,19 +736,17 @@ export type ComponentSection = {
   items: ComponentItem[];
 };
 
+// iso dates compare as strings, and the sort is stable so same day keeps list order
+export const latest = [...components].sort((a, b) =>
+  b.released.localeCompare(a.released),
+);
+
 // gallery sections: New repeats its members so they still appear under their own category
 export const gallerySections: ComponentSection[] = [
   {
     id: "new",
     label: "New releases",
-    items: components
-      .filter((c) => c.isNew)
-      .reverse()
-      .sort(
-        (a, b) =>
-          Number(b.href === "/components/toast") -
-          Number(a.href === "/components/toast"),
-      ),
+    items: latest.filter((c) => c.isNew),
   },
   ...CATEGORY_ORDER.map((id) => ({
     id,
