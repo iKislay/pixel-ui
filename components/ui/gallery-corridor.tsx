@@ -953,7 +953,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
         aria-roledescription="carousel"
         aria-label={`A corridor of ${n} pieces. Scroll, drag or use the arrow keys to walk, Enter to open the one in front of you.`}
         className={cn(
-          "relative isolate overflow-hidden text-foreground outline-none select-none touch-none focus-visible:ring-2 focus-visible:ring-ring",
+          "@container relative isolate overflow-hidden text-foreground outline-none select-none touch-none focus-visible:ring-2 focus-visible:ring-ring",
           hovering && "cursor-pointer",
           className,
         )}
@@ -961,7 +961,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
       >
         <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block size-full" />
 
-        <div aria-live="polite" className="pointer-events-none absolute inset-x-0 bottom-0 p-5 sm:p-8 lg:p-10">
+        <div aria-live="polite" className="pointer-events-none absolute inset-x-0 bottom-0 p-4 @lg:p-8 @4xl:p-10">
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={shown}
@@ -973,10 +973,10 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
               <p className="font-mono text-[11px] tracking-widest tabular-nums">
                 {pad(shown + 1)} <span className="opacity-50">/ {pad(n)}</span>
               </p>
-              <h2 className="mt-1 max-w-[14ch] text-4xl leading-[0.95] font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
+              <h2 className="mt-1 max-w-[14ch] text-[clamp(1.6rem,7.5cqi,4.75rem)] leading-[0.95] font-semibold tracking-tight text-balance">
                 {item.title}
               </h2>
-              <p className="mt-3 flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase opacity-70 sm:text-[11px]">
+              <p className="mt-2 flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase opacity-70 @lg:mt-3 @lg:text-[11px]">
                 <span className="size-2 shrink-0 rounded-[2px]" style={{ background: item.color }} />
                 {item.meta}
               </p>
@@ -987,7 +987,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
         <ol
           aria-label="Pieces"
           className={cn(
-            "absolute top-1/2 right-3 flex -translate-y-1/2 flex-col items-end gap-0.5 transition-opacity duration-300 sm:right-6",
+            "absolute top-1/2 right-3 flex -translate-y-1/2 flex-col items-end gap-0.5 transition-opacity duration-300 @lg:right-6",
             opened !== null && "pointer-events-none opacity-30",
           )}
         >
@@ -1002,7 +1002,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
               >
                 <span
                   className={cn(
-                    "hidden transition-opacity duration-300 sm:inline",
+                    "hidden transition-opacity duration-300 @2xl:inline",
                     i === active ? "opacity-100" : "opacity-0 group-hover:opacity-60 group-focus-visible:opacity-60",
                   )}
                 >
@@ -1011,7 +1011,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
                 <span
                   className={cn(
                     "h-px bg-current transition-[width,opacity] duration-300 motion-reduce:transition-opacity",
-                    i === active ? "w-6 opacity-100 sm:w-8" : "w-3 opacity-40 group-hover:opacity-80",
+                    i === active ? "w-6 opacity-100 @lg:w-8" : "w-3 opacity-40 group-hover:opacity-80",
                   )}
                 />
               </button>
@@ -1028,7 +1028,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3, delay: 0.2 }}
-              className="absolute top-4 right-4 rounded-full border border-current/20 bg-background/40 px-4 py-1.5 text-sm font-medium backdrop-blur-md sm:top-6 sm:right-6"
+              className="absolute top-3 right-3 rounded-full border border-current/20 bg-background/40 px-3 py-1 text-xs font-medium backdrop-blur-md @lg:top-6 @lg:right-6 @lg:px-4 @lg:py-1.5 @lg:text-sm"
             >
               Close
             </motion.button>
