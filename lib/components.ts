@@ -269,6 +269,50 @@ export function Demo() {
 }`,
   },
   {
+    name: "Comic Glitch Text",
+    href: "/components/comic-glitch-text",
+    released: "2026-11-13",
+    category: "display",
+    isNew: true,
+    registry: "comic-glitch-text",
+    description:
+      "A paragraph that glitches in word by word through comic panels, torn color slices and print misregistration.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/comic-glitch-text.tsx`,
+    interaction:
+      "Words appear one after another. Each one flickers through a few frames first: stamped on a tilted comic panel with halftone dots, torn into offset color strips, or doubled in pink and cyan. It lands bold, then settles into plain text. Once the paragraph is in, a random word glitches again now and then. After about 4 seconds the words drop out in random order and the reveal starts over. Honors prefers-reduced-motion: the text shows settled and nothing flickers.",
+    props: [
+      {
+        name: "children",
+        type: "string",
+        required: true,
+        description: "The text to reveal. It wraps like a normal paragraph.",
+      },
+      {
+        name: "stagger",
+        type: "number",
+        default: "3",
+        description: "Frames between one word and the next, at 24 frames a second.",
+      },
+      {
+        name: "loop",
+        type: "boolean",
+        default: "true",
+        options: ["true", "false"],
+        description: "Scrambles the text out and plays the reveal again. Off, the text stays after the first reveal.",
+      },
+    ],
+    usage: `import { ComicGlitchText } from "@/components/ui/comic-glitch-text"
+
+export function Demo() {
+  return (
+    <ComicGlitchText className="max-w-md text-lg">
+      With great power there must also come great responsibility.
+    </ComicGlitchText>
+  )
+}`,
+    credits: ["Inspired by sethihq on X"],
+  },
+  {
     name: "Tracked Butterfly Ascii",
     href: "/components/tracked-butterfly-ascii",
     released: "2026-11-13",
