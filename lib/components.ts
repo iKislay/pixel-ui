@@ -335,6 +335,44 @@ export function Demo() {
     credits: ["Inspired by navedux on Threads"],
   },
   {
+    name: "Gallery Corridor",
+    href: "/components/gallery-corridor",
+    released: "2026-11-13",
+    category: "display",
+    registry: "gallery-corridor",
+    description:
+      "A portfolio hero that walks you down a bending wireframe corridor hung with glowing pieces of work.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/gallery-corridor.tsx`,
+    dependencies: [
+      { name: "three" },
+      {
+        name: "motion",
+        icon: createElement(MotionIcon, { className: "h-4 w-4" }),
+      },
+    ],
+    interaction:
+      "On load the grid races down the corridor and each piece flickers on as the light reaches it. Scroll, drag or use the arrow keys to walk from one piece to the next; the view banks into the bends, leans toward the piece beside you and settles on the nearest one when you stop. Each piece tints the grid around it in its own colour, and the title, number and details change as you pass. Hover a piece to light its frame, click it or press Enter and it peels off the wall to face you while the corridor dims; click anywhere, press Escape or use Close to put it back, and the arrow keys flip between pieces while one is open. The index on the right jumps straight to any piece. Honors prefers-reduced-motion: the camera never flies, it fades through to each stop, pieces open with a fade instead of a peel, and the artwork holds still.",
+    props: [
+      {
+        name: "items",
+        type: "{ title: string; meta: string; color: string }[]",
+        default: "10 sample pieces",
+        description:
+          "The pieces, in walking order. color tints the artwork, its frame and the grid around it; the first 24 light the grid.",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root. Give it a height; the corridor fills it.",
+      },
+    ],
+    usage: `import { GalleryCorridor } from "@/components/ui/gallery-corridor"
+
+export function Demo() {
+  return <GalleryCorridor className="h-[640px] w-full" />
+}`,
+  },
+  {
     name: "Spider Cursor",
     href: "/components/spider-cursor",
     released: "2026-11-10",
