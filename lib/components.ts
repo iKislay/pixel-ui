@@ -279,7 +279,7 @@ export function Demo() {
       "A paragraph that glitches in word by word through comic panels, torn color slices and print misregistration.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/comic-glitch-text.tsx`,
     interaction:
-      "Words appear one after another. Each one flickers through a few frames first: stamped on a tilted comic panel with halftone dots, torn into offset color strips, or doubled in pink and cyan. It lands bold, then settles into plain text. Once the paragraph is in, a random word glitches again now and then. After about 4 seconds the words drop out in random order and the reveal starts over. Honors prefers-reduced-motion: the text shows settled and nothing flickers.",
+      "Words appear one after another. Each one flickers through a few frames first: stamped on a tilted comic panel with halftone dots, torn into offset color strips, or doubled in pink and cyan. It lands bold, then settles into plain text. Once the paragraph is in, a random word glitches again now and then. After about 4 seconds the words drop out in random order and the reveal starts over. Honors prefers-reduced-motion: words fade in one by one with no glitch frames, and the reveal plays once.",
     props: [
       {
         name: "children",

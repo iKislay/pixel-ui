@@ -78,10 +78,10 @@ export function ComicGlitchText({ children, stagger = 3, loop = true, className,
 
   React.useEffect(() => {
     const els = Array.from(rootRef.current!.querySelectorAll<HTMLSpanElement>("[data-fx]"));
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      els.forEach((el) => (el.dataset.fx = "rest"));
-      return;
-    }
+    // reduced motion keeps the word by word reveal as a plain fade, played once
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const enter = calm ? (): Fx[] => [...Array<Fx>(10).fill("bold"), "rest"] : enterSeq;
+    const looping = loop && !calm;
 
     const list: Word[] = els.map((el) => ({ el, queue: [], enterAt: 0, exitAt: Infinity }));
     const entered = list.length * stagger + 16;
@@ -92,7 +92,7 @@ export function ComicGlitchText({ children, stagger = 3, loop = true, className,
       const order = list.map((_, i) => i).sort(() => Math.random() - 0.5);
       list.forEach((w, i) => {
         w.enterAt = i * stagger;
-        w.exitAt = loop ? exitStart + order[i] : Infinity;
+        w.exitAt = looping ? exitStart + order[i] : Infinity;
       });
     };
 
@@ -100,11 +100,11 @@ export function ComicGlitchText({ children, stagger = 3, loop = true, className,
     plan();
     const id = setInterval(() => {
       for (const w of list) {
-        if (f === w.enterAt) w.queue = enterSeq();
+        if (f === w.enterAt) w.queue = enter();
         if (f === w.exitAt) w.queue = exitSeq();
       }
       // idle re-glitch, kept out of the reveal and the exit
-      if (f > entered && (!loop || f < exitStart) && f % 19 === 0 && Math.random() < 0.7) {
+      if (!calm && f > entered && (!looping || f < exitStart) && f % 19 === 0 && Math.random() < 0.7) {
         const w = pick(list);
         if (!w.queue.length) w.queue = idleSeq();
       }
@@ -113,7 +113,7 @@ export function ComicGlitchText({ children, stagger = 3, loop = true, className,
         if (fx) paint(w, fx, hatch);
       }
       f++;
-      if (loop && f >= cycle) {
+      if (looping && f >= cycle) {
         f = 0;
         plan();
       }
@@ -132,7 +132,7 @@ export function ComicGlitchText({ children, stagger = 3, loop = true, className,
       {words.map((word, i) => (
         <React.Fragment key={i}>
           {i > 0 && " "}
-          <span aria-hidden data-fx="hide" className="group relative inline-block data-[fx=hide]:invisible">
+          <span aria-hidden data-fx="hide" className="group relative inline-block data-[fx=hide]:opacity-0 motion-reduce:transition-opacity motion-reduce:duration-500">
             <svg
               viewBox="0 0 100 100"
               preserveAspectRatio="none"
