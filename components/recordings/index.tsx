@@ -13,6 +13,7 @@ const RECORDINGS: Record<string, ComponentType<RecordingProps>> = {
   "member-selector": dynamic(() => import("./member-selector"), { ssr: false }),
   "ascii-jellyfish": dynamic(() => import("./ascii").then((m) => m.Jellyfish), { ssr: false }),
   "ascii-butterflies": dynamic(() => import("./ascii").then((m) => m.Butterflies), { ssr: false }),
+  "tracked-butterfly-ascii": dynamic(() => import("./ascii").then((m) => m.TrackedButterfly), { ssr: false }),
   "swarm-reveal": dynamic(() => import("./swarm-reveal"), { ssr: false }),
 };
 
