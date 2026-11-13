@@ -43,6 +43,8 @@ const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
     "Click the button to switch themes with an expanding circular reveal.",
   "/components/pull-to-refresh":
     "Pull down to watch a masked pixel hero climb in and hold up the page.",
+  "/components/tracked-butterfly":
+    "Move to pull the tracking target across a pixel butterfly, and click to send a ring over its wings.",
   "/components/spider-cursor":
     "Scroll to swing the page on a web line, click to throw webs, and drag items by a thread.",
   "/components/otp-input":

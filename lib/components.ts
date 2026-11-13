@@ -265,6 +265,31 @@ export function Demo() {
 }`,
   },
   {
+    name: "Tracked Butterfly",
+    href: "/components/tracked-butterfly",
+    category: "display",
+    isNew: true,
+    registry: "tracked-butterfly",
+    description:
+      "A butterfly drawn in WebGL as a fine grid of glowing cells, under a motion tracking overlay that marks points on its wings.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/tracked-butterfly.tsx`,
+    interaction:
+      "The butterfly hovers and slowly beats its wings. Its left wings are a sparse teal scan with cells that spark on and off; its right wings are solid, shading from blue to pink with a pale sheen drifting across. Twenty five markers ride the wings, some with live coordinates, and thin lines tie them to a lock box on the body. Move the pointer in and the box becomes a target that follows it: the lines swing over, nearby cells light up, and the butterfly leans toward it. Click and a bright ring spreads across the wings from that spot while the wings beat faster for a moment. Left alone, a ring pulses out from the lock every 3 seconds. Honors prefers-reduced-motion: the butterfly holds still with its wings open, nothing sparks or pulses, and the target and the glow under it still follow the pointer.",
+    props: [
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root. Give it a height; the butterfly scales to fit.",
+      },
+    ],
+    usage: `import { TrackedButterfly } from "@/components/ui/tracked-butterfly"
+
+export function Demo() {
+  return <TrackedButterfly className="h-96 w-full rounded-2xl" />
+}`,
+    credits: ["Inspired by navedux on Threads"],
+  },
+  {
     name: "Spider Cursor",
     href: "/components/spider-cursor",
     category: "display",
