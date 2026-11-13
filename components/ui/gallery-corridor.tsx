@@ -7,6 +7,7 @@ import {
   Color,
   DoubleSide,
   Float32BufferAttribute,
+  LinearSRGBColorSpace,
   Mesh,
   PerspectiveCamera,
   Raycaster,
@@ -77,6 +78,8 @@ const THEMES = {
   light: { bg: "#ececea", surf: "#f4f4f2", line: "#161616", lineA: 0.34, off: "#e4e4e1", dark: 0, dim: 0.6 },
 };
 
+// the shaders write colours straight out, so hex values skip three's linear conversion
+const RAW = LinearSRGBColorSpace;
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const easeInOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const smooth = (x: number) => x * x * (3 - 2 * x);
@@ -474,7 +477,7 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
 
     const makePiece = (index: number, echo: boolean): Piece => {
       const place = placeFor(index, echo);
-      const color = new Color(items[index].color);
+      const color = new Color().setStyle(items[index].color, RAW);
       const mesh = new Mesh(
         buildPanel(place),
         new ShaderMaterial({
@@ -592,14 +595,14 @@ function GalleryCorridor({ items = DEFAULT_ITEMS, className, ...props }: Gallery
       dimK = t.dim;
       renderer.setClearColor(t.bg, 1);
       const u = tunnel.material.uniforms;
-      u.uBg.value.set(t.bg);
-      u.uSurf.value.set(t.surf);
-      u.uLine.value.set(t.line);
+      u.uBg.value.setStyle(t.bg, RAW);
+      u.uSurf.value.setStyle(t.surf, RAW);
+      u.uLine.value.setStyle(t.line, RAW);
       u.uLineA.value = t.lineA;
       u.uDark.value = t.dark;
       for (const pc of all) {
-        pc.mesh.material.uniforms.uBg.value.set(t.bg);
-        pc.mesh.material.uniforms.uOff.value.set(t.off);
+        pc.mesh.material.uniforms.uBg.value.setStyle(t.bg, RAW);
+        pc.mesh.material.uniforms.uOff.value.setStyle(t.off, RAW);
       }
     };
 
