@@ -48,7 +48,6 @@ export type ComponentItem = {
   href: string;
   released: string;
   category: ComponentCategory;
-  isNew?: boolean;
   description?: string;
   registry?: string;
   source?: string;
@@ -70,7 +69,6 @@ export const components: ComponentItem[] = [
     href: "/components/theme-toggle",
     released: "2026-11-05",
     category: "inputs",
-    isNew: true,
     registry: "theme-toggle",
     description:
       "A toggle button that flips between light and dark mode with an expanding circular reveal.",
@@ -105,7 +103,6 @@ export default function Demo() {
     href: "/components/otp-input",
     released: "2026-11-06",
     category: "inputs",
-    isNew: true,
     registry: "otp-input",
     description:
       "A one-time code input that grows out of a button and settles into a verified badge.",
@@ -166,7 +163,6 @@ export default function Demo() {
     href: "/components/audio-chat-room",
     released: "2026-11-05",
     category: "display",
-    isNew: true,
     registry: "audio-chat-room",
     description:
       "A voice chat pill that morphs into a card showing everyone in the room.",
@@ -276,7 +272,6 @@ export function Demo() {
     href: "/components/comic-glitch-text",
     released: "2026-11-13",
     category: "text",
-    isNew: true,
     registry: "comic-glitch-text",
     description:
       "A paragraph that glitches in word by word through comic panels, torn color slices and print misregistration.",
@@ -320,7 +315,6 @@ export function Demo() {
     href: "/components/tracked-butterfly-ascii",
     released: "2026-11-13",
     category: "display",
-    isNew: true,
     registry: "tracked-butterfly-ascii",
     description:
       "A butterfly drawn in WebGL as a fine grid of glowing cells, under a motion tracking overlay that marks points on its wings.",
@@ -346,7 +340,6 @@ export function Demo() {
     href: "/components/spider-cursor",
     released: "2026-11-10",
     category: "display",
-    isNew: true,
     registry: "spider-cursor",
     description:
       "A scroll container whose cursor is a red spider mask that swings the page on a web line, webs up what you click, and hauls draggable items around on a thread.",
@@ -393,7 +386,6 @@ export default function Demo() {
     href: "/components/pull-to-refresh",
     released: "2026-11-09",
     category: "feedback",
-    isNew: true,
     registry: "pull-to-refresh",
     description:
       "A pull-to-refresh container with a masked pixel hero who climbs into the gap and holds up the page.",
@@ -434,7 +426,6 @@ export default function Demo() {
     href: "/components/toast",
     released: "2026-11-05",
     category: "feedback",
-    isNew: true,
     registry: "toast",
     description:
       "A toast notification whose status lands with a rippling pulse and whose text morphs word by word.",
@@ -543,7 +534,6 @@ export function Demo() {
     href: "/components/member-selector",
     released: "2026-11-05",
     category: "inputs",
-    isNew: true,
     registry: "member-selector",
     description:
       "An avatar row for picking people, with a searchable dropdown to add more.",
@@ -633,7 +623,6 @@ export function Demo() {
     href: "/components/ascii-jellyfish",
     released: "2026-11-05",
     category: "display",
-    isNew: true,
     registry: "ascii-jellyfish",
     description:
       "Translucent jellyfish drawn as ASCII glyphs, pulsing through the water with trailing tentacles.",
@@ -669,7 +658,6 @@ export function Demo() {
     href: "/components/ascii-butterflies",
     released: "2026-11-05",
     category: "display",
-    isNew: true,
     registry: "ascii-butterflies",
     description:
       "A few butterflies drawn as ASCII glyphs, flapping on wandering paths and landing now and then.",
@@ -705,7 +693,6 @@ export function Demo() {
     href: "/components/swarm-reveal",
     released: "2026-11-07",
     category: "display",
-    isNew: true,
     registry: "swarm-reveal",
     description:
       "A wrapper that has a swarm of cursors build your page in front of the visitor when it loads.",
@@ -783,6 +770,12 @@ export type ComponentSection = {
   items: ComponentItem[];
 };
 
+const NEW_FOR_DAYS = 30;
+
+// shortcut: measured from the last deploy, so labels age out on the next deploy after 30 days
+export const isNew = (item: ComponentItem) =>
+  Number(process.env.BUILD_TIME) - Date.parse(item.released) < NEW_FOR_DAYS * 86_400_000;
+
 // iso dates compare as strings, and the sort is stable so same day keeps list order
 export const latest = [...components].sort((a, b) =>
   b.released.localeCompare(a.released),
@@ -793,7 +786,7 @@ export const gallerySections: ComponentSection[] = [
   {
     id: "new",
     label: "New releases",
-    items: latest.filter((c) => c.isNew),
+    items: latest.filter(isNew),
   },
   ...CATEGORY_ORDER.map((id) => ({
     id,

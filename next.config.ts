@@ -8,6 +8,8 @@ const PUBLIC_CACHE = [
 ];
 
 const nextConfig: NextConfig = {
+  // one shared clock for server and browser, so the new label never mismatches on hydration
+  env: { BUILD_TIME: String(Date.now()) },
   async headers() {
     return [
       {
