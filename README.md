@@ -21,6 +21,8 @@
 
 [**pixelui.dev**](https://pixelui.dev) &nbsp;&middot;&nbsp; [Components](https://pixelui.dev/components) &nbsp;&middot;&nbsp; [Follow on X](https://x.com/pixeluiHQ)
 
+<a href="https://github.com/sponsors/iKislay"><img src="https://img.shields.io/badge/Sponsor-0a0a0a?logo=githubsponsors&logoColor=EA4AAA" alt="Sponsor on GitHub" /></a>
+
 </div>
 
 <br />
