@@ -7,6 +7,7 @@ import HeroIntro from "@/components/HeroIntro";
 import ComponentsShowcase from "@/components/ComponentsShowcase";
 import Faq, { type FaqItem } from "@/components/Faq";
 import Footer from "@/components/Footer";
+import Sponsors from "@/components/Sponsors";
 import { REGISTRY_REPO } from "@/lib/components";
 import { AsciiJellyfish } from "@/components/ui/ascii-jellyfish";
 import AmbientVeil from "@/components/preview/AmbientVeil";
@@ -89,6 +90,7 @@ export default async function Home() {
         </div>
       </section>
       <ComponentsShowcase />
+      <Sponsors />
       <section className="mx-auto grid w-full max-w-6xl gap-8 px-5 pb-20 sm:px-6 md:grid-cols-[1fr_2fr] md:pb-28">
         <header className="flex flex-col items-start gap-1">
           <span className="text-sm font-medium text-muted-foreground">FAQ</span>
