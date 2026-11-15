@@ -215,6 +215,24 @@
       ]
     },
     {
+      "name": "dimension-hero",
+      "type": "registry:ui",
+      "title": "Dimension Hero",
+      "description": "A bold headline hero with a pill that turns the page into a black wireframe world of extruded letters.",
+      "dependencies": [
+        "three"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/dimension-hero.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "gallery-corridor",
       "type": "registry:ui",
       "title": "Gallery Corridor",
