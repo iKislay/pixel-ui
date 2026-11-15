@@ -313,6 +313,43 @@ export function Demo() {
 }`,
   },
   {
+    name: "Dimension Hero",
+    href: "/components/dimension-hero",
+    released: "2026-11-15",
+    category: "sections",
+    registry: "dimension-hero",
+    description:
+      "A bold headline hero with a pill that turns the page into a black wireframe world of extruded letters.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/dimension-hero.tsx`,
+    dependencies: [{ name: "three" }],
+    interaction:
+      "On load each word starts as a small square or circle beside it, which grows in steps until the word pops in, small, then larger, then full size. The words land 0.12 seconds apart, then the headline rises toward the top and the tagline fades up under it. Press the pill in the corner and the page cuts to black: the headline becomes solid letters with white edges, hanging in a wireframe room. Move the pointer and the view swings around them, showing each letter at a different depth. Scroll to fly forward through the letters. Press the pill again or Escape to go back. Honors prefers-reduced-motion: the words and tagline appear without animation, and the 3D view opens straight on and only moves when you move the pointer.",
+    props: [
+      {
+        name: "headline",
+        type: "string",
+        default: '"Draw outside the frame"',
+        description: "The headline. Each word reveals on its own and becomes 3D letters in the pill view.",
+      },
+      {
+        name: "tagline",
+        type: "string",
+        description: "The line under the headline. It also floats in the 3D view.",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root. Give it a height; the headline scales to its width.",
+      },
+    ],
+    usage: `import { DimensionHero } from "@/components/ui/dimension-hero"
+
+export function Demo() {
+  return <DimensionHero className="h-[640px] w-full" />
+}`,
+    credits: ["Inspired by the shopify.design hero"],
+  },
+  {
     name: "Tracked Butterfly Ascii",
     href: "/components/tracked-butterfly-ascii",
     released: "2026-11-13",
