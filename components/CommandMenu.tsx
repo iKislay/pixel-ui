@@ -9,6 +9,7 @@ import {
   type Variants,
 } from "motion/react";
 import Recording from "@/components/recordings";
+import Tag from "@/components/Tag";
 import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
@@ -497,11 +498,7 @@ export default function CommandMenu({
                                     New
                                   </span>
                                 )}
-                                {item.pro && (
-                                  <span className="rounded-full bg-foreground px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-background">
-                                    Pro
-                                  </span>
-                                )}
+                                {item.pro && <Tag tone="pro" />}
                               </span>
                             )}
                           </div>

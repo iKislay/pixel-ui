@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Tag from "@/components/Tag";
 import { isNew, type ComponentItem } from "@/lib/components";
 import { feedback } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
@@ -65,16 +66,8 @@ export default function ComponentCard({
         <div className="pointer-events-none absolute bottom-5 left-5 opacity-0 transition-all duration-200 ease-out group-hover:opacity-100 [@media(hover:none)]:opacity-100 sm:bottom-6 sm:left-6 motion-reduce:transition-none">
           <div className="flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/85 px-3.5 py-1.5 text-xs font-medium text-black shadow-md backdrop-blur-md dark:border-white/10 dark:bg-[#1c1c1e]/85 dark:text-white sm:px-4 sm:py-2 sm:text-sm">
             <span>{item.name}</span>
-            {isNew(item) && (
-              <span className="rounded-full bg-brand/20 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-brand">
-                NEW
-              </span>
-            )}
-            {item.pro && (
-              <span className="rounded-full bg-foreground px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-background">
-                PRO
-              </span>
-            )}
+            {isNew(item) && <Tag tone="new" />}
+            {item.pro && <Tag tone="pro" />}
           </div>
         </div>
       </Link>

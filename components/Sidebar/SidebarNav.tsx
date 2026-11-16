@@ -10,6 +10,7 @@ import {
   type ComponentCategory,
   type ComponentItem,
 } from "@/lib/components";
+import Tag from "@/components/Tag";
 import { cn } from "@/lib/utils";
 import { SCROLL_FADE, SCROLL_SELECTOR } from "./SidebarScroll";
 
@@ -93,6 +94,7 @@ const SidebarGroup = ({
               )}
             >
               <span className="truncate">{item.name}</span>
+              {item.pro && <Tag tone="pro" className="ml-auto" />}
             </Link>
           );
         })}
