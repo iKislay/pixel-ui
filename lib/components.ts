@@ -323,7 +323,7 @@ export function Demo() {
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/dimension-hero.tsx`,
     dependencies: [{ name: "three" }],
     interaction:
-      "On load each word starts as a small square or circle beside it, which grows in steps until the word pops in, small, then larger, then full size. The words land 0.12 seconds apart. At 1.1 seconds, tiles flicker open from the centre for 2 seconds, showing glimpses of a blue, colour-split world behind the page, while the headline rises toward the top and the tagline fades up under it. Press the pill in the corner and a crackling ring spreads from the centre, warping the page into black: the headline becomes solid letters with white edges, hanging in a wireframe room where grid lines, light streaks and specks keep rushing past. Move the pointer and the view swings around the letters, showing each one at a different depth. Scroll to fly forward through them. Press the pill again or Escape and the ring collapses back to the flat page. Honors prefers-reduced-motion: the words and tagline appear without animation, the tiles are skipped, the 3D view switches in and out without the ring, nothing in it drifts, and it moves only with the pointer.",
+      "On load each word starts as a small square or circle beside it, which grows in steps until the word pops in, small, then larger, then full size. The words land 0.12 seconds apart. At 1.1 seconds, tiles flicker open from the centre for 2 seconds, showing glimpses of a blue, colour-split world behind the page, while the headline rises toward the top and the tagline fades up under it. Press the pill in the corner and the headline peels off the page, letter by letter, sinking into depth while a crackling ring spreads from the centre and warps the page into black. Inside, the letters are solids with white edges, hanging in a wireframe room where grid lines, light streaks and specks keep rushing past. Move the pointer and the view swings around the letters, showing each one at a different depth. Scroll to fly forward through them. Press the pill again or Escape and the ring collapses while the letters fly back and flatten into the headline. Honors prefers-reduced-motion: the words and tagline appear without animation, the tiles are skipped, the 3D view switches in and out without the ring, nothing in it drifts, and it moves only with the pointer.",
     props: [
       {
         name: "headline",
@@ -334,6 +334,7 @@ export function Demo() {
       {
         name: "tagline",
         type: "string",
+        default: '"Every flat page hides a little depth. The pill knows where."',
         description: "The line under the headline. It also floats in the 3D view.",
       },
       {
