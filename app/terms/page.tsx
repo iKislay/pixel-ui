@@ -6,7 +6,7 @@ import { fetchStarCount } from "@/lib/github";
 import { LEGAL_UPDATED, TERMS_SECTIONS } from "@/lib/legal";
 import { SITE_NAME } from "@/lib/site";
 
-const DESCRIPTION = `The terms for using ${SITE_NAME}: the component registry and the license it ships under, and the sponsorship that funds it, including pricing, billing, cancellation and refunds.`;
+const DESCRIPTION = `The terms for using ${SITE_NAME}: the free registry and its license, ${SITE_NAME} Pro and its license, and sponsorship, including pricing, billing, cancellation and refunds.`;
 
 export const metadata: Metadata = {
   title: "Terms of Service",

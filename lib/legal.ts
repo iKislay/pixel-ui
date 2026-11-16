@@ -18,7 +18,7 @@ export const JURISDICTION = `the courts of ${BUSINESS_COUNTRY}`;
 
 export const DISPUTE_WINDOW = "30 days";
 
-export const LEGAL_UPDATED = "October 4, 2026";
+export const LEGAL_UPDATED = "November 16, 2026";
 
 export const MERCHANT_NAME = "Dodo Payments";
 
@@ -27,20 +27,26 @@ export const MERCHANT_URL = "https://dodopayments.com";
 export const MERCHANT_PRIVACY_URL =
   "https://dodopayments.com/legal/privacy-policy";
 
+export const PRO_MERCHANT_NAME = "Polar";
+
+export const PRO_MERCHANT_URL = "https://polar.sh";
+
+export const PRO_MERCHANT_PRIVACY_URL = "https://polar.sh/legal/privacy-policy";
+
 export const SUPPORT_RESPONSE = "within 2 business days";
 
 export const PRIVACY_SECTIONS: LegalSection[] = [
   {
     heading: "Who we are",
     body: [
-      `${SITE_NAME} is a free, open-source React component registry operated by ${BUSINESS_OWNER}, an independent developer based in ${BUSINESS_COUNTRY}. This policy covers ${SITE_URL}, the component registry served from it, and the sponsorship checkout linked from it.`,
+      `${SITE_NAME} is a free, open-source React component registry operated by ${BUSINESS_OWNER}, an independent developer based in ${BUSINESS_COUNTRY}. This policy covers ${SITE_URL}, the component registry served from it, the Pixel UI Pro registry, and the sponsorship and Pro checkouts linked from it.`,
     ],
   },
   {
     heading: "The short version",
     body: [
       "You do not need an account to browse the site or to install a component. We do not run ads, we do not use tracking cookies, and we do not sell or share your data with anyone for their own marketing.",
-      "The only personal data we hold is what a sponsor gives us in order to be listed, and whatever you write to us directly.",
+      "The only personal data we hold is what a sponsor gives us in order to be listed, what we need to deliver a Pro purchase, and whatever you write to us directly.",
     ],
   },
   {
@@ -48,6 +54,8 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     list: [
       "Anonymous usage analytics: page views, referrer, country, browser and device type, collected through Databuddy. The data is aggregated and is not used to identify you.",
       "Sponsorship billing details: name, company, billing address, email address and tax identifiers, collected and stored by our payment processor, not by us. We receive only your name or company name, email address, tier and subscription status.",
+      "Pro purchase details: name, email address, billing address and tax identifiers, collected and stored by Polar, not by us. We receive only your name, email address, purchase status and license key.",
+      "Pro license checks: when you install a Pro component, the shadcn CLI sends your license key to the Pro registry. We pass the key to Polar to confirm it is valid and count installs per component. We keep your IP address in server memory for up to 10 minutes to block repeated invalid keys, and never store it.",
       "Sponsor brand assets: the logo, company name and destination link you send us so we can publish your placement.",
       "Messages you send: anything you include when you email us or message us on X.",
       "Public repository activity: if you open an issue or a pull request, that is handled by GitHub under their terms and is public by design. We do not import it into any other system.",
@@ -57,7 +65,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     heading: "What we do not collect",
     body: [
       "We do not run advertising, cross-site tracking or fingerprinting, we do not build profiles, and we never see or store your card number.",
-      "Installing a component with the shadcn CLI fetches a static JSON file from the registry. Nothing about your project, your code or your machine is sent to us.",
+      "Installing a free component with the shadcn CLI fetches a static JSON file from the registry. Installing a Pro component also sends your license key. Nothing about your project, your code or your machine is sent to us.",
       "Your theme preference is kept in your browser's local storage on your own device. It is never sent to us.",
     ],
   },
@@ -65,6 +73,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     heading: "Payments",
     body: [
       `Payments are processed by ${MERCHANT_NAME} (${MERCHANT_URL}), which acts as the merchant of record. ${MERCHANT_NAME} collects your payment details directly, calculates and remits tax, and issues your invoice. Their handling of your data is governed by their own privacy policy at ${MERCHANT_PRIVACY_URL}.`,
+      `${SITE_NAME} Pro is sold through ${PRO_MERCHANT_NAME} (${PRO_MERCHANT_URL}), which acts as the merchant of record for it. ${PRO_MERCHANT_NAME} collects your payment details directly, calculates and remits tax, and issues your invoice and your license key. Their handling of your data is governed by their own privacy policy at ${PRO_MERCHANT_PRIVACY_URL}.`,
     ],
   },
   {
@@ -73,16 +82,17 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
       "We rely on a small number of third parties to run the site. Each processes only the data needed for its function.",
     ],
     list: [
-      `${MERCHANT_NAME}: payment processing, subscription billing and invoicing.`,
+      `${MERCHANT_NAME}: payment processing, subscription billing and invoicing for sponsorship.`,
+      `${PRO_MERCHANT_NAME}: payment processing, invoicing and license keys for ${SITE_NAME} Pro.`,
       "Databuddy: privacy-focused, aggregated website analytics.",
-      "GitHub: hosts the open-source repository, serves the registry files, and provides the public star count shown on the site.",
+      "GitHub: hosts the open-source repository and the private Pro repository, serves the registry files, and provides the public star count shown on the site.",
       "Our hosting provider: serves the site and keeps short-lived server logs, including IP addresses, for security and reliability.",
     ],
   },
   {
     heading: "How we use your information",
     body: [
-      "We use billing and contact details to deliver and support a sponsorship, to send receipts and renewal notices, and to reply to you. We use aggregated analytics to understand which components people find useful and to decide what to build next. We do not use any of it for automated decision making or profiling.",
+      "We use billing and contact details to deliver and support a sponsorship or a Pro purchase, to send receipts and renewal notices, and to reply to you. We use your license key only to confirm your access to Pro components. We use aggregated analytics to understand which components people find useful and to decide what to build next. We do not use any of it for automated decision making or profiling.",
     ],
   },
   {
@@ -94,20 +104,20 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   {
     heading: "How long we keep it",
     body: [
-      "Invoice and sponsorship records are kept for as long as tax and accounting law requires, currently up to eight years. Email correspondence is kept while it is useful for support, then deleted. Aggregated analytics holds no personal data and is retained indefinitely.",
+      "Invoice, sponsorship and Pro purchase records are kept for as long as tax and accounting law requires, currently up to eight years. Email correspondence is kept while it is useful for support, then deleted. Aggregated analytics holds no personal data and is retained indefinitely.",
     ],
   },
   {
     heading: "Your rights",
     body: [
       `You can ask for a copy of the personal data we hold about you, ask us to correct it, ask us to delete it, or object to a particular use, subject to records we are legally required to keep. Email ${SUPPORT_EMAIL} and we will respond ${SUPPORT_RESPONSE}, and in any case within 30 days.`,
-      `If your request concerns payment data held by ${MERCHANT_NAME}, we will pass it on to them. If you are in the EU or the UK and you are not satisfied with our response, you can complain to your local data protection authority.`,
+      `If your request concerns payment data held by ${MERCHANT_NAME} or ${PRO_MERCHANT_NAME}, we will pass it on to them. If you are in the EU or the UK and you are not satisfied with our response, you can complain to your local data protection authority.`,
     ],
   },
   {
     heading: "Security",
     body: [
-      "The site is served over HTTPS. Payment data is handled entirely by our payment processor on PCI compliant infrastructure. No method of transmission over the internet is completely secure, so we cannot guarantee absolute security.",
+      "The site is served over HTTPS. License keys are checked over HTTPS and never written to our logs. Payment data is handled entirely by our payment processors on PCI compliant infrastructure. No method of transmission over the internet is completely secure, so we cannot guarantee absolute security.",
     ],
   },
   {
@@ -117,9 +127,9 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     ],
   },
   {
-    heading: "If we add paid products or accounts",
+    heading: "If we add more paid products or accounts",
     body: [
-      `${SITE_NAME} is free today, and sponsorship is the only thing we sell. If we later add paid components, licenses, downloads or anything that needs an account, that will introduce new categories of data, such as login credentials, license keys and purchase history.`,
+      `We sell sponsorship and ${SITE_NAME} Pro. If we later add anything that needs an account, that will introduce new categories of data, such as login credentials.`,
       "We will update this policy, and the date on it, before we start collecting anything new, and we will describe what is collected and why. We will not quietly apply this version of the policy to data it never covered.",
     ],
   },
@@ -140,7 +150,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
     heading: "Agreement",
     body: [
       `These terms govern your use of ${SITE_NAME} at ${SITE_URL}, the components published in its registry, and anything you buy from us. The site is operated by ${BUSINESS_OWNER}, an independent developer based in ${BUSINESS_COUNTRY}. By using the site, installing a component, or making a purchase, you accept these terms.`,
-      `In these terms, "the registry" means the free components published at ${SITE_REPO}, and "paid offerings" means anything we sell. Sponsorship is currently the only paid offering.`,
+      `In these terms, "the registry" means the free components published at ${SITE_REPO}, and "paid offerings" means anything we sell. The paid offerings are sponsorship and ${SITE_NAME} Pro.`,
     ],
   },
   {
@@ -160,11 +170,27 @@ export const TERMS_SECTIONS: LegalSection[] = [
     ],
   },
   {
-    heading: "If we add paid offerings later",
+    heading: "Free components stay free",
     body: [
-      "The registry is free today and we intend to keep the components that are already published free. We may add paid offerings in the future, for example premium components, templates, licenses or hosted services.",
+      `We intend to keep every component already published in the free registry free. ${SITE_NAME} Pro adds new components; it does not move existing ones behind a paywall. We may add other paid offerings in the future, for example templates or hosted services.`,
       "A component published under the current license stays under it. Releasing a paid product later does not retroactively change the license of a component you already installed, and does not give us a claim over a project you built with it.",
       "Any paid offering will show its price and any additional product-specific terms at the point of purchase before you pay. These terms apply to it in addition to those.",
+    ],
+  },
+  {
+    heading: `${SITE_NAME} Pro`,
+    body: [
+      `${SITE_NAME} Pro is a one-time purchase that gives you a license key for the Pro registry. The key installs every Pro component with the shadcn CLI or MCP, including components we publish after you buy, for as long as the Pro registry runs. There is no subscription and no renewal.`,
+      `${SITE_NAME} Pro is sold by ${PRO_MERCHANT_NAME}, the merchant of record. Applicable sales tax, VAT or GST is calculated and added by ${PRO_MERCHANT_NAME} at checkout, and ${PRO_MERCHANT_NAME} emails your invoice. Your key is on your ${PRO_MERCHANT_NAME} purchases page.`,
+      "If we ever shut the Pro registry down, components you already installed stay yours under this license, and we will give at least 90 days' notice by email so you can install anything you still need.",
+    ],
+  },
+  {
+    heading: "The Pro license",
+    body: [
+      "Pro components are licensed to the person who bought them. You may use and modify them in any number of personal and commercial projects, including client work and closed source products, and ship them inside those projects. Attribution is not required.",
+      "You may not share your license key, publish Pro source code where others can read it, such as a public repository, or sell, sublicense or redistribute Pro components on their own or as part of a template, kit, theme, component library, course or port to another framework. A component compiled into a finished app or site is fine.",
+      "Keep your key in an environment file or a CI secret, never in code you commit. If your key leaks, rotate it from your purchases page. We may revoke a key that is shared or used to redistribute Pro components, without a refund.",
     ],
   },
   {
@@ -175,9 +201,9 @@ export const TERMS_SECTIONS: LegalSection[] = [
     ],
   },
   {
-    heading: "Pricing and billing",
+    heading: "Sponsorship pricing and billing",
     body: [
-      `Your first payment is charged at checkout and the subscription renews automatically on the same date each month until you cancel. Payments are processed by ${MERCHANT_NAME}, the merchant of record for every purchase. Applicable sales tax, VAT or GST is calculated and added by ${MERCHANT_NAME} at checkout, and you receive an invoice by email for each payment.`,
+      `Your first payment is charged at checkout and the subscription renews automatically on the same date each month until you cancel. Payments are processed by ${MERCHANT_NAME}, the merchant of record for sponsorship. Applicable sales tax, VAT or GST is calculated and added by ${MERCHANT_NAME} at checkout, and you receive an invoice by email for each payment.`,
       "We may change pricing at any time. An active sponsor keeps their current price for as long as the subscription runs without interruption, and we give at least 30 days' notice by email before any change takes effect on renewal.",
     ],
   },
@@ -193,7 +219,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
       `You can cancel at any time from the billing portal link in your receipt, or by emailing ${SUPPORT_EMAIL}. Cancelling stops future charges. Your placement stays live until the end of the period you have already paid for, and is then removed.`,
       "If you cancel within 14 days of your first payment, email us and we refund that payment in full. After 14 days, and for renewal payments, charges are not refundable, because the placement has already been delivered for that month.",
       "If we remove your placement early through no fault of yours, or take the site down, we refund the unused part of the month.",
-      `For any future paid offering that is a one-time digital purchase, you can request a full refund within 14 days of purchase if the product is faulty or not as described. Refunds are issued to the original payment method by ${MERCHANT_NAME} and usually appear within 5 to 10 business days.`,
+      `For ${SITE_NAME} Pro, you can request a full refund within 14 days of purchase if it is faulty or not as described. Refunds are issued to the original payment method by ${PRO_MERCHANT_NAME} and usually appear within 5 to 10 business days. Your license key is revoked when the refund is issued.`,
     ],
   },
   {
