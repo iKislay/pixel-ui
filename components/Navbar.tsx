@@ -11,6 +11,7 @@ import { BrandLogo } from "@/components/BrandLogo";
 const LINKS = [
   { label: "Components", href: "/components" },
   { label: "MCP", href: "/mcp" },
+  { label: "Pricing", href: "/pricing" },
 ];
 
 const GITHUB_URL = "https://github.com/ikislay/pixel-ui";

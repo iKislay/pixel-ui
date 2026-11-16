@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 const LINKS = [
   { label: "Components", href: "/components" },
   { label: "MCP", href: "/mcp" },
+  { label: "Pricing", href: "/pricing" },
 ];
 
 const pill = "rounded-full liquid-glass";

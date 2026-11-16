@@ -19,6 +19,7 @@ const LINKS: FooterLink[] = [
   { label: "Home", href: "/" },
   { label: "Components", href: "/components" },
   { label: "MCP", href: "/mcp" },
+  { label: "Pricing", href: "/pricing" },
   { label: "GitHub", href: GITHUB_URL, external: true, icon: GithubLogo },
   { label: "X / Twitter", href: X_URL, external: true, icon: XLogo },
 ];

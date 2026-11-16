@@ -25,6 +25,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
+      url: `${SITE_URL}/pricing`,
+      lastModified: new Date("2026-11-16"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${SITE_URL}/brand-assets`,
       lastModified: new Date("2026-11-06"),
       changeFrequency: "yearly",
