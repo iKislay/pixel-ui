@@ -8,6 +8,7 @@ import {
   EdgesGeometry,
   Float32BufferAttribute,
   Group,
+  LinearSRGBColorSpace,
   LineSegments,
   Mesh,
   MeshBasicMaterial,
@@ -38,14 +39,15 @@ const DIST = WORLD_H / 2 / Math.tan((FOV * Math.PI) / 360);
 const TRACKING = -0.04;
 const TILE_START = 1.1;
 const TILE_TIME = 2;
-const WIPE_IN = 1.1;
-const WIPE_OUT = 0.8;
+const LIFT_IN = 1.6;
+const LIFT_OUT = 1.3;
 
 const CSS = `
 .dh-root{container-type:size}
 .dh-stage{transform:translateY(-12cqh);animation:dh-rise 1.9s cubic-bezier(.83,0,.17,1) 1.5s both}
 @keyframes dh-rise{from{transform:translateY(calc((1.5rem + 1.25rem * 1.1) / 2))}}
-.dh-head{font-size:clamp(40px,calc((100cqw - 3rem) / 5.5),220px)}
+.dh-head{font-size:clamp(40px,min(calc((100cqw - 3rem) / 6.5),24cqh),220px);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:700}
+.dh-root[data-lifted] .dh-head,.dh-root[data-lifted] .dh-tag{visibility:hidden}
 .dh-word{display:inline-block;position:relative}
 .dh-text{display:inline-block;-webkit-text-fill-color:transparent;animation:dh-text 1s step-end var(--d) forwards,dh-drift .25s ease-out calc(var(--d) + .55s) both}
 .dh-word[data-side=left] .dh-text{transform-origin:left bottom}
@@ -132,16 +134,18 @@ void main(){
 }`;
 
 const EDGE_FRAG = `
+uniform vec3 uInk;
+uniform float uFlat;
 varying float vA;
-void main(){gl_FragColor=vec4(vec3(vA),1.);}`;
+void main(){gl_FragColor=vec4(mix(vec3(vA),uInk,uFlat),1.);}`;
 
 const COMP_VERT = `
 varying vec2 vUv;
 void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`;
 
-// mode 0: tiles flash the world through the page; mode 1: a radial wipe with a glowing edge
+// mode 0: tiles flash the world through the page; mode 1: a radial wipe with a glowing edge, with the lifting letters drawn over the page outside it
 const COMP_FRAG = `
-uniform sampler2D tScene;
+uniform sampler2D tScene,tFlat;
 uniform float uAspect,uTime,uMode,uTile,uWipe,uPulse,uSeed;
 varying vec2 vUv;
 ${NOISE}
@@ -187,11 +191,39 @@ void main(){
     col+=vec3(.6,.85,1.)*band*1.8;
     mask=max(mask,band);
   }
-  gl_FragColor=vec4(col*mask,mask);
+  vec4 lift=uMode<.5?vec4(0.):texture2D(tFlat,vUv);
+  gl_FragColor=vec4(col*mask+lift.rgb*(1.-mask),mask+lift.a*(1.-mask));
 }`;
 
-type Placed = { obj: Group | Mesh; y: number; f: number };
-type World = { tiles: (delay: number) => void; setDeep: (on: boolean) => void; dispose: () => void };
+type Placed = { obj: Group | Mesh; x: number; y: number; z: number; sx: number; sy: number; sz: number; delay: number };
+type World = {
+  tiles: (delay: number) => void;
+  setDeep: (on: boolean) => void;
+  relayout: () => void;
+  dispose: () => void;
+};
+type Rgb = [number, number, number];
+
+const probe = typeof document === "undefined" ? null : document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+
+// canvas normalises any css colour (oklch included) to srgb bytes
+function rgb(css: string, fallback: Rgb): Rgb {
+  if (!probe) return fallback;
+  probe.clearRect(0, 0, 1, 1);
+  probe.fillStyle = css;
+  probe.fillRect(0, 0, 1, 1);
+  const [r, g, b, a] = probe.getImageData(0, 0, 1, 1).data;
+  return a ? [r / 255, g / 255, b / 255] : fallback;
+}
+
+function baseline(font: string, top: number, height: number) {
+  if (!probe) return top + height * 0.8;
+  probe.font = font;
+  const m = probe.measureText("Hg");
+  const ascent = m.fontBoundingBoxAscent ?? m.actualBoundingBoxAscent;
+  const descent = m.fontBoundingBoxDescent ?? m.actualBoundingBoxDescent;
+  return top + (height - ascent - descent) / 2 + ascent;
+}
 
 function measure(root: HTMLElement) {
   const box = root.getBoundingClientRect();
@@ -200,15 +232,28 @@ function measure(root: HTMLElement) {
     return { x: r.left - box.left, y: r.top - box.top, w: r.width, h: r.height };
   };
   const head = root.querySelector(".dh-head");
+  const headStyle = head && getComputedStyle(head);
   const tagEl = root.querySelector<HTMLElement>(".dh-tag");
   const tagStyle = tagEl && getComputedStyle(tagEl);
+  const fontOf = (st: CSSStyleDeclaration) => `${st.fontWeight} ${st.fontSize} ${st.fontFamily}`;
+  const page = rgb(getComputedStyle(root).backgroundColor, [1, 1, 1]);
   return {
-    words: [...root.querySelectorAll(".dh-word")].map((el) => ({ text: el.textContent ?? "", ...rel(el) })),
-    fontSize: head ? parseFloat(getComputedStyle(head).fontSize) : 100,
+    words: [...root.querySelectorAll(".dh-word")].map((el) => {
+      const r = rel(el);
+      return { text: el.textContent ?? "", ...r, base: headStyle ? baseline(fontOf(headStyle), r.y, r.h) : r.y + r.h * 0.8 };
+    }),
+    fontSize: headStyle ? parseFloat(headStyle.fontSize) : 100,
     headTop: head ? rel(head).y : 0,
+    ink: headStyle ? rgb(headStyle.color, [0, 0, 0]) : ([0, 0, 0] as Rgb),
+    page,
     tag:
       tagEl && tagStyle
-        ? { text: tagEl.textContent ?? "", font: `${tagStyle.fontWeight} ${tagStyle.fontSize} ${tagStyle.fontFamily}`, ...rel(tagEl) }
+        ? {
+            text: tagEl.textContent ?? "",
+            font: fontOf(tagStyle),
+            ink: rgb(tagStyle.color, [0, 0, 0]),
+            ...rel(tagEl),
+          }
         : null,
   };
 }
@@ -237,12 +282,17 @@ function createWorld(
   const dpr = Math.min(window.devicePixelRatio, 2);
   renderer.setPixelRatio(dpr);
   const target = new WebGLRenderTarget(1, 1, { samples: 4 });
+  const flatTarget = new WebGLRenderTarget(1, 1, { samples: 4 });
   const scene = new Scene();
   const camera = new PerspectiveCamera(FOV, 1, 0.05, 400);
 
   const time = { value: 0 };
   const fill = new MeshBasicMaterial({ color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
-  const edge = new ShaderMaterial({ vertexShader: EDGE_VERT, fragmentShader: EDGE_FRAG, uniforms: { uTime: time, uSweep: { value: 8 } } });
+  const edge = new ShaderMaterial({
+    vertexShader: EDGE_VERT,
+    fragmentShader: EDGE_FRAG,
+    uniforms: { uTime: time, uSweep: { value: 8 }, uInk: { value: [0, 0, 0] }, uFlat: { value: 0 } },
+  });
   const roomU = { uTime: time, uStep: { value: 1.25 }, uZ1: { value: -DIST * 3 }, uSpan: { value: DIST * 4.2 }, uNear: { value: DIST * 0.6 }, uFar: { value: DIST * 4 } };
   const grid = shader(GRID_VERT, FADE_FRAG, roomU);
   const streak = shader(STREAK_VERT, FADE_FRAG, { uTime: time, uOrigin: { value: [0, 0, -DIST * 0.6] } });
@@ -252,6 +302,7 @@ function createWorld(
     fragmentShader: COMP_FRAG,
     uniforms: {
       tScene: { value: target.texture },
+      tFlat: { value: flatTarget.texture },
       uAspect: { value: 1 },
       uTime: time,
       uMode: { value: 0 },
@@ -285,12 +336,18 @@ function createWorld(
   let placed: Placed[] = [];
   let headTop = 0;
   let k = 1;
+  let ink: Rgb = [0, 0, 0];
+  let edgeInk: Rgb = [0, 0, 0];
+  let tagInk: Rgb = [0, 0, 0];
+  let tagMat: MeshBasicMaterial | null = null;
+  let atmosphere: (LineSegments | Points)[] = [];
 
   const build = () => {
     const W = root.clientWidth;
     const H = root.clientHeight;
     renderer.setSize(W, H, false);
     target.setSize(W * dpr, H * dpr);
+    flatTarget.setSize(W * dpr, H * dpr);
     camera.aspect = W / H;
     camera.updateProjectionMatrix();
     comp.uniforms.uAspect.value = W / H;
@@ -305,30 +362,32 @@ function createWorld(
     const halfW = (W * k) / 2;
     const snap = measure(root);
     headTop = snap.headTop;
+    ink = snap.ink;
+    edgeInk = snap.ink.map((c, i) => c * 0.55 + snap.page[i] * 0.45) as Rgb;
+    tagInk = snap.tag?.ink ?? ink;
+    atmosphere = [];
+    tagMat = null;
     const rand = seeded(7);
     const res = font.data.resolution;
     edge.uniforms.uSweep.value = halfW;
 
-    // each piece sits at a random depth, scaled so the front view still reads as the flat headline
     const place = (obj: Group | Mesh, x: number, y: number, z: number, sx: number, sy: number, sz: number) => {
-      const f = (DIST - z) / DIST;
-      obj.position.set(x * f, y * f, z);
-      obj.scale.set(sx * f, sy * f, sz * f);
       world.add(obj);
-      placed.push({ obj, y, f });
+      placed.push({ obj, x, y, z, sx, sy, sz, delay: Math.min(0.3, Math.max(0, ((x + halfW) / (halfW * 2)) * 0.24 + rand() * 0.06)) });
     };
 
     for (const word of snap.words) {
       const chars = [...word.text];
       const advances = chars.map((c) => (font.data.glyphs[c]?.ha ?? res * 0.3) / res + TRACKING);
       const size = Math.min(word.w / (advances.reduce((a, b) => a + b, 0) - TRACKING), snap.fontSize * 1.2) * k;
+      const height = snap.fontSize * k;
       let pen = word.x * k - halfW;
-      const baseline = WORLD_H / 2 - (word.y + word.h / 2 + snap.fontSize * 0.36) * k;
+      const base = WORLD_H / 2 - word.base * k;
       chars.forEach((c, i) => {
         if (c.trim()) {
           const g = glyph(c);
           const letter = new Group().add(new Mesh(g.solid, fill), new LineSegments(g.edges, edge));
-          place(letter, pen, baseline, (rand() - 0.6) * DIST * 0.5, size, size, size * (0.25 + rand() * 0.9));
+          place(letter, pen, base, (rand() - 0.6) * DIST * 0.5, size, height, height * (0.25 + rand() * 0.9));
         }
         pen += advances[i] * size;
       });
@@ -345,14 +404,14 @@ function createWorld(
         ctx.font = t.font;
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(t.text, t.w / 2, t.h / 2);
+        ctx.fillText(t.text, t.w / 2, baseline(t.font, 0, t.h));
       }
       const map = new CanvasTexture(c);
       const geo = new PlaneGeometry(1, 1);
-      const mat = new MeshBasicMaterial({ map, transparent: true, opacity: 0.75, depthWrite: false });
-      place(new Mesh(geo, mat), (t.x + t.w / 2) * k - halfW, WORLD_H / 2 - (t.y + t.h / 2) * k, -DIST * 0.35, t.w * k, t.h * k, 1);
-      owned.push(map, geo, mat);
+      tagMat = new MeshBasicMaterial({ map, transparent: true, depthWrite: false });
+      tagMat.color.setRGB(0.75, 0.75, 0.75, LinearSRGBColorSpace);
+      place(new Mesh(geo, tagMat), (t.x + t.w / 2) * k - halfW, WORLD_H / 2 - (t.y + t.h / 2) * k, -DIST * 0.35, t.w * k, t.h * k, 1);
+      owned.push(map, geo, tagMat);
     }
 
     const A = Math.max(halfW * 1.25, 8);
@@ -401,7 +460,8 @@ function createWorld(
     const dots = new Points(speckGeo, dust);
     rays.frustumCulled = false;
     dots.frustumCulled = false;
-    world.add(new LineSegments(roomGeo, grid), rays, dots);
+    atmosphere = [new LineSegments(roomGeo, grid), rays, dots];
+    world.add(...atmosphere);
     owned.push(roomGeo, rayGeo, speckGeo);
   };
 
@@ -428,27 +488,33 @@ function createWorld(
   root.addEventListener("pointermove", onMove);
   root.addEventListener("wheel", onWheel, { passive: false });
 
+  const ease = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  const clamp = (x: number) => Math.min(1, Math.max(0, x));
+
   const tick = (now: number) => {
     frame = 0;
     const dt = Math.min(0.05, (now - (last || now)) / 1000);
     last = now;
-    const p = reduced ? 1 : Math.min(1, (now - phaseAt) / 1000 / (phase === "tiles" ? TILE_TIME : phase === "in" ? WIPE_IN : WIPE_OUT));
+    const span = phase === "tiles" ? TILE_TIME : phase === "in" ? LIFT_IN : LIFT_OUT;
+    const p = reduced ? 1 : clamp((now - phaseAt) / 1000 / span);
+    const lifting = phase === "in" || phase === "out";
     const u = comp.uniforms;
     u.uMode.value = phase === "tiles" ? 0 : 1;
     u.uTile.value = 1 - Math.pow(1 - p, 3);
-    u.uWipe.value = phase === "in" ? (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2) : phase === "out" ? Math.pow(1 - p, 3) : 1;
-    u.uPulse.value = phase === "tiles" ? 1 : phase === "deep" || reduced ? 0 : Math.sin(Math.PI * p);
+    u.uWipe.value = phase === "in" ? ease((p - 0.12) / 0.85) : phase === "out" ? 1 - ease(p / 0.65) : 1;
+    u.uPulse.value = phase === "tiles" ? 1 : lifting && !reduced ? Math.sin(Math.PI * p) : 0;
     time.value = reduced ? 0 : (now - born) / 1000;
 
-    // the camera opens dead on so the cut lands on the flat headline, then swings toward the pointer
+    // the camera opens dead on so the lift starts on the flat headline, and is back dead on before it lands
     const opening = phase === "in" || phase === "deep";
-    cam.open = reduced ? Number(opening) : cam.open + (Number(opening) - cam.open) * (1 - Math.exp(-dt * 2.5));
+    const rate = phase === "out" ? 5 : 2.5;
+    cam.open = reduced ? Number(opening) : cam.open + (Number(opening) - cam.open) * (1 - Math.exp(-dt * rate));
     if (!opening) cam.flyTo = 0;
     const drift = reduced ? 0 : Math.sin(time.value * 0.25) * 0.12;
-    const ease = 1 - Math.exp(-dt * 4);
-    cam.yaw += ((aim.x * 0.45 + drift) * cam.open - cam.yaw) * ease;
-    cam.pitch += (aim.y * 0.22 * cam.open - cam.pitch) * ease;
-    cam.fly += (cam.flyTo - cam.fly) * (1 - Math.exp(-dt * 3));
+    const follow = 1 - Math.exp(-dt * 4);
+    cam.yaw += ((aim.x * 0.45 + drift) * cam.open - cam.yaw) * follow;
+    cam.pitch += (aim.y * 0.22 * cam.open - cam.pitch) * follow;
+    cam.fly += (cam.flyTo - cam.fly) * (1 - Math.exp(-dt * rate * 1.2));
     const cp = Math.cos(cam.pitch);
     camera.position.set(DIST * Math.sin(cam.yaw) * cp, DIST * Math.sin(cam.pitch), DIST * Math.cos(cam.yaw) * cp - cam.fly);
     camera.lookAt(0, 0, -cam.fly);
@@ -456,22 +522,46 @@ function createWorld(
     // follow the headline while it is still rising on load
     const head = root.querySelector(".dh-head");
     const dy = head ? (head.getBoundingClientRect().top - root.getBoundingClientRect().top - headTop) * k : 0;
-    for (const item of placed) item.obj.position.y = (item.y - dy) * item.f;
+    for (const item of placed) {
+      // each letter peels off the page into its depth, scaled so the front view keeps reading as the headline
+      const m = phase === "in" ? ease((p - item.delay) / 0.55) : phase === "out" ? 1 - ease((p - 0.15 - item.delay) / 0.55) : 1;
+      const z = item.z * m;
+      const f = (DIST - z) / DIST;
+      item.obj.position.set(item.x * f, (item.y - dy) * f, z);
+      item.obj.scale.set(item.sx * f, item.sy * f, Math.max(1e-3, item.sz * m) * f);
+    }
 
     renderer.setRenderTarget(target);
     renderer.setClearColor(0x000000, 1);
     renderer.clear();
     renderer.render(scene, camera);
+    if (lifting) {
+      for (const a of atmosphere) a.visible = false;
+      fill.color.setRGB(...ink, LinearSRGBColorSpace);
+      edge.uniforms.uInk.value = edgeInk;
+      edge.uniforms.uFlat.value = 1;
+      tagMat?.color.setRGB(...tagInk, LinearSRGBColorSpace);
+      renderer.setRenderTarget(flatTarget);
+      renderer.setClearColor(0x000000, 0);
+      renderer.clear();
+      renderer.render(scene, camera);
+      for (const a of atmosphere) a.visible = true;
+      fill.color.setRGB(0, 0, 0);
+      edge.uniforms.uFlat.value = 0;
+      tagMat?.color.setRGB(0.75, 0.75, 0.75, LinearSRGBColorSpace);
+    }
     renderer.setRenderTarget(null);
     renderer.setClearColor(0x000000, 0);
     renderer.clear();
     if (p >= 1 && (phase === "tiles" || phase === "out")) {
       phase = "idle";
       last = 0;
+      root.removeAttribute("data-lifted");
       return;
     }
     if (p >= 1 && phase === "in") phase = "deep";
     renderer.render(compScene, compCam);
+    if (phase !== "tiles") root.setAttribute("data-lifted", "");
     frame = requestAnimationFrame(tick);
   };
 
@@ -492,6 +582,10 @@ function createWorld(
     tiles: (delay) => {
       timer = window.setTimeout(() => phase === "idle" && go("tiles"), delay * 1000);
     },
+    relayout: () => {
+      cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(build);
+    },
     setDeep: (on) => {
       if (on && phase !== "in" && phase !== "deep") go("in");
       if (!on && (phase === "in" || phase === "deep")) go("out");
@@ -511,6 +605,8 @@ function createWorld(
       for (const m of [fill, edge, grid, streak, dust, comp]) m.dispose();
       compGeo.dispose();
       target.dispose();
+      flatTarget.dispose();
+      root.removeAttribute("data-lifted");
       renderer.dispose();
     },
   };
@@ -561,6 +657,8 @@ export function DimensionHero({
     };
   }, []);
 
+  useEffect(() => worldRef.current?.relayout(), [headline, tagline]);
+
   useEffect(() => {
     deepRef.current = deep;
     worldRef.current?.setDeep(deep);
@@ -582,7 +680,7 @@ export function DimensionHero({
         <div className="dh-stage flex flex-col items-center">
           <h1
             aria-label={headline}
-            className="dh-head text-center leading-[0.8] font-medium tracking-[-0.04em] text-balance select-none"
+            className="dh-head text-center leading-[0.8] tracking-[-0.04em] text-balance select-none"
           >
             {words.map((word, i) => (
               <span key={i}>
