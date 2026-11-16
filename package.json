@@ -8,6 +8,7 @@
     "registry:build": "shadcn build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run --project unit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
