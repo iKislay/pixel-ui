@@ -1,3 +1,5 @@
+import { after } from "next/server";
+import { installerId, trackInstall } from "@/lib/installs";
 import {
   isBlocked,
   isLicensed,
@@ -72,6 +74,15 @@ export async function GET(
   if (!res.ok) {
     console.error("pro registry fetch failed", res.status);
     return fail(502, "Could not load the component. Try again in a minute.");
+  }
+
+  if (request.headers.get("user-agent")?.toLowerCase().includes("shadcn")) {
+    after(async () =>
+      trackInstall({
+        component: name,
+        installerId: await installerId(request.headers.get("x-forwarded-for")),
+      }),
+    );
   }
 
   return new Response(res.body, {
