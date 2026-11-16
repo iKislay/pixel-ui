@@ -558,7 +558,7 @@ export default function SidebarControls({
       <PreviewBehaviorControls />
 
       <div className="flex flex-col gap-2 pt-4">
-        {onOpenCode && (
+        {onOpenCode && !activeItem?.pro && (
           <button
             type="button"
             onClick={onOpenCode}

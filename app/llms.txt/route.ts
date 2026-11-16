@@ -19,6 +19,7 @@ export function GET() {
     const install = installCommand(item);
     if (install) lines.push(`- Install: \`${install}\``);
     if (item.source) lines.push(`- Source: ${item.source}`);
+    if (item.pro) lines.push(`- Pro: needs a license key, see ${SITE_URL}/pricing`);
     if (item.dependencies?.length) {
       lines.push(
         `- Dependencies: ${item.dependencies.map((d) => d.name).join(", ")}`,
@@ -30,7 +31,7 @@ export function GET() {
   const body = [
     "# Pixel UI",
     "",
-    "> A shadcn registry of pixel-perfect, animated React components: frosted-glass, springy, Apple-flavored UI built with Tailwind CSS and Motion (Framer Motion). Every component is free to use and installable with one command via the shadcn CLI.",
+    `> A shadcn registry of pixel-perfect, animated React components: frosted-glass, springy, Apple-flavored UI built with Tailwind CSS and Motion (Framer Motion). Components are installable with one command via the shadcn CLI. Most are free; Pro components need a license key from ${SITE_URL}/pricing.`,
     "",
     "Install any component into a React / Next.js project:",
     "",

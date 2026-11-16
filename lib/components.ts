@@ -1,5 +1,6 @@
 import { createElement, type ReactNode } from "react";
 import { MotionIcon } from "@/components/Description/icons";
+import { PRO_REGISTRY } from "@/lib/pro";
 
 export type Dependency = {
   name: string;
@@ -55,6 +56,7 @@ export type ComponentItem = {
   registry?: string;
   source?: string;
   featured?: boolean;
+  pro?: boolean;
   dependencies?: Dependency[];
   interaction?: string;
   usage?: string;
@@ -839,7 +841,8 @@ export function installCommand(
 ): string | null {
   if (!item.registry) return null;
   // @latest matters: npx otherwise picks a stale local shadcn, and github registries need 4.16+
-  return `${PM_EXECUTORS[pm]} shadcn@latest add ${REGISTRY_REPO}/${item.registry}`;
+  const registry = item.pro ? PRO_REGISTRY : REGISTRY_REPO;
+  return `${PM_EXECUTORS[pm]} shadcn@latest add ${registry}/${item.registry}`;
 }
 
 export type ComponentSection = {

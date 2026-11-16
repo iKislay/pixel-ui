@@ -490,9 +490,18 @@ export default function CommandMenu({
                             <span className="relative truncate">
                               <Highlight text={item.name} query={query} />
                             </span>
-                            {isNew(item) && (
-                              <span className="relative ml-auto shrink-0 rounded-full bg-brand px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white">
-                                New
+                            {(isNew(item) || item.pro) && (
+                              <span className="relative ml-auto flex shrink-0 gap-1">
+                                {isNew(item) && (
+                                  <span className="rounded-full bg-brand px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white">
+                                    New
+                                  </span>
+                                )}
+                                {item.pro && (
+                                  <span className="rounded-full bg-foreground px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-background">
+                                    Pro
+                                  </span>
+                                )}
                               </span>
                             )}
                           </div>

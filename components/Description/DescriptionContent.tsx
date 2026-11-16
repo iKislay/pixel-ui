@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { type ComponentItem } from "@/lib/components";
 import { cn } from "@/lib/utils";
 import PanelCode from "./PanelCode";
@@ -70,7 +71,22 @@ export default function DescriptionContent({
       {item?.registry && (
         <div className="flex flex-col gap-3">
           <SectionLabel as="h2">Source Code</SectionLabel>
-          <SourceCodePreview item={item} onOpenCode={onOpenCode} />
+          {item.pro ? (
+            <div className="flex flex-col items-start gap-3 rounded-lg bg-muted p-4">
+              <p className="text-sm leading-relaxed text-foreground/70">
+                The source comes with Pro. Install it with your license key and
+                the file is yours to edit.
+              </p>
+              <Link
+                href="/pricing"
+                className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-150 ease-out hover:bg-brand-hover"
+              >
+                Get Pro
+              </Link>
+            </div>
+          ) : (
+            <SourceCodePreview item={item} onOpenCode={onOpenCode} />
+          )}
         </div>
       )}
 

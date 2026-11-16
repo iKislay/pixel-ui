@@ -70,6 +70,11 @@ export default function ComponentCard({
                 NEW
               </span>
             )}
+            {item.pro && (
+              <span className="rounded-full bg-foreground px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-background">
+                PRO
+              </span>
+            )}
           </div>
         </div>
       </Link>
