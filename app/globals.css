@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* the private pro checkout is gitignored, which tailwind skips unless named */
+@source "../pro/**/*.tsx";
 
 
 @custom-variant dark (&:is(.dark *));
