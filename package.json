@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "shadcn build && next build",
+    "build": "node scripts/pro.mjs && shadcn build && next build",
     "registry:build": "shadcn build",
     "start": "next start",
     "lint": "eslint",

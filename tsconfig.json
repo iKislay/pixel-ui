@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@pro/demos": ["./pro/demos/index.ts", "./lib/pro-demos.ts"]
     }
   },
   "include": [

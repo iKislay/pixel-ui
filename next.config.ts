@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import type { NextConfig } from "next";
 
 const PUBLIC_CACHE = [
@@ -10,6 +11,13 @@ const PUBLIC_CACHE = [
 const nextConfig: NextConfig = {
   // one shared clock for server and browser, so the new label never mismatches on hydration
   env: { BUILD_TIME: String(Date.now()) },
+  turbopack: {
+    resolveAlias: {
+      "@pro/demos": existsSync("pro/demos/index.ts")
+        ? "./pro/demos/index.ts"
+        : "./lib/pro-demos.ts",
+    },
+  },
   async headers() {
     return [
       {
