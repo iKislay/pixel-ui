@@ -20,7 +20,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@pro/demos": ["./pro/demos/index.ts", "./lib/pro-demos.ts"]
+      "@pro/*": ["./pro/*", "./lib/pro-fallback/*"]
     }
   },
   "include": [

@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       "@pro/demos": existsSync("pro/demos/index.ts")
         ? "./pro/demos/index.ts"
-        : "./lib/pro-demos.ts",
+        : "./lib/pro-fallback/demos.ts",
     },
   },
   async headers() {
