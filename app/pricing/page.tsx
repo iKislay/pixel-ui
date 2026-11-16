@@ -144,8 +144,8 @@ const FAQ: FaqItem[] = [
       "No. A key is for you. Redistributing Pro components or sharing a key gets the key revoked.",
   },
   {
-    question: "What if Pro isn't for me?",
-    answer: `Email ${SUPPORT_EMAIL} within 14 days of purchase for a full refund. The key is revoked with the refund.`,
+    question: "Can I get a refund?",
+    answer: `If Pro is faulty or not as described, email ${SUPPORT_EMAIL} within 14 days of purchase for a full refund. The key is revoked with the refund.`,
   },
 ];
 
