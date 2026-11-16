@@ -70,6 +70,95 @@ export const REGISTRY_REPO = "ikislay/pixel-ui";
 
 export const components: ComponentItem[] = [
   {
+    name: "Distortion Wave",
+    href: "/components/distortion-wave",
+    released: "2026-11-16",
+    category: "feedback",
+    pro: true,
+    registry: "distortion-wave",
+    description:
+      "A wrapper that plays a WebGL wave across its contents whenever they change.",
+    dependencies: [{ name: "distortion-wave" }],
+    interaction:
+      "Click a control inside the wrapper and the change ripples out from it as a lensed, colourful wave that leans toward where you pressed. Keyboard presses start the wave from the control. Honors prefers-reduced-motion: the update applies without the wave.",
+    usage: `import { useState } from "react";
+import { DistortionWave, useWave } from "@/components/ui/distortion-wave";
+
+function LikeButton() {
+  const wave = useWave();
+  const [liked, setLiked] = useState(false);
+
+  return (
+    <button
+      onClick={(e) =>
+        // source: where the wave starts; focus: the touch point it leans toward
+        wave(() => setLiked(!liked), { source: e.currentTarget, focus: e })
+      }
+    >
+      {liked ? "Liked" : "Like"}
+    </button>
+  );
+}
+
+export default function Demo() {
+  return (
+    <DistortionWave palette="ember">
+      <LikeButton />
+    </DistortionWave>
+  );
+}`,
+    props: [
+      {
+        name: "children",
+        type: "ReactNode",
+        required: true,
+        description:
+          "The content the wave plays across. Call useWave() inside it to get wave(update, options).",
+      },
+      {
+        name: "palette",
+        type: '"aurora" | "ocean" | "mint" | "ember" | "electric" | "pixel" | string[]',
+        options: ["aurora", "ocean", "mint", "ember", "electric", "pixel"],
+        description: "A named palette or up to 8 hex colours for the wave.",
+      },
+      {
+        name: "effect",
+        type: '"wave" | Effect',
+        default: '"wave"',
+        description:
+          "The look of the wave. Import others from distortion-wave, such as electric from distortion-wave/electric.",
+      },
+      {
+        name: "duration",
+        type: "number",
+        description:
+          "Length in ms. By default it scales with the size of the wrapper.",
+      },
+      {
+        name: "easing",
+        type: "string | [number, number, number, number] | (t: number) => number",
+        description: "How the wave front travels, like a CSS easing.",
+      },
+      {
+        name: "intensity",
+        type: "number",
+        default: "1",
+        description: "Strength of the distortion. 0 keeps only the colours.",
+      },
+      {
+        name: "particles",
+        type: "boolean | number",
+        default: "true",
+        description: "Set false to drop the particles, or a number for a particle count.",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the wrapper div.",
+      },
+    ],
+  },
+  {
     name: "Theme Toggle",
     href: "/components/theme-toggle",
     released: "2026-11-05",
