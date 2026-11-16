@@ -347,6 +347,42 @@ function ComicGlitchControls() {
   );
 }
 
+export const DIMENSION_HEADLINE = "Draw outside the frame";
+export const DIMENSION_TAGLINE = "Every flat page hides a little depth. The pill knows where.";
+
+function DimensionHeroControls() {
+  const [headline, setHeadline] = usePreviewControl("headline", DIMENSION_HEADLINE);
+  const [tagline, setTagline] = usePreviewControl("tagline", DIMENSION_TAGLINE);
+  const [replay, setReplay] = usePreviewControl("replay", "0");
+  const fields = [
+    { title: "Headline", value: headline, set: setHeadline },
+    { title: "Tagline", value: tagline, set: setTagline },
+  ];
+
+  return (
+    <div className="flex flex-col gap-5">
+      {fields.map((field) => (
+        <label key={field.title} className="flex flex-col gap-2">
+          <SectionHeader title={field.title} />
+          <input
+            value={field.value}
+            onChange={(e) => field.set(e.target.value)}
+            className="rounded-xl bg-muted/60 px-3 py-2 text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+          />
+        </label>
+      ))}
+
+      <button
+        type="button"
+        onClick={() => setReplay(String(Number(replay) + 1))}
+        className="rounded-xl bg-muted/40 py-2.5 px-3 text-xs font-semibold text-foreground transition-all hover:bg-muted/80"
+      >
+        Replay intro
+      </button>
+    </div>
+  );
+}
+
 function ToastControls() {
   return (
     <div className="flex flex-col gap-2">
@@ -513,6 +549,7 @@ export default function SidebarControls({
       {pathname === "/components/swarm-reveal" && <SwarmControls />}
       {pathname === "/components/comic-glitch-text" && <ComicGlitchControls />}
       {pathname === "/components/toast" && <ToastControls />}
+      {pathname === "/components/dimension-hero" && <DimensionHeroControls />}
       {pathname === "/components/member-selector" && <MemberSelectorControls />}
       {pathname === "/components/audio-chat-room" && <AudioChatControls />}
 
