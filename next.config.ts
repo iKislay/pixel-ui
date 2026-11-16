@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
       "@pro/demos": existsSync("pro/demos/index.ts")
         ? "./pro/demos/index.ts"
         : "./lib/pro-fallback/demos.ts",
+      "@pro/recordings": existsSync("pro/recordings/index.ts")
+        ? "./pro/recordings/index.ts"
+        : "./lib/pro-fallback/recordings.ts",
     },
   },
   async headers() {

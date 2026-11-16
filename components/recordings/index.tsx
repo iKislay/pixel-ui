@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
+import { PRO_RECORDINGS } from "@pro/recordings";
 import Fallback from "./Fallback";
 import type { RecordingProps } from "./Player";
 
@@ -18,6 +19,7 @@ const RECORDINGS: Record<string, ComponentType<RecordingProps>> = {
   "comic-glitch-text": dynamic(() => import("./comic-glitch-text"), { ssr: false }),
   "gallery-corridor": dynamic(() => import("./gallery-corridor"), { ssr: false }),
   "dimension-hero": dynamic(() => import("./dimension-hero"), { ssr: false }),
+  ...PRO_RECORDINGS,
 };
 
 export default function Recording({
