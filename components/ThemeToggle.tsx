@@ -49,13 +49,33 @@ const NO_TRANSITIONS = "*,*::before,*::after{transition:none!important}";
 // small screens get lighter pictures and a lighter canvas, so the wave keeps its frame rate on phones
 const resolution = () => (innerWidth < 768 ? 1 : Math.min(devicePixelRatio || 1, 1.5));
 
+// media fully off screen is left out of the picture, the slow part of it: every image is fetched and
+// re-encoded and every canvas copied; its parent keeps its height so nothing around it moves
+function offscreenMedia() {
+  const media = new Set<Element>();
+  const pinned = new Map<Element, number>();
+  const margin = 80;
+  for (const el of document.querySelectorAll("img, canvas, video")) {
+    const r = el.getBoundingClientRect();
+    const away =
+      r.bottom < -margin || r.top > innerHeight + margin || r.right < -margin || r.left > innerWidth + margin;
+    if (!away) continue;
+    media.add(el);
+    const parent = el.parentElement;
+    if (parent && !pinned.has(parent)) pinned.set(parent, parent.offsetHeight);
+  }
+  return { media, pinned };
+}
+
 function pagePicture() {
   const scrolled = scrollY;
+  const { media, pinned } = offscreenMedia();
   return snapshot(document.documentElement, {
     width: document.documentElement.clientWidth,
     height: innerHeight,
     scale: resolution(),
     background: getComputedStyle(document.body).backgroundColor,
+    skip: (el) => media.has(el),
     force: (el) => {
       const cs = getComputedStyle(el);
       const out: Record<string, string> = {};
@@ -68,6 +88,11 @@ function pagePicture() {
         out.top = `${el.offsetTop + scrolled}px`;
         out.bottom = "auto";
         out.height = `${el.offsetHeight}px`;
+        out["box-sizing"] = "border-box";
+      }
+      const height = pinned.get(el);
+      if (height !== undefined) {
+        out.height = `${height}px`;
         out["box-sizing"] = "border-box";
       }
       return out;
@@ -112,6 +137,16 @@ function differs(a: HTMLCanvasElement, b: HTMLCanvasElement) {
   let total = 0;
   for (let i = 0; i < x.length; i++) total += Math.abs(x[i] - y[i]);
   return total / x.length > 8;
+}
+
+// the first picture fetches and inlines every font and image it shows, the slow part of a first click,
+// so one is taken while the browser is idle after load and the engine keeps them cached
+let warmed = false;
+function warmOnce() {
+  if (warmed || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  warmed = true;
+  const idle = window.requestIdleCallback ?? ((run: () => void) => setTimeout(run, 2000));
+  idle(() => void pagePicture().catch(() => {}), { timeout: 5000 });
 }
 
 async function takePictures(next: Theme): Promise<Pictures> {
@@ -219,6 +254,8 @@ export default function ThemeToggle({
   const pressing = useRef<{ pictures: Promise<Pictures>; at: number } | null>(null);
   const [wave, setWave] = useState<Wave | null>(null);
   const finish = useCallback(() => setWave(null), []);
+
+  useEffect(warmOnce, []);
 
   const next: Theme = resolvedTheme === "dark" ? "light" : "dark";
 
