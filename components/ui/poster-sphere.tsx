@@ -21,8 +21,7 @@ export type PosterMovie = {
   rating: number;
   tagline: string;
   synopsis: string;
-  color: string;
-  poster?: string;
+  poster: string;
 };
 
 export type PosterSphereProps = Omit<ComponentProps<"div">, "children"> & {
@@ -33,22 +32,30 @@ export type PosterSphereProps = Omit<ComponentProps<"div">, "children"> & {
 };
 
 const DEFAULT_MOVIES: PosterMovie[] = [
-  { title: "The Last Lighthouse", year: 1987, genre: "Drama", rating: 82, tagline: "Someone has to keep the light on.", synopsis: "A retired keeper refuses to leave the last manual lighthouse on the coast, even after the ships stop coming.", color: "#e0703a" },
-  { title: "Static Bloom", year: 2019, genre: "Sci-Fi", rating: 74, tagline: "The signal grew roots.", synopsis: "A radio astronomer finds a broadcast that only plays when the flowers in her garden open.", color: "#5b7cfa" },
-  { title: "Paper Crowns", year: 2004, genre: "Comedy", rating: 68, tagline: "Long live the substitute king.", synopsis: "A party entertainer is mistaken for royalty and decides the job is easier than birthday parties.", color: "#f2c14e" },
-  { title: "Undertow", year: 2011, genre: "Thriller", rating: 79, tagline: "Calm water lies.", synopsis: "Two lifeguards cover up one bad summer, until the tide brings it back.", color: "#2a9d8f" },
-  { title: "Midnight Diner Club", year: 1996, genre: "Romance", rating: 71, tagline: "Open late. Hearts included.", synopsis: "Regulars at an all-night diner pair off, fall out and find their way back over one long winter.", color: "#d6457a" },
-  { title: "Iron Orchard", year: 1978, genre: "Western", rating: 85, tagline: "Nothing grows here but trouble.", synopsis: "A widow defends a dying apple farm against a railroad baron with more patience than bullets.", color: "#b5542f" },
-  { title: "Quiet Planet", year: 2023, genre: "Animation", rating: 88, tagline: "Small world, big silence.", synopsis: "A tiny robot on a forgotten moon learns to talk by listening to the wind.", color: "#7bc96f" },
-  { title: "The Glass Detective", year: 1952, genre: "Mystery", rating: 77, tagline: "Every clue leaves a reflection.", synopsis: "A window cleaner sees a little too much from the forty-second floor.", color: "#8fa3b8" },
-  { title: "Velvet Engine", year: 2008, genre: "Action", rating: 63, tagline: "Faster than the ending.", synopsis: "A getaway driver takes one last job and keeps missing the exit.", color: "#9b3df0" },
-  { title: "Salt & Ember", year: 2015, genre: "Fantasy", rating: 81, tagline: "Two kingdoms. One spark.", synopsis: "A salt miner and a fire priestess share a secret that could end a hundred-year war.", color: "#ff5a36" },
-  { title: "Northbound", year: 1999, genre: "Adventure", rating: 76, tagline: "Keep the compass close.", synopsis: "Three siblings drive their late father's van to the Arctic Circle to scatter a map, not ashes.", color: "#3fb6e0" },
-  { title: "Hollow Hours", year: 2021, genre: "Horror", rating: 70, tagline: "The clock stopped. They didn't.", synopsis: "A night-shift crew notices the building has an extra floor between three and four in the morning.", color: "#5e5a73" },
-  { title: "Small Fortunes", year: 2013, genre: "Drama", rating: 84, tagline: "Luck is a family business.", synopsis: "A cookie factory family writes every fortune by hand, until one starts coming true.", color: "#e9a23b" },
-  { title: "Neon Tide", year: 1989, genre: "Crime", rating: 73, tagline: "The city never sleeps. Neither does she.", synopsis: "A harbour cop chases a smuggler who only works when the boardwalk lights are on.", color: "#ff3d9a" },
-  { title: "The Long Weekend", year: 2006, genre: "Comedy", rating: 66, tagline: "Three days. Zero plans.", synopsis: "Old friends rent a cabin with no signal and run out of excuses by Saturday.", color: "#58c4a7" },
-  { title: "Echo Valley", year: 2017, genre: "Documentary", rating: 90, tagline: "Listen to where you live.", synopsis: "A sound recordist spends a year capturing a valley before the dam fills it.", color: "#6d8b4a" },
+  { title: "The Last Lighthouse", year: 1987, genre: "Drama", rating: 82, tagline: "Someone has to keep the light on.", synopsis: "A retired keeper refuses to leave the last manual lighthouse on the coast, even after the ships stop coming.", poster: "https://picsum.photos/seed/pixel-ui-1/400/600" },
+  { title: "Static Bloom", year: 2019, genre: "Sci-Fi", rating: 74, tagline: "The signal grew roots.", synopsis: "A radio astronomer finds a broadcast that only plays when the flowers in her garden open.", poster: "https://picsum.photos/seed/pixel-ui-2/400/600" },
+  { title: "Paper Crowns", year: 2004, genre: "Comedy", rating: 68, tagline: "Long live the substitute king.", synopsis: "A party entertainer is mistaken for royalty and decides the job is easier than birthday parties.", poster: "https://picsum.photos/seed/pixel-ui-3/400/600" },
+  { title: "Undertow", year: 2011, genre: "Thriller", rating: 79, tagline: "Calm water lies.", synopsis: "Two lifeguards cover up one bad summer, until the tide brings it back.", poster: "https://picsum.photos/seed/pixel-ui-4/400/600" },
+  { title: "Midnight Diner Club", year: 1996, genre: "Romance", rating: 71, tagline: "Open late. Hearts included.", synopsis: "Regulars at an all-night diner pair off, fall out and find their way back over one long winter.", poster: "https://picsum.photos/seed/pixel-ui-5/400/600" },
+  { title: "Iron Orchard", year: 1978, genre: "Western", rating: 85, tagline: "Nothing grows here but trouble.", synopsis: "A widow defends a dying apple farm against a railroad baron with more patience than bullets.", poster: "https://picsum.photos/seed/pixel-ui-6/400/600" },
+  { title: "Quiet Planet", year: 2023, genre: "Animation", rating: 88, tagline: "Small world, big silence.", synopsis: "A tiny robot on a forgotten moon learns to talk by listening to the wind.", poster: "https://picsum.photos/seed/pixel-ui-7/400/600" },
+  { title: "The Glass Detective", year: 1952, genre: "Mystery", rating: 77, tagline: "Every clue leaves a reflection.", synopsis: "A window cleaner sees a little too much from the forty-second floor.", poster: "https://picsum.photos/seed/pixel-ui-8/400/600" },
+  { title: "Velvet Engine", year: 2008, genre: "Action", rating: 63, tagline: "Faster than the ending.", synopsis: "A getaway driver takes one last job and keeps missing the exit.", poster: "https://picsum.photos/seed/pixel-ui-9/400/600" },
+  { title: "Salt & Ember", year: 2015, genre: "Fantasy", rating: 81, tagline: "Two kingdoms. One spark.", synopsis: "A salt miner and a fire priestess share a secret that could end a hundred-year war.", poster: "https://picsum.photos/seed/pixel-ui-10/400/600" },
+  { title: "Northbound", year: 1999, genre: "Adventure", rating: 76, tagline: "Keep the compass close.", synopsis: "Three siblings drive their late father's van to the Arctic Circle to scatter a map, not ashes.", poster: "https://picsum.photos/seed/pixel-ui-11/400/600" },
+  { title: "Hollow Hours", year: 2021, genre: "Horror", rating: 70, tagline: "The clock stopped. They didn't.", synopsis: "A night-shift crew notices the building has an extra floor between three and four in the morning.", poster: "https://picsum.photos/seed/pixel-ui-12/400/600" },
+  { title: "Small Fortunes", year: 2013, genre: "Drama", rating: 84, tagline: "Luck is a family business.", synopsis: "A cookie factory family writes every fortune by hand, until one starts coming true.", poster: "https://picsum.photos/seed/pixel-ui-13/400/600" },
+  { title: "Neon Tide", year: 1989, genre: "Crime", rating: 73, tagline: "The city never sleeps. Neither does she.", synopsis: "A harbour cop chases a smuggler who only works when the boardwalk lights are on.", poster: "https://picsum.photos/seed/pixel-ui-14/400/600" },
+  { title: "The Long Weekend", year: 2006, genre: "Comedy", rating: 66, tagline: "Three days. Zero plans.", synopsis: "Old friends rent a cabin with no signal and run out of excuses by Saturday.", poster: "https://picsum.photos/seed/pixel-ui-15/400/600" },
+  { title: "Echo Valley", year: 2017, genre: "Documentary", rating: 90, tagline: "Listen to where you live.", synopsis: "A sound recordist spends a year capturing a valley before the dam fills it.", poster: "https://picsum.photos/seed/pixel-ui-16/400/600" },
+  { title: "Ghost Frequency", year: 1984, genre: "Horror", rating: 69, tagline: "Some channels should stay off air.", synopsis: "A late-night radio host takes a call from a listener who sounds exactly like her.", poster: "https://picsum.photos/seed/pixel-ui-17/400/600" },
+  { title: "Glass Harbor", year: 2010, genre: "Drama", rating: 80, tagline: "Every town keeps one secret.", synopsis: "A ferry captain returns home to sell the family boat and ends up rebuilding it instead.", poster: "https://picsum.photos/seed/pixel-ui-18/400/600" },
+  { title: "Rocket Summer", year: 1993, genre: "Family", rating: 78, tagline: "Aim higher than the treehouse.", synopsis: "Four kids build a rocket in a backyard and accidentally win the county science fair.", poster: "https://picsum.photos/seed/pixel-ui-19/400/600" },
+  { title: "Copper Saints", year: 1971, genre: "Crime", rating: 83, tagline: "Honest work never paid this well.", synopsis: "A crew of retired miners plans one heist on the company that shut them down.", poster: "https://picsum.photos/seed/pixel-ui-20/400/600" },
+  { title: "Lunar Motel", year: 2022, genre: "Sci-Fi", rating: 72, tagline: "Vacancy: one. Gravity: low.", synopsis: "The night clerk of the only hotel on the moon has to solve a disappearance before checkout.", poster: "https://picsum.photos/seed/pixel-ui-21/400/600" },
+  { title: "Wild Brass", year: 1959, genre: "Musical", rating: 75, tagline: "The band plays on, louder.", synopsis: "A marching band loses its conductor and finds a new one in the school janitor.", poster: "https://picsum.photos/seed/pixel-ui-22/400/600" },
+  { title: "Thin Ice", year: 2002, genre: "Thriller", rating: 67, tagline: "One wrong step.", synopsis: "Two rivals are stranded on a frozen lake and have to trust each other until dawn.", poster: "https://picsum.photos/seed/pixel-ui-23/400/600" },
+  { title: "Orchard Road", year: 2016, genre: "Romance", rating: 79, tagline: "Some paths lead back.", synopsis: "A fruit picker and a city lawyer share one season and a stubborn old tractor.", poster: "https://picsum.photos/seed/pixel-ui-24/400/600" },
 ];
 
 const TILE = { sm: 64, md: 88, lg: 120 };
@@ -404,18 +411,8 @@ export function PosterSphere({
 }
 
 function Poster({ movie }: { movie: PosterMovie }) {
-  if (movie.poster)
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={movie.poster} alt="" loading="lazy" decoding="async" draggable={false} className="size-full object-cover" />;
-  return (
-    <div
-      className="@container flex size-full flex-col justify-end p-[8%] text-white"
-      style={{ background: `linear-gradient(160deg, ${movie.color}, color-mix(in oklab, ${movie.color} 25%, black))` }}
-    >
-      <span className="text-[13cqw] leading-none font-black tracking-tight uppercase">{movie.title}</span>
-      <span className="mt-[4%] text-[8cqw] opacity-70">{movie.year}</span>
-    </div>
-  );
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={movie.poster} alt="" loading="lazy" decoding="async" draggable={false} className="size-full object-cover" />;
 }
 
 function Rating({ value, className }: { value: number; className?: string }) {

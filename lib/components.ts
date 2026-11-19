@@ -89,10 +89,10 @@ export const components: ComponentItem[] = [
     props: [
       {
         name: "movies",
-        type: "{ title: string; year: number; genre: string; rating: number; tagline: string; synopsis: string; color: string; poster?: string }[]",
-        default: "16 sample films",
+        type: "{ title: string; year: number; genre: string; rating: number; tagline: string; synopsis: string; poster: string }[]",
+        default: "24 sample films",
         description:
-          "The films on the globe, repeated to fill it. rating is out of 100; without a poster image, a title card is drawn in color.",
+          "The films on the wall, repeated to fill it. poster is an image URL; rating is out of 100.",
       },
       {
         name: "size",
