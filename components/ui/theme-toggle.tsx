@@ -10,7 +10,7 @@ export type ThemeToggleProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   sound?: boolean;
 };
 
-function tick() {
+export function tick() {
   try {
     const ctx = new AudioContext();
     const osc = ctx.createOscillator();
