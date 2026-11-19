@@ -521,6 +521,49 @@ function AudioChatControls() {
   );
 }
 
+const POSTER_SPHERE_CONTROLS = [
+  { name: "size", title: "Size", options: ["sm", "md", "lg"], fallback: "md" },
+  { name: "smoothness", title: "Smoothness", options: ["snappy", "smooth", "floaty"], fallback: "smooth" },
+  { name: "movement", title: "Movement", options: ["drag", "hover"], fallback: "drag" },
+];
+
+function PosterSphereOption({ name, title, options, fallback }: (typeof POSTER_SPHERE_CONTROLS)[number]) {
+  const [value, setValue] = usePreviewControl(name, fallback);
+  return (
+    <div className="flex flex-col gap-2">
+      <SectionHeader title={title} />
+      <div className="flex rounded-xl bg-muted/60 p-1">
+        {options.map((v) => (
+          <button
+            key={v}
+            type="button"
+            aria-pressed={value === v}
+            onClick={() => setValue(v)}
+            className={cn(
+              "flex-1 py-1.5 px-3 text-xs font-medium rounded-lg capitalize transition-all",
+              value === v
+                ? "bg-popover text-foreground shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {v}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PosterSphereControls() {
+  return (
+    <div className="flex flex-col gap-5">
+      {POSTER_SPHERE_CONTROLS.map((c) => (
+        <PosterSphereOption key={c.name} {...c} />
+      ))}
+    </div>
+  );
+}
+
 export default function SidebarControls({
   item,
   onOpenCode,
@@ -552,6 +595,7 @@ export default function SidebarControls({
       {pathname === "/components/dimension-hero" && <DimensionHeroControls />}
       {pathname === "/components/member-selector" && <MemberSelectorControls />}
       {pathname === "/components/audio-chat-room" && <AudioChatControls />}
+      {pathname === "/components/poster-sphere" && <PosterSphereControls />}
 
       <ColorSwatches showLabel />
 
