@@ -69,14 +69,6 @@ const BULGE_A = 0.15;
 const BULGE_K = 4.5;
 const DEAD_ZONE = 0.35;
 
-// glass over each poster; --gx/--gy is the surface tilt, so the glint and thick edge face the centre
-const GLASS: CSSProperties = {
-  background:
-    "radial-gradient(90% 60% at calc(50% - var(--gx, 0) * 45%) calc(22% - var(--gy, 0) * 40%), rgb(255 255 255 / 0.4), transparent 55%), linear-gradient(to bottom, rgb(255 255 255 / 0.14), transparent 30%, transparent 70%, rgb(0 0 0 / 0.4))",
-  boxShadow:
-    "inset 0 0 0 1px rgb(255 255 255 / 0.2), inset calc(var(--gx, 0) * -4px) calc(var(--gy, 0) * -4px - 1px) 3px rgb(255 255 255 / 0.35), inset calc(var(--gx, 0) * 3px) calc(var(--gy, 0) * 3px + 2px) 5px rgb(0 0 0 / 0.45)",
-};
-
 type Origin = { x: number; y: number; w: number; h: number } | null;
 
 const REDUCE_QUERY = "(prefers-reduced-motion: reduce)";
@@ -148,14 +140,12 @@ export function PosterSphere({
         let tan = 1;
         let rad = 1;
         let shade = Math.min(0.8, 0.35 + 1.5 * (u - 1));
-        let tilt = Math.max(0, 1 - (u - 1) * 4);
         if (u < 1) {
           // a radial lens over a flat sheet: tangential scale is g(u)/u, radial is g'(u)
           const rest = (1 - u) ** (BULGE_K - 1);
           rad = BULGE_A + (1 - BULGE_A) * BULGE_K * rest;
           tan = u < 1e-4 ? rad : (BULGE_A * u + (1 - BULGE_A) * (1 - rest * (1 - u))) / u;
           shade = 0.35 + 0.65 * Math.sqrt(1 - u);
-          tilt = u;
         }
         const x = px * tan;
         const y = py * tan;
@@ -166,8 +156,6 @@ export function PosterSphere({
         const phi = Math.atan2(py, px);
         el.style.visibility = "";
         el.style.opacity = String(shade);
-        el.style.setProperty("--gx", String(Math.cos(phi) * tilt));
-        el.style.setProperty("--gy", String(Math.sin(phi) * tilt));
         el.style.transform = `translate3d(${x}px,${y}px,0) rotate(${phi}rad) scale(${rad},${tan}) rotate(${-phi}rad)`;
       }
     }
@@ -386,7 +374,7 @@ export function PosterSphere({
                 }}
                 data-tile={i}
                 style={{ visibility: "hidden" }}
-                className="absolute top-1/2 left-1/2 -mt-[calc(var(--tile-h)/2)] -ml-[calc(var(--tile-w)/2)] h-(--tile-h) w-(--tile-w) overflow-hidden rounded-[18%/12%]"
+                className="absolute top-1/2 left-1/2 -mt-[calc(var(--tile-h)/2)] -ml-[calc(var(--tile-w)/2)] h-(--tile-h) w-(--tile-w) overflow-hidden rounded-[14%/9%]"
               >
                 {movie && <Poster movie={movie} />}
               </div>
@@ -432,20 +420,8 @@ export function PosterSphere({
 }
 
 function Poster({ movie }: { movie: PosterMovie }) {
-  return (
-    <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={movie.poster}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        draggable={false}
-        className="absolute -inset-[6%] size-[112%] max-w-none object-cover [translate:calc(var(--gx,0)*5%)_calc(var(--gy,0)*5%)]"
-      />
-      <div className="absolute inset-0 rounded-[inherit]" style={GLASS} />
-    </>
-  );
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={movie.poster} alt="" loading="lazy" decoding="async" draggable={false} className="size-full object-cover" />;
 }
 
 function Rating({ value, className }: { value: number; className?: string }) {
@@ -532,7 +508,7 @@ function MovieModal({
           animate={{ opacity: 1 }}
           exit="out"
           transition={{ type: "spring", duration: 0.5, bounce: 0.1 }}
-          className="pointer-events-auto relative aspect-2/3 w-[min(70vw,calc(60dvh/1.5),22rem)] shrink-0 overflow-hidden rounded-[6%/4%] shadow-2xl"
+          className="pointer-events-auto aspect-2/3 w-[min(70vw,calc(60dvh/1.5),22rem)] shrink-0 overflow-hidden rounded-[6%/4%] shadow-2xl"
         >
           <Poster movie={movie} />
         </motion.div>
