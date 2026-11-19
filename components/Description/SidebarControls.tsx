@@ -8,6 +8,13 @@ import { toast } from "../ui/toast";
 import ColorSwatches from "../preview/ColorSwatches";
 import PreviewBehaviorControls from "../preview/PreviewBehaviorControls";
 import SectionHeader from "../preview/SectionHeader";
+import {
+  SCRUB_KEY,
+  WAVE_PICKERS,
+  WAVE_SLIDERS,
+  useWaveStyle,
+  type WaveSlider,
+} from "@/lib/distortion-wave-controls";
 
 type SidebarControlsProps = {
   item?: ComponentItem;
@@ -564,6 +571,132 @@ function PosterSphereControls() {
   );
 }
 
+function WavePicker({ name, title, options }: (typeof WAVE_PICKERS)[number]) {
+  const [value, setValue] = usePreviewControl(name, options[0]);
+  return (
+    <div className="flex flex-col gap-2">
+      <SectionHeader title={title} />
+      <div className="flex flex-wrap gap-1 rounded-xl bg-muted/60 p-1">
+        {options.map((v) => (
+          <button
+            key={v}
+            type="button"
+            aria-pressed={value === v}
+            onClick={() => setValue(v)}
+            className={cn(
+              "flex-1 rounded-lg px-2.5 py-1.5 text-xs font-medium capitalize whitespace-nowrap transition-all",
+              value === v
+                ? "bg-popover text-foreground shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {v}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WaveRange({
+  title,
+  min,
+  max,
+  step,
+  value,
+  changed,
+  onChange,
+}: Omit<WaveSlider, "key" | "fallback"> & {
+  value: number;
+  changed: boolean;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="flex items-center justify-between text-xs">
+        <span className={changed ? "font-semibold text-foreground" : "text-muted-foreground"}>
+          {title}
+        </span>
+        <span className="font-mono text-[11px] tabular-nums text-muted-foreground">{value}</span>
+      </span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="h-1.5 w-full cursor-pointer accent-brand"
+      />
+    </label>
+  );
+}
+
+function DistortionWaveControls() {
+  const [style, setStyle, resetStyle] = useWaveStyle();
+  const [scrub, setScrub] = usePreviewControl(SCRUB_KEY, "");
+
+  return (
+    <div className="flex flex-col gap-5">
+      {WAVE_PICKERS.map((picker) => (
+        <WavePicker key={picker.name} {...picker} />
+      ))}
+
+      <div className="flex flex-col gap-2">
+        <SectionHeader title="Scrub" />
+        <button
+          type="button"
+          aria-pressed={scrub !== ""}
+          onClick={() => setScrub(scrub === "" ? "0.4" : "")}
+          className={cn(
+            "rounded-xl px-3 py-2 text-xs font-semibold transition-all",
+            scrub === "" ? "bg-muted/40 text-foreground hover:bg-muted/80" : "bg-brand/15 text-brand",
+          )}
+        >
+          {scrub === "" ? "Hold every wave at a point" : "Release the waves"}
+        </button>
+        {scrub !== "" && (
+          <WaveRange
+            title="Progress"
+            min={0}
+            max={1}
+            step={0.01}
+            value={Number(scrub)}
+            changed
+            onChange={(v) => setScrub(String(v))}
+          />
+        )}
+      </div>
+
+      {WAVE_SLIDERS.map(({ group, items }) => (
+        <div key={group} className="flex flex-col gap-3">
+          <SectionHeader title={group} />
+          {items.map(({ key, fallback, ...slider }) => (
+            <WaveRange
+              key={key}
+              {...slider}
+              value={style[key] ?? fallback}
+              changed={key in style}
+              onChange={(v) => setStyle(key, v)}
+            />
+          ))}
+        </div>
+      ))}
+
+      <button
+        type="button"
+        onClick={() => {
+          resetStyle();
+          setScrub("");
+        }}
+        className="rounded-xl bg-muted/40 px-3 py-2.5 text-xs font-semibold text-foreground transition-all hover:bg-muted/80"
+      >
+        Reset wave style
+      </button>
+    </div>
+  );
+}
+
 export default function SidebarControls({
   item,
   onOpenCode,
@@ -596,6 +729,7 @@ export default function SidebarControls({
       {pathname === "/components/member-selector" && <MemberSelectorControls />}
       {pathname === "/components/audio-chat-room" && <AudioChatControls />}
       {pathname === "/components/poster-sphere" && <PosterSphereControls />}
+      {pathname === "/components/distortion-wave" && <DistortionWaveControls />}
 
       <ColorSwatches showLabel />
 
