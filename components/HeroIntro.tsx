@@ -1,15 +1,7 @@
-"use client";
+import type { CSSProperties, ReactNode } from "react";
 
-import { motion, useReducedMotion } from "motion/react";
-
-const spring = { type: "spring", stiffness: 300, damping: 22 } as const;
-
-const STEP = 0.09;
-
-const rise = {
-  hidden: { y: 18, filter: "blur(4px)" },
-  shown: { y: 0, filter: "blur(0px)" },
-};
+// css, not motion: the intro starts on first paint instead of waiting for the page's js to hydrate
+const rise = (index: number): CSSProperties => ({ animationDelay: `${index * 90}ms` });
 
 export default function HeroIntro({
   headline,
@@ -17,54 +9,38 @@ export default function HeroIntro({
   badge,
   children,
 }: {
-  headline: React.ReactNode;
-  sub: React.ReactNode;
-  badge?: React.ReactNode;
-  children: React.ReactNode;
+  headline: ReactNode;
+  sub: ReactNode;
+  badge?: ReactNode;
+  children: ReactNode;
 }) {
-  const reduceMotion = useReducedMotion();
-
-  const step = (index: number) =>
-    reduceMotion ? { duration: 0 } : { ...spring, delay: index * STEP };
+  const first = badge ? 1 : 0;
 
   return (
     <>
       {badge && (
-        <motion.div
-          initial={reduceMotion ? false : rise.hidden}
-          animate={rise.shown}
-          transition={step(0)}
-          className="mb-1"
-        >
+        <div className="hero-rise mb-1" style={rise(0)}>
           {badge}
-        </motion.div>
+        </div>
       )}
 
-      <motion.h1
-        initial={reduceMotion ? false : rise.hidden}
-        animate={rise.shown}
-        transition={step(badge ? 1 : 0)}
-        className="max-w-5xl text-balance font-serif text-4xl font-normal tracking-tight text-black dark:text-white sm:text-6xl md:text-7xl lg:text-8xl"
+      <h1
+        className="hero-rise max-w-5xl text-balance font-serif text-4xl font-normal tracking-tight text-black dark:text-white sm:text-6xl md:text-7xl lg:text-8xl"
+        style={rise(first)}
       >
         {headline}
-      </motion.h1>
+      </h1>
 
-      <motion.p
-        initial={reduceMotion ? false : rise.hidden}
-        animate={rise.shown}
-        transition={step(badge ? 2 : 1)}
-        className="max-w-xl font-medium text-black/60 dark:text-white/60 sm:text-lg"
+      <p
+        className="hero-rise max-w-xl font-medium text-black/60 dark:text-white/60 sm:text-lg"
+        style={rise(first + 1)}
       >
         {sub}
-      </motion.p>
+      </p>
 
-      <motion.div
-        initial={reduceMotion ? false : rise.hidden}
-        animate={rise.shown}
-        transition={step(badge ? 3 : 2)}
-      >
+      <div className="hero-rise" style={rise(first + 2)}>
         {children}
-      </motion.div>
+      </div>
     </>
   );
 }

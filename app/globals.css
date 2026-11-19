@@ -277,6 +277,23 @@ html {
   color: #fff;
 }
 
+@keyframes hero-rise {
+  from {
+    transform: translateY(18px);
+    filter: blur(4px);
+  }
+}
+
+.hero-rise {
+  animation: hero-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise {
+    animation: none;
+  }
+}
+
 @keyframes voice-bar {
   50% {
     transform: scaleY(1);
