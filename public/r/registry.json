@@ -236,7 +236,7 @@
       "name": "poster-sphere",
       "type": "registry:ui",
       "title": "Poster Sphere",
-      "description": "A movie browser that wraps an endless wall of posters around a globe and opens each film in a full screen view.",
+      "description": "A movie browser that swells an endless wall of posters under a lens and opens each film in a full screen view.",
       "dependencies": [
         "motion"
       ],

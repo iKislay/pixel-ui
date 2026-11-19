@@ -58,13 +58,15 @@ const DEFAULT_MOVIES: PosterMovie[] = [
   { title: "Orchard Road", year: 2016, genre: "Romance", rating: 79, tagline: "Some paths lead back.", synopsis: "A fruit picker and a city lawyer share one season and a stubborn old tractor.", poster: "https://picsum.photos/seed/pixel-ui-24/400/600" },
 ];
 
-const TILE = { sm: 64, md: 88, lg: 120 };
+const TILE = { sm: 22, md: 30, lg: 42 };
 const FEEL = {
   snappy: { rate: 18, throw: 0.08 },
   smooth: { rate: 9, throw: 0.18 },
   floaty: { rate: 4, throw: 0.36 },
 };
-const HALF_PI = Math.PI / 2;
+// lens profile: centre magnifies by A + (1 - A) * K, the rim squeezes to A
+const BULGE_A = 0.15;
+const BULGE_K = 4.5;
 const DEAD_ZONE = 0.35;
 
 type Origin = { x: number; y: number; w: number; h: number } | null;
@@ -134,19 +136,27 @@ export function PosterSphere({
         if (slotsRef.current[i] !== m) (next ??= slotsRef.current.slice())[i] = m;
         const el = tilesRef.current[i];
         if (!el) continue;
-        const d = Math.hypot(px, py);
-        const th = d / radius;
-        if (th >= HALF_PI) {
+        const u = Math.hypot(px, py) / radius;
+        let tan = 1;
+        let rad = 1;
+        let shade = Math.min(0.8, 0.35 + 1.5 * (u - 1));
+        if (u < 1) {
+          // a radial lens over a flat sheet: tangential scale is g(u)/u, radial is g'(u)
+          const rest = (1 - u) ** (BULGE_K - 1);
+          rad = BULGE_A + (1 - BULGE_A) * BULGE_K * rest;
+          tan = u < 1e-4 ? rad : (BULGE_A * u + (1 - BULGE_A) * (1 - rest * (1 - u))) / u;
+          shade = 0.35 + 0.65 * Math.sqrt(1 - u);
+        }
+        const x = px * tan;
+        const y = py * tan;
+        if (Math.abs(x) > s.w / 2 + cellX * tan || Math.abs(y) > s.h / 2 + cellY * tan) {
           el.style.visibility = "hidden";
           continue;
         }
-        // orthographic sphere: radial edge squashes by cos, tangential by sin/θ
-        const tan = th < 1e-4 ? 1 : Math.sin(th) / th;
-        const boost = 1 + 0.2 * Math.exp((-2 * d * d) / (cellX * cellX));
         const phi = Math.atan2(py, px);
         el.style.visibility = "";
-        el.style.opacity = String(Math.min(1, (HALF_PI - th) / 0.7));
-        el.style.transform = `translate3d(${px * tan}px,${py * tan}px,0) rotate(${phi}rad) scale(${Math.cos(th) * boost},${tan * boost}) rotate(${-phi}rad)`;
+        el.style.opacity = String(shade);
+        el.style.transform = `translate3d(${x}px,${y}px,0) rotate(${phi}rad) scale(${rad},${tan}) rotate(${-phi}rad)`;
       }
     }
     if (next) {
@@ -208,12 +218,12 @@ export function PosterSphere({
       const { width, height } = entry.contentRect;
       s.w = width;
       s.h = height;
-      s.radius = Math.max(1, Math.min(width, height) * 0.48);
+      s.radius = Math.max(1, Math.min(width, height) * 0.42);
       s.cellX = tileW * 1.12;
       s.cellY = tileH + tileW * 0.12;
-      // the wrap seam must sit past the sphere's back so swapped posters are never seen
-      s.cols = Math.ceil((s.radius * Math.PI) / s.cellX) + 2;
-      s.rows = Math.ceil((s.radius * Math.PI) / s.cellY) + 2;
+      // the wrap seam must sit past the container edge so swapped posters are never seen
+      s.cols = Math.ceil(width / s.cellX) + 3;
+      s.rows = Math.ceil(height / s.cellY) + 3;
       snap();
       s.x = s.tx;
       s.y = s.ty;
@@ -364,16 +374,15 @@ export function PosterSphere({
                 }}
                 data-tile={i}
                 style={{ visibility: "hidden" }}
-                className="absolute top-1/2 left-1/2 -mt-[calc(var(--tile-h)/2)] -ml-[calc(var(--tile-w)/2)] h-(--tile-h) w-(--tile-w) overflow-hidden rounded-[14%/9%] will-change-transform"
+                className="absolute top-1/2 left-1/2 -mt-[calc(var(--tile-h)/2)] -ml-[calc(var(--tile-w)/2)] h-(--tile-h) w-(--tile-w) overflow-hidden rounded-[14%/9%]"
               >
                 {movie && <Poster movie={movie} />}
               </div>
             );
           })}
         </div>
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_45%,var(--color-background)_80%)]" />
         {current && (
-          <div aria-live="polite" className="pointer-events-none absolute top-0 left-0 max-w-[min(26rem,80%)] p-5 sm:p-7">
+          <div aria-live="polite" className="pointer-events-none absolute top-0 left-0 max-w-[min(30rem,85%)] rounded-br-3xl bg-linear-to-br from-background via-background/80 to-transparent p-5 pr-12 pb-10 sm:p-7 sm:pr-16 sm:pb-12">
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.div
                 key={active}

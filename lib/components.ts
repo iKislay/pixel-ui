@@ -76,7 +76,7 @@ export const components: ComponentItem[] = [
     category: "sections",
     registry: "poster-sphere",
     description:
-      "A movie browser that wraps an endless wall of posters around a globe and opens each film in a full screen view.",
+      "A movie browser that swells an endless wall of posters under a lens and opens each film in a full screen view.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/poster-sphere.tsx`,
     dependencies: [
       {
@@ -85,7 +85,7 @@ export const components: ComponentItem[] = [
       },
     ],
     interaction:
-      "Drag the globe in any direction; posters bend away at the edges and the wall never runs out. Let go and it glides on, then settles with a poster in the middle, whose tagline, title, genre and rating show in the corner. With hover movement, pushing the cursor toward an edge also rolls the globe that way. Click a poster or press Enter to fly it out into a full screen view that stops the page from scrolling; close it with the button, Escape or a click outside. Arrow keys step one poster at a time. Honors prefers-reduced-motion: the globe follows your drag without gliding, hover rolling is off, and the full screen view fades in instead of flying.",
+      "Drag the wall in any direction; posters swell as they slide under the bulge in the middle, squeeze around its rim and never run out. Let go and it glides on, then settles with a poster in the middle, whose tagline, title, genre and rating show in the corner. With hover movement, pushing the cursor toward an edge also slides the wall that way. Click a poster or press Enter to fly it out into a full screen view that stops the page from scrolling; close it with the button, Escape or a click outside. Arrow keys step one poster at a time. Honors prefers-reduced-motion: the wall follows your drag without gliding, hover sliding is off, and the full screen view fades in instead of flying.",
     props: [
       {
         name: "movies",
@@ -99,26 +99,26 @@ export const components: ComponentItem[] = [
         type: '"sm" | "md" | "lg"',
         default: '"md"',
         options: ["sm", "md", "lg"],
-        description: "Poster width: 64, 88 or 120 pixels. Smaller posters fit more on the globe.",
+        description: "Poster width on the flat wall: 22, 30 or 42 pixels; the centre of the bulge magnifies about four times. Smaller posters fit more but cost more to draw.",
       },
       {
         name: "smoothness",
         type: '"snappy" | "smooth" | "floaty"',
         default: '"smooth"',
         options: ["snappy", "smooth", "floaty"],
-        description: "How closely the globe trails your drag and how far it glides after you let go.",
+        description: "How closely the wall trails your drag and how far it glides after you let go.",
       },
       {
         name: "movement",
         type: '"drag" | "hover"',
         default: '"drag"',
         options: ["drag", "hover"],
-        description: "drag moves only while dragging. hover also rolls the globe toward the cursor near its edges.",
+        description: "drag moves only while dragging. hover also slides the wall toward the cursor near its edges.",
       },
       {
         name: "className",
         type: "string",
-        description: "Classes applied to the root. Give it a height; the globe fills it.",
+        description: "Classes applied to the root. Give it a height; the wall fills it.",
       },
     ],
     usage: `import { PosterSphere } from "@/components/ui/poster-sphere"
