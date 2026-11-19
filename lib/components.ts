@@ -70,6 +70,64 @@ export const REGISTRY_REPO = "ikislay/pixel-ui";
 
 export const components: ComponentItem[] = [
   {
+    name: "Poster Sphere",
+    href: "/components/poster-sphere",
+    released: "2026-11-19",
+    category: "sections",
+    registry: "poster-sphere",
+    description:
+      "A movie browser that wraps an endless wall of posters around a globe and opens each film in a full screen view.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/poster-sphere.tsx`,
+    dependencies: [
+      {
+        name: "motion",
+        icon: createElement(MotionIcon, { className: "h-4 w-4" }),
+      },
+    ],
+    interaction:
+      "Drag the globe in any direction; posters bend away at the edges and the wall never runs out. Let go and it glides on, then settles with a poster in the middle, whose tagline, title, genre and rating show in the corner. With hover movement, pushing the cursor toward an edge also rolls the globe that way. Click a poster or press Enter to fly it out into a full screen view that stops the page from scrolling; close it with the button, Escape or a click outside. Arrow keys step one poster at a time. Honors prefers-reduced-motion: the globe follows your drag without gliding, hover rolling is off, and the full screen view fades in instead of flying.",
+    props: [
+      {
+        name: "movies",
+        type: "{ title: string; year: number; genre: string; rating: number; tagline: string; synopsis: string; color: string; poster?: string }[]",
+        default: "16 sample films",
+        description:
+          "The films on the globe, repeated to fill it. rating is out of 100; without a poster image, a title card is drawn in color.",
+      },
+      {
+        name: "size",
+        type: '"sm" | "md" | "lg"',
+        default: '"md"',
+        options: ["sm", "md", "lg"],
+        description: "Poster width: 64, 88 or 120 pixels. Smaller posters fit more on the globe.",
+      },
+      {
+        name: "smoothness",
+        type: '"snappy" | "smooth" | "floaty"',
+        default: '"smooth"',
+        options: ["snappy", "smooth", "floaty"],
+        description: "How closely the globe trails your drag and how far it glides after you let go.",
+      },
+      {
+        name: "movement",
+        type: '"drag" | "hover"',
+        default: '"drag"',
+        options: ["drag", "hover"],
+        description: "drag moves only while dragging. hover also rolls the globe toward the cursor near its edges.",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root. Give it a height; the globe fills it.",
+      },
+    ],
+    usage: `import { PosterSphere } from "@/components/ui/poster-sphere"
+
+export function Demo() {
+  return <PosterSphere movement="hover" className="h-[640px] w-full" />
+}`,
+  },
+  {
     name: "Distortion Wave",
     href: "/components/distortion-wave",
     released: "2026-11-16",

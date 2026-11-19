@@ -37,6 +37,8 @@ const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
     "Swims away from pointers and ripples on click.",
   "/components/ascii-butterflies":
     "Flits away on pointer proximity and scatters on click.",
+  "/components/poster-sphere":
+    "Drag a globe of movie posters and click one to open it full screen.",
   "/components/gallery-corridor":
     "Scroll down a bending wireframe corridor and click a piece to peel it off the wall.",
   "/components/dimension-hero":
