@@ -27,12 +27,17 @@ type Wave = {
   light: HTMLCanvasElement | null;
   dark: HTMLCanvasElement | null;
   toDark: boolean;
+  source: Element;
 };
 
 const SIDES = ["top", "right", "bottom", "left"];
 
 // same front as the appearance demo, with a shorter afterglow so the page comes back sooner
 const WAVE_STYLE = {
+  // full screen scales every length up, so the pull toward the toggle is eased back to the demo's feel
+  pull: 12,
+  inhale: 28,
+  gatherGlow: 0.25,
   rimFade: 1.4,
   hairlineLinger: 0.2,
   hairlineFade: 1.4,
@@ -126,8 +131,8 @@ function Picture({ canvas }: { canvas: HTMLCanvasElement }) {
 }
 
 // light is always the first view and dark the second, like the appearance demo:
-// going dark sends the wave down the screen, going light pulls it back up
-function ThemeWave({ light, dark, toDark, onDone }: Wave & { onDone: () => void }) {
+// going dark sends the wave out from the toggle, going light pulls it back in
+function ThemeWave({ light, dark, toDark, source, onDone }: Wave & { onDone: () => void }) {
   const wave = useRef<DistortionWaveHandle>(null);
   const root = useRef<HTMLDivElement>(null);
   const [revealed, setRevealed] = useState(!toDark);
@@ -170,7 +175,6 @@ function ThemeWave({ light, dark, toDark, onDone }: Wave & { onDone: () => void 
     };
   }, [onDone]);
 
-  const width = document.documentElement.clientWidth;
 
   return createPortal(
     <div
@@ -188,8 +192,7 @@ function ThemeWave({ light, dark, toDark, onDone }: Wave & { onDone: () => void 
         ref={wave}
         palette="mono"
         revealed={revealed}
-        // always down from the top center, wherever the toggle sits
-        source={{ x: width / 2 - 40, y: 0, w: 80, h: 1 }}
+        source={source}
         live={false}
         resolution={resolution()}
         cornerRadius={0}
@@ -235,6 +238,7 @@ export default function ThemeToggle({
     event.preventDefault();
     if (sound) tick();
 
+    const source = event.currentTarget;
     const apply = () => flushSync(() => setTheme(next));
     // a press that never became a click, such as a drag away, leaves pictures too old to trust
     const pressed = pressing.current;
@@ -247,7 +251,7 @@ export default function ThemeToggle({
       const pair = (b: HTMLCanvasElement, a: HTMLCanvasElement | null) =>
         toDark ? { light: b, dark: a } : { light: a, dark: b };
       // the overlay paints in the same frame as the switch, so the page never shows the new theme early
-      flushSync(() => setWave({ ...pair(before, after), toDark }));
+      flushSync(() => setWave({ ...pair(before, after), toDark, source }));
       apply();
       if (!after) {
         const late = await pagePicture();
