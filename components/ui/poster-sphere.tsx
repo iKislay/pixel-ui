@@ -64,9 +64,8 @@ const FEEL = {
   smooth: { rate: 9, throw: 0.18 },
   floaty: { rate: 4, throw: 0.36 },
 };
-// lens profile: centre magnifies by A + (1 - A) * K, the rim squeezes to A
-const BULGE_A = 0.15;
-const BULGE_K = 4.5;
+// centre magnification minus one; above 2.24 the gaussian lens folds tiles over each other
+const BULGE = 2.1;
 const DEAD_ZONE = 0.35;
 
 type Origin = { x: number; y: number; w: number; h: number } | null;
@@ -106,7 +105,8 @@ export function PosterSphere({
   const tileH = tileW * 1.5;
   const s = useRef({
     x: 0, y: 0, tx: 0, ty: 0, vx: 0, vy: 0,
-    w: 0, h: 0, radius: 1, cellX: 1, cellY: 1, cols: 0, rows: 0,
+    w: 0, h: 0, sigma: 1, cellX: 1, cellY: 1, cols: 0, rows: 0,
+    prevX: 0, prevY: 0, svx: 0, svy: 0, lx: 0, ly: 0, st: 0, ux: 1, uy: 0, wx: 0, wy: 0, wg: 0,
     raf: 0, last: 0, moveAt: 0,
     drag: null as null | { id: number; px: number; py: number; tx: number; ty: number; moved: boolean; tile: number },
     pointer: { x: 0, y: 0, inside: false },
@@ -116,8 +116,19 @@ export function PosterSphere({
     cfg.current = { movies, reduced, movement, smoothness, open: open !== null };
   });
 
+  // plane point (from the centre) to screen; writes s.wx, s.wy and the lens gain s.wg
+  const warp = (px: number, py: number) => {
+    const dx = px - s.lx;
+    const dy = py - s.ly;
+    const a = (dx * s.ux + dy * s.uy) / (s.sigma * (1 + s.st));
+    const b = (dy * s.ux - dx * s.uy) / s.sigma;
+    s.wg = BULGE * Math.exp(-(a * a + b * b) / 2);
+    s.wx = px + dx * s.wg;
+    s.wy = py + dy * s.wg;
+  };
+
   const layout = () => {
-    const { cols, rows, cellX, cellY, radius } = s;
+    const { cols, rows, cellX, cellY } = s;
     const n = cfg.current.movies.length;
     if (!cols || !n) return;
     const W = cols * cellX;
@@ -136,27 +147,28 @@ export function PosterSphere({
         if (slotsRef.current[i] !== m) (next ??= slotsRef.current.slice())[i] = m;
         const el = tilesRef.current[i];
         if (!el) continue;
-        const u = Math.hypot(px, py) / radius;
-        let tan = 1;
-        let rad = 1;
-        let shade = Math.min(0.8, 0.35 + 1.5 * (u - 1));
-        if (u < 1) {
-          // a radial lens over a flat sheet: tangential scale is g(u)/u, radial is g'(u)
-          const rest = (1 - u) ** (BULGE_K - 1);
-          rad = BULGE_A + (1 - BULGE_A) * BULGE_K * rest;
-          tan = u < 1e-4 ? rad : (BULGE_A * u + (1 - BULGE_A) * (1 - rest * (1 - u))) / u;
-          shade = 0.35 + 0.65 * Math.sqrt(1 - u);
-        }
-        const x = px * tan;
-        const y = py * tan;
-        if (Math.abs(x) > s.w / 2 + cellX * tan || Math.abs(y) > s.h / 2 + cellY * tan) {
+        warp(px, py);
+        const x = s.wx;
+        const y = s.wy;
+        const gain = s.wg;
+        const reach = (1 + gain) * cellY;
+        if (Math.abs(x) > s.w / 2 + reach || Math.abs(y) > s.h / 2 + reach) {
           el.style.visibility = "hidden";
           continue;
         }
-        const phi = Math.atan2(py, px);
+        // the tile's local stretch and shear, measured across its own width
+        const e = cellX / 2;
+        warp(px + e, py);
+        const rx = s.wx, ry = s.wy;
+        warp(px - e, py);
+        const m11 = (rx - s.wx) / (2 * e), m21 = (ry - s.wy) / (2 * e);
+        warp(px, py + e);
+        const dx = s.wx, dy = s.wy;
+        warp(px, py - e);
+        const m12 = (dx - s.wx) / (2 * e), m22 = (dy - s.wy) / (2 * e);
         el.style.visibility = "";
-        el.style.opacity = String(shade);
-        el.style.transform = `translate3d(${x}px,${y}px,0) rotate(${phi}rad) scale(${rad},${tan}) rotate(${-phi}rad)`;
+        el.style.opacity = String(0.45 + (0.55 * gain) / BULGE);
+        el.style.transform = `matrix(${m11},${m21},${m12},${m22},${x},${y})`;
       }
     }
     if (next) {
@@ -196,11 +208,46 @@ export function PosterSphere({
     const k = cfg.current.reduced ? 1 : 1 - Math.exp(-FEEL[cfg.current.smoothness].rate * dt);
     s.x += (s.tx - s.x) * k;
     s.y += (s.ty - s.y) * k;
-    const settled = Math.abs(s.tx - s.x) < 0.1 && Math.abs(s.ty - s.y) < 0.1;
+    let settled = Math.abs(s.tx - s.x) < 0.1 && Math.abs(s.ty - s.y) < 0.1;
     if (settled) {
       s.x = s.tx;
       s.y = s.ty;
     }
+    if (dt > 0) {
+      const kv = 1 - Math.exp(-8 * dt);
+      s.svx += ((s.x - s.prevX) / dt - s.svx) * kv;
+      s.svy += ((s.y - s.prevY) / dt - s.svy) * kv;
+    }
+    s.prevX = s.x;
+    s.prevY = s.y;
+    // the lens leans and stretches along the travel, and follows the cursor in hover mode
+    const c = cfg.current;
+    const speed = Math.hypot(s.svx, s.svy);
+    let lx = 0, ly = 0, st = 0;
+    if (!c.reduced) {
+      lx = s.svx * 0.12;
+      ly = s.svy * 0.12;
+      if (c.movement === "hover" && s.pointer.inside && !c.open) {
+        lx += (s.pointer.x - s.w / 2) * 0.4;
+        ly += (s.pointer.y - s.h / 2) * 0.4;
+      }
+      const max = Math.min(s.w, s.h) * 0.3;
+      const len = Math.hypot(lx, ly);
+      if (len > max) {
+        lx *= max / len;
+        ly *= max / len;
+      }
+      st = Math.min(0.9, speed / 1200);
+      if (speed > 1) {
+        s.ux = s.svx / speed;
+        s.uy = s.svy / speed;
+      }
+    }
+    const kl = 1 - Math.exp(-6 * dt);
+    s.lx += (lx - s.lx) * kl;
+    s.ly += (ly - s.ly) * kl;
+    s.st += (st - s.st) * kl;
+    settled &&= speed < 2 && Math.abs(lx - s.lx) < 0.2 && Math.abs(ly - s.ly) < 0.2 && Math.abs(st - s.st) < 0.005;
     layout();
     s.raf = settled && !steer && !s.drag ? 0 : requestAnimationFrame(tick);
   };
@@ -218,15 +265,15 @@ export function PosterSphere({
       const { width, height } = entry.contentRect;
       s.w = width;
       s.h = height;
-      s.radius = Math.max(1, Math.min(width, height) * 0.42);
+      s.sigma = Math.max(1, Math.min(width, height) * 0.2);
       s.cellX = tileW * 1.12;
       s.cellY = tileH + tileW * 0.12;
       // the wrap seam must sit past the container edge so swapped posters are never seen
       s.cols = Math.ceil(width / s.cellX) + 3;
       s.rows = Math.ceil(height / s.cellY) + 3;
       snap();
-      s.x = s.tx;
-      s.y = s.ty;
+      s.x = s.prevX = s.tx;
+      s.y = s.prevY = s.ty;
       setGrid((g) => (g.cols === s.cols && g.rows === s.rows ? g : { cols: s.cols, rows: s.rows }));
       layout();
     });

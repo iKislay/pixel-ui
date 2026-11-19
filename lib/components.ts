@@ -85,7 +85,7 @@ export const components: ComponentItem[] = [
       },
     ],
     interaction:
-      "Drag the wall in any direction; posters swell as they slide under the bulge in the middle, squeeze around its rim and never run out. Let go and it glides on, then settles with a poster in the middle. With hover movement, pushing the cursor toward an edge also slides the wall that way. Click a poster or press Enter to fly it out into a full screen view that stops the page from scrolling; close it with the button, Escape or a click outside. Arrow keys step one poster at a time. Honors prefers-reduced-motion: the wall follows your drag without gliding, hover sliding is off, and the full screen view fades in instead of flying.",
+      "Drag the wall in any direction; posters swell as they slide under the bulge in the middle, squeeze around its edge and never run out. The bulge leans and stretches the way you drag, then eases back to round. Let go and it glides on, then settles with a poster in the middle. With hover movement, the bulge drifts toward the cursor, and pushing it toward an edge slides the wall that way. Click a poster or press Enter to fly it out into a full screen view that stops the page from scrolling; close it with the button, Escape or a click outside. Arrow keys step one poster at a time. Honors prefers-reduced-motion: the wall follows your drag without gliding, the bulge stays still and round, hover sliding is off, and the full screen view fades in instead of flying.",
     props: [
       {
         name: "movies",
@@ -99,7 +99,7 @@ export const components: ComponentItem[] = [
         type: '"sm" | "md" | "lg"',
         default: '"md"',
         options: ["sm", "md", "lg"],
-        description: "Poster width on the flat wall: 22, 30 or 42 pixels; the centre of the bulge magnifies about four times. Smaller posters fit more but cost more to draw.",
+        description: "Poster width on the flat wall: 22, 30 or 42 pixels; the centre of the bulge magnifies about three times. Smaller posters fit more but cost more to draw.",
       },
       {
         name: "smoothness",
@@ -113,7 +113,7 @@ export const components: ComponentItem[] = [
         type: '"drag" | "hover"',
         default: '"drag"',
         options: ["drag", "hover"],
-        description: "drag moves only while dragging. hover also slides the wall toward the cursor near its edges.",
+        description: "drag moves only while dragging. hover also drifts the bulge toward the cursor and slides the wall near its edges.",
       },
       {
         name: "className",
