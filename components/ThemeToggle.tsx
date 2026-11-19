@@ -1,6 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+} from "react";
 import { createPortal, flushSync } from "react-dom";
 import { useTheme } from "next-themes";
 import { DistortionWave, snapshot, type DistortionWaveHandle } from "distortion-waves";
@@ -12,37 +21,38 @@ import {
 
 type Theme = "light" | "dark";
 
-type Pictures = {
-  before: HTMLCanvasElement;
-  after: HTMLCanvasElement | null;
-  theme: string;
-  view: string;
-  at: number;
+type Pictures = { before: HTMLCanvasElement; after: HTMLCanvasElement | null };
+
+type Wave = {
+  light: HTMLCanvasElement | null;
+  dark: HTMLCanvasElement | null;
+  toDark: boolean;
 };
 
 const SIDES = ["top", "right", "bottom", "left"];
 
-// pictures older than this may miss what moved on the page since
-const FRESH_FOR = 3000;
+const FADE = 220;
 
-const FADE = 260;
+// same front as the appearance demo, with a shorter afterglow so the page comes back sooner
+const WAVE_STYLE = {
+  rimFade: 1.4,
+  hairlineLinger: 0.2,
+  hairlineFade: 1.4,
+  particleLife: 1.2,
+};
 
-const PULL = { pull: 9, inhale: 20, gatherGlow: 0.2 };
+const SCROLL_KEYS = new Set([" ", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"]);
 
 const NO_TRANSITIONS = "*,*::before,*::after{transition:none!important}";
 
-const viewKey = () =>
-  [scrollX, scrollY, document.documentElement.clientWidth, innerHeight, ...scrollTops()].join(",");
-
-function scrollTops() {
-  return Array.from(document.querySelectorAll("body *"), (el) => el.scrollTop).filter(Boolean);
-}
+// small screens get lighter pictures and a lighter canvas, so the wave keeps its frame rate on phones
+const resolution = () => (innerWidth < 768 ? 1 : Math.min(devicePixelRatio || 1, 1.5));
 
 function pagePicture() {
   return snapshot(document.documentElement, {
     width: document.documentElement.clientWidth,
     height: innerHeight,
-    scale: Math.min(devicePixelRatio || 1, 1.5),
+    scale: resolution(),
     background: getComputedStyle(document.body).backgroundColor,
     force: (el) => {
       const cs = getComputedStyle(el);
@@ -95,6 +105,12 @@ function differs(a: HTMLCanvasElement, b: HTMLCanvasElement) {
   return total / x.length > 8;
 }
 
+async function takePictures(next: Theme): Promise<Pictures> {
+  const before = await pagePicture();
+  const after = await otherThemePicture(next);
+  return { before, after: differs(before, after) ? after : null };
+}
+
 function Picture({ canvas }: { canvas: HTMLCanvasElement }) {
   const box = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -105,16 +121,9 @@ function Picture({ canvas }: { canvas: HTMLCanvasElement }) {
   return <div ref={box} style={{ width: "100%", height: "100%", border: "none" }} />;
 }
 
-type Wave = {
-  light: HTMLCanvasElement | null;
-  dark: HTMLCanvasElement | null;
-  toDark: boolean;
-  source: Element;
-};
-
 // light is always the first view and dark the second, like the appearance demo:
-// going dark sends the wave out from the toggle, going light pulls it back in
-function ThemeWave({ light, dark, toDark, source, onDone }: Wave & { onDone: () => void }) {
+// going dark sends the wave up the screen, going light pulls it back down
+function ThemeWave({ light, dark, toDark, onDone }: Wave & { onDone: () => void }) {
   const wave = useRef<DistortionWaveHandle>(null);
   const root = useRef<HTMLDivElement>(null);
   const [revealed, setRevealed] = useState(!toDark);
@@ -122,7 +131,7 @@ function ThemeWave({ light, dark, toDark, source, onDone }: Wave & { onDone: () 
 
   // the overlay sits on top of the whole site, so it must never outlive a wave that went wrong
   useEffect(() => {
-    const limit = setTimeout(onDone, 6000);
+    const limit = setTimeout(onDone, 5000);
     return () => clearTimeout(limit);
   }, [onDone]);
 
@@ -137,9 +146,12 @@ function ThemeWave({ light, dark, toDark, source, onDone }: Wave & { onDone: () 
     };
   }, [ready, toDark]);
 
+  // the picture cannot scroll, so the page holds still for the short wave instead of jumping at the end
   useEffect(() => {
-    if (revealed !== toDark) return;
-    let frame = 0;
+    const hold = (event: Event) => event.preventDefault();
+    const holdKeys = (event: globalThis.KeyboardEvent) => {
+      if (SCROLL_KEYS.has(event.key)) event.preventDefault();
+    };
     let ending = false;
     const end = () => {
       if (ending) return;
@@ -147,26 +159,20 @@ function ThemeWave({ light, dark, toDark, source, onDone }: Wave & { onDone: () 
       if (root.current) root.current.style.opacity = "0";
       setTimeout(onDone, FADE);
     };
-    // once the wave has covered the screen the live page matches the picture, so hand it back
-    const watch = () => {
-      const debug = wave.current?.controller?.debug;
-      if (debug?.running && debug.progress >= debug.clearAt) return end();
-      frame = requestAnimationFrame(watch);
-    };
-    // the way back collapses into the toggle, so it plays to the end
-    if (toDark) frame = requestAnimationFrame(watch);
-    addEventListener("wheel", end, { passive: true });
-    addEventListener("touchmove", end, { passive: true });
-    addEventListener("keydown", end);
+    addEventListener("wheel", hold, { passive: false, capture: true });
+    addEventListener("touchmove", hold, { passive: false, capture: true });
+    addEventListener("keydown", holdKeys, { capture: true });
     addEventListener("resize", end);
     return () => {
-      cancelAnimationFrame(frame);
-      removeEventListener("wheel", end);
-      removeEventListener("touchmove", end);
-      removeEventListener("keydown", end);
+      removeEventListener("wheel", hold, { capture: true });
+      removeEventListener("touchmove", hold, { capture: true });
+      removeEventListener("keydown", holdKeys, { capture: true });
       removeEventListener("resize", end);
     };
-  }, [revealed, toDark, onDone]);
+  }, [onDone]);
+
+  const width = document.documentElement.clientWidth;
+  const height = innerHeight;
 
   return createPortal(
     <div
@@ -184,13 +190,13 @@ function ThemeWave({ light, dark, toDark, source, onDone }: Wave & { onDone: () 
       <DistortionWave
         ref={wave}
         palette="mono"
-        // full screen scales every length up, so the suck toward the toggle is eased back to the card's feel
-        waveStyle={PULL}
         revealed={revealed}
-        source={source}
+        // always up from the bottom edge, wherever the toggle sits
+        source={{ x: 0, y: height - 1, w: width, h: 1 }}
         live={false}
-        resolution={Math.min(devicePixelRatio || 1, 1.5)}
+        resolution={resolution()}
         cornerRadius={0}
+        waveStyle={WAVE_STYLE}
         revealedContent={dark ? <Picture canvas={dark} /> : undefined}
         onFinish={(shown) => shown === toDark && onDone()}
         style={{ width: "100%", height: "100%", border: "none" }}
@@ -204,39 +210,25 @@ function ThemeWave({ light, dark, toDark, source, onDone }: Wave & { onDone: () 
 
 export default function ThemeToggle({
   onClick,
-  onPointerEnter,
-  onFocus,
+  onPointerDown,
+  onKeyDown,
   sound = true,
   ...props
 }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
-  const pictures = useRef<Pictures | null>(null);
-  const warming = useRef<Promise<void> | null>(null);
+  const pressing = useRef<{ pictures: Promise<Pictures>; at: number } | null>(null);
   const [wave, setWave] = useState<Wave | null>(null);
-
   const finish = useCallback(() => setWave(null), []);
 
-  const next = (resolvedTheme === "dark" ? "light" : "dark") as Theme;
-  const fresh = (p: Pictures | null) =>
-    p && p.theme === resolvedTheme && p.view === viewKey() && performance.now() - p.at < FRESH_FOR ? p : null;
+  const next: Theme = resolvedTheme === "dark" ? "light" : "dark";
 
-  // pictured on approach, so the click itself has nothing left to wait for
-  const warm = () => {
-    if (warming.current || fresh(pictures.current)) return;
-    const theme = resolvedTheme;
-    const view = viewKey();
-    warming.current = (async () => {
-      const before = await pagePicture();
-      let after: HTMLCanvasElement | null = await otherThemePicture(next);
-      if (!differs(before, after)) after = null;
-      pictures.current = { before, after, theme: theme ?? "", view, at: performance.now() };
-    })()
-      .catch(() => {
-        pictures.current = null;
-      })
-      .finally(() => {
-        warming.current = null;
-      });
+  // pictured on press, so the page cannot change before the click and most of the work is done by then
+  const press = () => {
+    if (wave) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const pictures = takePictures(next);
+    pictures.catch(() => {});
+    pressing.current = { pictures, at: performance.now() };
   };
 
   const toggle = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -246,19 +238,19 @@ export default function ThemeToggle({
     event.preventDefault();
     if (sound) tick();
 
-    const source = event.currentTarget;
     const apply = () => flushSync(() => setTheme(next));
+    // a press that never became a click, such as a drag away, leaves pictures too old to trust
+    const pressed = pressing.current;
+    pressing.current = null;
+    const taking =
+      pressed && performance.now() - pressed.at < 1000 ? pressed.pictures : takePictures(next);
     try {
-      if (warming.current) await warming.current;
-      const ready = fresh(pictures.current);
-      pictures.current = null;
-      const before = ready?.before ?? (await pagePicture());
-      const after = ready?.after ?? null;
+      const { before, after } = await taking;
       const toDark = next === "dark";
       const pair = (b: HTMLCanvasElement, a: HTMLCanvasElement | null) =>
         toDark ? { light: b, dark: a } : { light: a, dark: b };
       // the overlay paints in the same frame as the switch, so the page never shows the new theme early
-      flushSync(() => setWave({ ...pair(before, after), toDark, source }));
+      flushSync(() => setWave({ ...pair(before, after), toDark }));
       apply();
       if (!after) {
         const late = await pagePicture();
@@ -276,18 +268,16 @@ export default function ThemeToggle({
         {...props}
         sound={sound}
         onClick={toggle}
-        onPointerEnter={(event) => {
-          onPointerEnter?.(event);
-          warm();
+        onPointerDown={(event: PointerEvent<HTMLButtonElement>) => {
+          onPointerDown?.(event);
+          press();
         }}
-        onFocus={(event) => {
-          onFocus?.(event);
-          warm();
+        onKeyDown={(event: KeyboardEvent<HTMLButtonElement>) => {
+          onKeyDown?.(event);
+          if (event.key === "Enter" || event.key === " ") press();
         }}
       />
-      {wave && (
-        <ThemeWave {...wave} onDone={finish} />
-      )}
+      {wave && <ThemeWave {...wave} onDone={finish} />}
     </>
   );
 }
