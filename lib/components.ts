@@ -135,33 +135,29 @@ export function Demo() {
     pro: true,
     registry: "distortion-wave",
     description:
-      "A wrapper that plays a WebGL wave across its contents whenever they change.",
-    dependencies: [{ name: "distortion-wave" }],
+      "A wrapper that carries one view into another with a colourful WebGL wave.",
+    dependencies: [{ name: "distortion-waves" }],
     interaction:
-      "Click a control inside the wrapper and the change ripples out from it as a lensed, colourful wave that leans toward where you pressed. Keyboard presses start the wave from the control. Honors prefers-reduced-motion: the update applies without the wave.",
+      "Press the control that changes the view and a wave opens from it, bending the old view as it passes and leaving the new one behind. Pressing it again collapses the wave back into the control. The controls in the overlay stay sharp and clickable the whole time. Honors prefers-reduced-motion: the views crossfade instead.",
     usage: `import { useState } from "react";
-import { DistortionWave, useWave } from "@/components/ui/distortion-wave";
-
-function LikeButton() {
-  const wave = useWave();
-  const [liked, setLiked] = useState(false);
-
-  return (
-    <button
-      onClick={(e) =>
-        // source: where the wave starts; focus: the touch point it leans toward
-        wave(() => setLiked(!liked), { source: e.currentTarget, focus: e })
-      }
-    >
-      {liked ? "Liked" : "Like"}
-    </button>
-  );
-}
+import { DistortionWave } from "@/components/ui/distortion-wave";
 
 export default function Demo() {
+  const [sent, setSent] = useState(false);
+
   return (
-    <DistortionWave palette="ember">
-      <LikeButton />
+    <DistortionWave
+      revealed={sent}
+      revealedContent={<Receipt />}
+      overlay={
+        <button className="absolute inset-x-6 bottom-6" onClick={() => setSent(!sent)}>
+          {sent ? "Done" : "Confirm"}
+        </button>
+      }
+      className="w-[420px] rounded-3xl"
+    >
+      {/* both views need an opaque background */}
+      <Review />
     </DistortionWave>
   );
 }`,
@@ -170,49 +166,68 @@ export default function Demo() {
         name: "children",
         type: "ReactNode",
         required: true,
+        description: "The view that shows first. Give it an opaque background.",
+      },
+      {
+        name: "revealedContent",
+        type: "ReactNode",
         description:
-          "The content the wave plays across. Call useWave() inside it to get wave(update, options).",
+          "The view the wave leaves behind. Without one, the wave passes over children and leaves them as they were.",
+      },
+      {
+        name: "revealed",
+        type: "boolean",
+        description:
+          "Which view shows. Setting it to true sends the wave out; false collapses it back. Leave it out to drive the wave with ref.play().",
+      },
+      {
+        name: "overlay",
+        type: "ReactNode",
+        description:
+          "Content that stays above the wave, sharp and clickable, such as the button that starts it. Position its children absolutely.",
+      },
+      {
+        name: "type",
+        type: '"vertical" | "horizontal" | "center"',
+        default: '"vertical"',
+        options: ["vertical", "horizontal", "center"],
+        description:
+          "The shape of the front: up from a button, across from a side edge, or a ring from an avatar or icon.",
+      },
+      {
+        name: "source",
+        type: "Element | RefObject | { x, y, w, h }",
+        description:
+          "Where the wave opens. By default, the control that was just pressed.",
       },
       {
         name: "palette",
-        type: '"aurora" | "ocean" | "mint" | "ember" | "electric" | "pixel" | string[]',
-        options: ["aurora", "ocean", "mint", "ember", "electric", "pixel"],
-        description: "A named palette or up to 8 hex colours for the wave.",
+        type: '"colorful" | "green" | "ocean" | "sunset" | "mono" | string',
+        options: ["colorful", "green", "ocean", "sunset", "mono"],
+        description: "A named palette or one hex colour. By default, the type's own.",
       },
       {
-        name: "effect",
-        type: '"wave" | Effect',
-        default: '"wave"',
+        name: "waveStyle",
+        type: "Partial<WaveStyle>",
         description:
-          "The look of the wave. Import others from distortion-wave, such as electric from distortion-wave/electric.",
+          "Fine tuning over the type's defaults, such as travel, amplitude, blur, aberration and particleCount.",
       },
       {
-        name: "duration",
-        type: "number",
+        name: "onFinish",
+        type: "(revealed: boolean) => void",
+        description: "Called when a wave ends, with the view now showing.",
+      },
+      {
+        name: "ref",
+        type: "Ref<DistortionWaveHandle>",
         description:
-          "Length in ms. By default it scales with the size of the wrapper.",
-      },
-      {
-        name: "easing",
-        type: "string | [number, number, number, number] | (t: number) => number",
-        description: "How the wave front travels, like a CSS easing.",
-      },
-      {
-        name: "intensity",
-        type: "number",
-        default: "1",
-        description: "Strength of the distortion. 0 keeps only the colours.",
-      },
-      {
-        name: "particles",
-        type: "boolean | number",
-        default: "true",
-        description: "Set false to drop the particles, or a number for a particle count.",
+          "Exposes play(), reverse(), reset() and prepare() to run the wave by hand.",
       },
       {
         name: "className",
         type: "string",
-        description: "Classes applied to the wrapper div.",
+        description:
+          "Classes applied to the wrapper. Give it a border radius; the wave follows it.",
       },
     ],
   },

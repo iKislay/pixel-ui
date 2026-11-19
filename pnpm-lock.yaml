@@ -26,9 +26,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
-      distortion-wave:
-        specifier: ^0.4.0
-        version: 0.4.0
+      distortion-waves:
+        specifier: ^0.1.0
+        version: 0.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       figma-squircle:
         specifier: ^1.1.0
         version: 1.1.0
@@ -2343,9 +2343,11 @@ packages:
     resolution: {integrity: sha512-DPi0FmjiSU5EvQV0++GFDOJ9ASQUVFh5kD+OzOnYdi7n3Wpm9hWWGfB/O2blfHcMVTL5WkQXSnRiK9makhrcnw==}
     engines: {node: '>=0.3.1'}
 
-  distortion-wave@0.4.0:
-    resolution: {integrity: sha512-VYbHxcgjQ5Pi4i6ugYOlO9vCXozoTRNYcwGApd4jgZSA0z+4TuhdWdqD4qoDXCo3Kiymwl/3A6onuVO/RkJbhQ==}
-    engines: {node: '>=18'}
+  distortion-waves@0.1.0:
+    resolution: {integrity: sha512-Y+UgvTq+KtvPOp26piB940ikKKWIf3MOMA8PoaFrSwOskbCDjNSwWW8vo0x6UvB2a9IjNGLBgu+f9+ORm0/sYg==}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
 
   doctrine@2.1.0:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
@@ -6339,7 +6341,10 @@ snapshots:
 
   diff@8.0.4: {}
 
-  distortion-wave@0.4.0: {}
+  distortion-waves@0.1.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
 
   doctrine@2.1.0:
     dependencies:
