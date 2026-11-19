@@ -11,7 +11,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
-import { AnimatePresence, MotionConfig, animate, motion } from "motion/react";
+import { MotionConfig, animate, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export type PosterMovie = {
@@ -68,7 +68,8 @@ const FEEL = {
 const BULGE = 2.1;
 const DEAD_ZONE = 0.35;
 
-type Origin = { x: number; y: number; w: number; h: number } | null;
+// the tile as it sits on the wall: its centre on screen and its local stretch and shear
+type Origin = { el: HTMLElement; cx: number; cy: number; w: number; m: number[] } | null;
 
 const REDUCE_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -110,6 +111,7 @@ export function PosterSphere({
     raf: 0, last: 0, moveAt: 0,
     drag: null as null | { id: number; px: number; py: number; tx: number; ty: number; moved: boolean; tile: number },
     pointer: { x: 0, y: 0, inside: false },
+    lifted: null as null | { el: HTMLElement; opacity: string },
   }).current;
   const cfg = useRef({ movies, reduced, movement, smoothness, open: false });
   useLayoutEffect(() => {
@@ -167,7 +169,9 @@ export function PosterSphere({
         warp(px, py - e);
         const m12 = (dx - s.wx) / (2 * e), m22 = (dy - s.wy) / (2 * e);
         el.style.visibility = "";
-        el.style.opacity = String(0.45 + (0.55 * gain) / BULGE);
+        const shade = String(0.45 + (0.55 * gain) / BULGE);
+        if (s.lifted?.el === el) s.lifted.opacity = shade;
+        else el.style.opacity = shade;
         el.style.transform = `matrix(${m11},${m21},${m12},${m22},${x},${y})`;
       }
     }
@@ -342,9 +346,16 @@ export function PosterSphere({
   const openTile = (el: HTMLElement | null | undefined, index?: number) => {
     if (!el) return;
     const idx = index ?? slotsRef.current[Number(el.dataset.tile)];
-    const r = el.getBoundingClientRect();
+    const box = el.parentElement!.getBoundingClientRect();
+    const m = el.style.transform.match(/matrix\(([^)]+)\)/)?.[1].split(",").map(Number) ?? [1, 0, 0, 1, 0, 0];
     s.pointer.inside = false;
-    setOpen({ index: idx, origin: { x: r.left, y: r.top, w: r.width, h: r.height } });
+    // the sheet lifts off the wall, so its spot stays empty until it lands back
+    s.lifted = { el, opacity: el.style.opacity };
+    el.style.opacity = "0";
+    setOpen({
+      index: idx,
+      origin: { el, cx: box.left + box.width / 2 + m[4], cy: box.top + box.height / 2 + m[5], w: el.offsetWidth, m },
+    });
   };
 
   const centerTile = () => {
@@ -432,17 +443,18 @@ export function PosterSphere({
           {current && `${current.title} (${current.year})`}
         </p>
       </div>
-      <AnimatePresence>
-        {open && movies[open.index] && (
-          <MovieModal
-            key="modal"
-            movie={movies[open.index]}
-            origin={reduced ? null : open.origin}
-            onClose={() => setOpen(null)}
-            onClosed={() => rootRef.current?.focus({ preventScroll: true })}
-          />
-        )}
-      </AnimatePresence>
+      {open && movies[open.index] && (
+        <MovieModal
+          movie={movies[open.index]}
+          origin={reduced ? null : open.origin}
+          onClose={() => {
+            if (s.lifted) s.lifted.el.style.opacity = s.lifted.opacity;
+            s.lifted = null;
+            setOpen(null);
+          }}
+          onClosed={() => rootRef.current?.focus({ preventScroll: true })}
+        />
+      )}
     </MotionConfig>
   );
 }
@@ -477,7 +489,9 @@ function MovieModal({
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const posterRef = useRef<HTMLDivElement>(null);
-  const fly = useRef({ x: 0, y: 0, scale: 1 });
+  const sheenRef = useRef<HTMLDivElement>(null);
+  const flight = useRef({ dx: 0, dy: 0, rx: 0, ry: 0, k: 1, t: 0, run: null as { stop: () => void } | null });
+  const [closing, setClosing] = useState(false);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -495,55 +509,100 @@ function MovieModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // t runs 0 (flat on the wall) to 1 (open); the sheet rises off the wall mid flight like lifted paper
+  const pose = (t: number) => {
+    const el = posterRef.current;
+    const f = flight.current;
+    if (!el || !origin) return;
+    f.t = t;
+    const u = 1 - t;
+    const lift = Math.sin(Math.PI * t);
+    const [a, b, c, d] = origin.m.map((v) => v * f.k);
+    el.style.transform =
+      t === 1
+        ? ""
+        : `perspective(1400px) translate3d(${f.dx * u}px,${f.dy * u}px,${lift * 90}px) rotateX(${f.rx * lift}deg) rotateY(${f.ry * lift}deg) matrix(${a * u + t},${b * u},${c * u},${d * u + t},0,0)`;
+    el.style.borderRadius = `${14 - 8 * t}% / ${9 - 5 * t}%`;
+    el.style.boxShadow = `0 ${12 + lift * 40}px ${24 + lift * 70}px rgb(0 0 0 / ${0.3 + lift * 0.35})`;
+    if (sheenRef.current) sheenRef.current.style.opacity = String(lift * 0.45);
+  };
+
   useLayoutEffect(() => {
     const el = posterRef.current;
-    if (!el || !origin) return;
+    if (!el) return;
+    if (!origin) {
+      flight.current.run = animate(el, { opacity: [0, 1] }, { duration: 0.25 });
+      return;
+    }
     const r = el.getBoundingClientRect();
-    fly.current = {
-      x: origin.x + origin.w / 2 - (r.left + r.width / 2),
-      y: origin.y + origin.h / 2 - (r.top + r.height / 2),
-      scale: origin.w / r.width,
-    };
-    animate(el, { x: [fly.current.x, 0], y: [fly.current.y, 0], scale: [fly.current.scale, 1] }, { type: "spring", duration: 0.6, bounce: 0.15 });
+    const f = flight.current;
+    f.dx = origin.cx - (r.left + r.width / 2);
+    f.dy = origin.cy - (r.top + r.height / 2);
+    f.k = origin.w / r.width;
+    const dist = Math.hypot(f.dx, f.dy) || 1;
+    // tip the sheet toward where it is heading, as if picked up by the far edge
+    f.rx = (f.dy / dist) * 16;
+    f.ry = (-f.dx / dist) * 16;
+    pose(0);
+    f.run = animate(0, 1, { duration: 0.8, ease: [0.22, 1, 0.36, 1], onUpdate: pose });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const close = () => {
+    if (closing) return;
+    setClosing(true);
+    const f = flight.current;
+    f.run?.stop();
+    const done = onClose;
+    const el = posterRef.current;
+    if (!origin || !el) {
+      if (el) animate(el, { opacity: 0 }, { duration: 0.2 }).then(done);
+      else done();
+      return;
+    }
+    animate(f.t, 0, { duration: 0.65, ease: [0.45, 0, 0.2, 1], onUpdate: pose, onComplete: done });
+  };
+
   return (
-    <motion.dialog
+    <dialog
       ref={dialogRef}
       aria-label={movie.title}
       onCancel={(e) => {
         e.preventDefault();
-        onClose();
+        close();
       }}
-      exit={{ pointerEvents: "none" }}
-      className="fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none overflow-y-auto overscroll-contain bg-transparent p-0 text-white backdrop:bg-transparent"
+      className={cn(
+        "fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none overflow-y-auto overscroll-contain bg-transparent p-0 text-white backdrop:bg-transparent",
+        closing && "pointer-events-none",
+      )}
     >
       <motion.div
         aria-hidden
-        onClick={onClose}
+        onClick={close}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
+        animate={{ opacity: closing ? 0 : 1 }}
+        transition={{ duration: closing ? 0.5 : 0.4 }}
         className="fixed inset-0 bg-black/90"
       />
       <div className="pointer-events-none relative flex min-h-full flex-col items-center justify-center gap-8 p-6 sm:flex-row sm:gap-12 sm:p-12">
-        <motion.div
+        <div
           ref={posterRef}
-          variants={{ out: () => ({ ...fly.current, opacity: origin ? 1 : 0 }) }}
-          initial={origin ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit="out"
-          transition={{ type: "spring", duration: 0.5, bounce: 0.1 }}
-          className="pointer-events-auto aspect-2/3 w-[min(70vw,calc(60dvh/1.5),22rem)] shrink-0 overflow-hidden rounded-[6%/4%] shadow-2xl"
+          className="pointer-events-auto relative aspect-2/3 w-[min(70vw,calc(60dvh/1.5),22rem)] shrink-0 overflow-hidden rounded-[6%/4%] shadow-2xl"
         >
           <Poster movie={movie} />
-        </motion.div>
+          <div
+            ref={sheenRef}
+            aria-hidden
+            className="absolute inset-0 bg-linear-to-br from-white/70 via-white/0 to-black/40 opacity-0"
+          />
+        </div>
         <motion.div
           initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0, transition: { delay: 0.15, duration: 0.3 } }}
-          exit={{ opacity: 0, transition: { duration: 0.15 } }}
+          animate={
+            closing
+              ? { opacity: 0, y: 8, transition: { duration: 0.2 } }
+              : { opacity: 1, y: 0, transition: { delay: 0.3, duration: 0.35 } }
+          }
           className="pointer-events-auto w-full max-w-md"
         >
           <p className="text-sm text-white/60">{movie.tagline}</p>
@@ -558,13 +617,13 @@ function MovieModal({
           <button
             type="button"
             autoFocus
-            onClick={onClose}
+            onClick={close}
             className="mt-8 rounded-full border border-white/25 px-5 py-2 text-sm font-medium transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
           >
             Close
           </button>
         </motion.div>
       </div>
-    </motion.dialog>
+    </dialog>
   );
 }
