@@ -381,28 +381,9 @@ export function PosterSphere({
             );
           })}
         </div>
-        {current && (
-          <div aria-live="polite" className="pointer-events-none absolute top-0 left-0 max-w-[min(30rem,85%)] rounded-br-3xl bg-linear-to-br from-background via-background/80 to-transparent p-5 pr-12 pb-10 sm:p-7 sm:pr-16 sm:pb-12">
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.div
-                key={active}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
-              >
-                <p className="text-xs text-muted-foreground">{current.tagline}</p>
-                <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
-                  {current.title} <span className="font-normal text-muted-foreground">({current.year})</span>
-                </h3>
-                <div className="mt-2 flex items-center gap-3">
-                  <span className="rounded-full bg-foreground px-2 py-0.5 text-[11px] font-medium text-background">{current.genre}</span>
-                  <Rating value={current.rating} className="size-9" />
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        )}
+        <p aria-live="polite" className="sr-only">
+          {current && `${current.title} (${current.year})`}
+        </p>
       </div>
       <AnimatePresence>
         {open && movies[open.index] && (
