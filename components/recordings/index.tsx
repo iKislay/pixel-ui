@@ -19,6 +19,7 @@ const RECORDINGS: Record<string, ComponentType<RecordingProps>> = {
   "comic-glitch-text": dynamic(() => import("./comic-glitch-text"), { ssr: false }),
   "gallery-corridor": dynamic(() => import("./gallery-corridor"), { ssr: false }),
   "dimension-hero": dynamic(() => import("./dimension-hero"), { ssr: false }),
+  "poster-sphere": dynamic(() => import("./poster-sphere"), { ssr: false }),
   ...PRO_RECORDINGS,
 };
 
