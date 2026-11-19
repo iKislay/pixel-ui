@@ -85,7 +85,7 @@ export const components: ComponentItem[] = [
       },
     ],
     interaction:
-      "Drag the wall in any direction; posters swell as they slide under the bulge in the middle, squeeze around its rim and never run out. Let go and it glides on, then settles with a poster in the middle, whose tagline, title, genre and rating show in the corner. With hover movement, pushing the cursor toward an edge also slides the wall that way. Click a poster or press Enter to fly it out into a full screen view that stops the page from scrolling; close it with the button, Escape or a click outside. Arrow keys step one poster at a time. Honors prefers-reduced-motion: the wall follows your drag without gliding, hover sliding is off, and the full screen view fades in instead of flying.",
+      "Drag the wall in any direction; posters swell as they slide under the bulge in the middle, squeeze around its rim and never run out. Each poster sits under a rounded glass cover that catches the light as it tilts. Let go and it glides on, then settles with a poster in the middle, whose tagline, title, genre and rating show in the corner. With hover movement, pushing the cursor toward an edge also slides the wall that way. Click a poster or press Enter to fly it out into a full screen view that stops the page from scrolling; close it with the button, Escape or a click outside. Arrow keys step one poster at a time. Honors prefers-reduced-motion: the wall follows your drag without gliding, hover sliding is off, and the full screen view fades in instead of flying.",
     props: [
       {
         name: "movies",
