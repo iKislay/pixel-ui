@@ -31,8 +31,6 @@ type Wave = {
 
 const SIDES = ["top", "right", "bottom", "left"];
 
-const FADE = 220;
-
 // same front as the appearance demo, with a shorter afterglow so the page comes back sooner
 const WAVE_STYLE = {
   rimFade: 1.4,
@@ -41,14 +39,13 @@ const WAVE_STYLE = {
   particleLife: 1.2,
 };
 
-const SCROLL_KEYS = new Set([" ", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"]);
-
 const NO_TRANSITIONS = "*,*::before,*::after{transition:none!important}";
 
 // small screens get lighter pictures and a lighter canvas, so the wave keeps its frame rate on phones
 const resolution = () => (innerWidth < 768 ? 1 : Math.min(devicePixelRatio || 1, 1.5));
 
 function pagePicture() {
+  const scrolled = scrollY;
   return snapshot(document.documentElement, {
     width: document.documentElement.clientWidth,
     height: innerHeight,
@@ -60,6 +57,13 @@ function pagePicture() {
       // preflight gives every box border-style solid at width 0; the picture would draw them 3px wide
       for (const side of SIDES) {
         if (cs.getPropertyValue(`border-${side}-width`) === "0px") out[`border-${side}-style`] = "none";
+      }
+      // the engine shifts body by the window scroll, which drags fixed bars (the navbar) out of the picture
+      if (scrolled && cs.position === "fixed" && el instanceof HTMLElement) {
+        out.top = `${el.offsetTop + scrolled}px`;
+        out.bottom = "auto";
+        out.height = `${el.offsetHeight}px`;
+        out["box-sizing"] = "border-box";
       }
       return out;
     },
@@ -122,7 +126,7 @@ function Picture({ canvas }: { canvas: HTMLCanvasElement }) {
 }
 
 // light is always the first view and dark the second, like the appearance demo:
-// going dark sends the wave up the screen, going light pulls it back down
+// going dark sends the wave down the screen, going light pulls it back up
 function ThemeWave({ light, dark, toDark, onDone }: Wave & { onDone: () => void }) {
   const wave = useRef<DistortionWaveHandle>(null);
   const root = useRef<HTMLDivElement>(null);
@@ -146,33 +150,27 @@ function ThemeWave({ light, dark, toDark, onDone }: Wave & { onDone: () => void 
     };
   }, [ready, toDark]);
 
-  // the picture cannot scroll, so the page holds still for the short wave instead of jumping at the end
+  // the window scroll slides the overlay with the page; an inner panel scroll cannot be followed, so the overlay steps aside
   useEffect(() => {
-    const hold = (event: Event) => event.preventDefault();
-    const holdKeys = (event: globalThis.KeyboardEvent) => {
-      if (SCROLL_KEYS.has(event.key)) event.preventDefault();
+    const start = scrollY;
+    const follow = (event: Event) => {
+      const el = root.current;
+      if (!el) return;
+      if (event.target === document || event.target === document.documentElement) {
+        el.style.transform = `translateY(${start - scrollY}px)`;
+      } else {
+        onDone();
+      }
     };
-    let ending = false;
-    const end = () => {
-      if (ending) return;
-      ending = true;
-      if (root.current) root.current.style.opacity = "0";
-      setTimeout(onDone, FADE);
-    };
-    addEventListener("wheel", hold, { passive: false, capture: true });
-    addEventListener("touchmove", hold, { passive: false, capture: true });
-    addEventListener("keydown", holdKeys, { capture: true });
-    addEventListener("resize", end);
+    addEventListener("scroll", follow, { passive: true, capture: true });
+    addEventListener("resize", onDone);
     return () => {
-      removeEventListener("wheel", hold, { capture: true });
-      removeEventListener("touchmove", hold, { capture: true });
-      removeEventListener("keydown", holdKeys, { capture: true });
-      removeEventListener("resize", end);
+      removeEventListener("scroll", follow, { capture: true });
+      removeEventListener("resize", onDone);
     };
   }, [onDone]);
 
   const width = document.documentElement.clientWidth;
-  const height = innerHeight;
 
   return createPortal(
     <div
@@ -184,15 +182,14 @@ function ThemeWave({ light, dark, toDark, onDone }: Wave & { onDone: () => void 
         zIndex: 2147483647,
         pointerEvents: "none",
         border: "none",
-        transition: `opacity ${FADE}ms ease-out`,
       }}
     >
       <DistortionWave
         ref={wave}
         palette="mono"
         revealed={revealed}
-        // always up from the bottom edge, wherever the toggle sits
-        source={{ x: 0, y: height - 1, w: width, h: 1 }}
+        // always down from the top center, wherever the toggle sits
+        source={{ x: width / 2 - 40, y: 0, w: 80, h: 1 }}
         live={false}
         resolution={resolution()}
         cornerRadius={0}
