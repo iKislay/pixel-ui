@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { arcPath, formatCompact, linePath, niceTicks, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
+import { arcPath, barPath, formatCompact, linePath, niceTicks, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
 
 describe("niceTicks", () => {
   it("rounds the range out to round steps", () => {
@@ -65,6 +65,16 @@ describe("paths", () => {
     const ys = (d.match(/-?[\d.]+/g) ?? []).map(Number).filter((_, i) => i % 2 === 1);
     expect(Math.min(...ys)).toBe(0);
     expect(Math.max(...ys)).toBe(10);
+  });
+
+  it("rounds only the value end of a bar", () => {
+    expect(barPath(0, 100, 20, 40, 4)).toBe("M0,100L0,44Q0,40 4,40L16,40Q20,40 20,44L20,100Z");
+    expect(barPath(0, 100, 20, 140, 4)).toBe("M0,100L0,136Q0,140 4,140L16,140Q20,140 20,136L20,100Z");
+  });
+
+  it("shrinks the corner on a short bar and skips an empty one", () => {
+    expect(barPath(0, 10, 20, 8, 4)).toContain("L0,10Q0,8");
+    expect(barPath(0, 10, 20, 10, 4)).toBe("");
   });
 
   it("closes a donut slice through the inner radius", () => {

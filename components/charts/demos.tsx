@@ -3,6 +3,7 @@
 import type { ComponentType } from "react";
 import { formatCompact } from "@/lib/chart";
 import { AreaChart } from "@/components/ui/area-chart";
+import { BarChart } from "@/components/ui/bar-chart";
 import { LineChart } from "@/components/ui/line-chart";
 
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -39,9 +40,31 @@ function AreaChartDemo() {
   );
 }
 
+const signups = [
+  { quarter: "Q1", web: 320, mobile: 210 },
+  { quarter: "Q2", web: 410, mobile: 290 },
+  { quarter: "Q3", web: 380, mobile: 350 },
+  { quarter: "Q4", web: 520, mobile: 430 },
+];
+
+function BarChartDemo() {
+  return (
+    <BarChart
+      label="Signups by quarter"
+      data={signups}
+      index="quarter"
+      series={[
+        { key: "web", label: "Web" },
+        { key: "mobile", label: "Mobile" },
+      ]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   "line-chart": LineChartDemo,
   "area-chart": AreaChartDemo,
+  "bar-chart": BarChartDemo,
 };
 
 export default function ChartDemo({ slug }: { slug: string }) {

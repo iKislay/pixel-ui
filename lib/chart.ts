@@ -67,7 +67,24 @@ export function smoothPath(points: Point[]): string {
   return d;
 }
 
-const polar = (cx: number, cy: number, r: number, angle: number): Point => [
+// a bar from the baseline to its value end, rounding only the value end
+export function barPath(x: number, base: number, width: number, end: number, radius: number): string {
+  const height = Math.abs(base - end);
+  if (height === 0 || width <= 0) return "";
+  const r = Math.min(radius, width / 2, height);
+  const dir = end < base ? 1 : -1;
+  const xr = x + width;
+  return [
+    `M${round(x)},${round(base)}`,
+    `L${round(x)},${round(end + dir * r)}`,
+    `Q${round(x)},${round(end)} ${round(x + r)},${round(end)}`,
+    `L${round(xr - r)},${round(end)}`,
+    `Q${round(xr)},${round(end)} ${round(xr)},${round(end + dir * r)}`,
+    `L${round(xr)},${round(base)}Z`,
+  ].join("");
+}
+
+const polar =(cx: number, cy: number, r: number, angle: number): Point => [
   cx + r * Math.sin(angle),
   cy - r * Math.cos(angle),
 ];

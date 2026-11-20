@@ -136,4 +136,41 @@ export function Demo() {
   )
 }`,
   }),
+  chart("bar-chart", {
+    name: "Bar Chart",
+    category: "comparison",
+    description: "A bar chart with soft rounded ends, grouped when there are several series.",
+    interaction: `The bars rise from the baseline one after another. ${cartesianInteraction("each group of bars")} The group you are reading stays bright while the rest fade back.`,
+    props: [
+      ...cartesianProps,
+      {
+        name: "radius",
+        type: "number",
+        default: "6",
+        description: "Corner radius at the value end of each bar. It shrinks to fit thin or short bars.",
+      },
+      classNameProp,
+    ],
+    usage: `import { BarChart } from "@/components/ui/bar-chart"
+
+const data = [
+  { quarter: "Q1", web: 320, mobile: 210 },
+  { quarter: "Q2", web: 410, mobile: 290 },
+  { quarter: "Q3", web: 380, mobile: 350 },
+]
+
+export function Demo() {
+  return (
+    <BarChart
+      label="Signups by quarter"
+      data={data}
+      index="quarter"
+      series={[
+        { key: "web", label: "Web" },
+        { key: "mobile", label: "Mobile" },
+      ]}
+    />
+  )
+}`,
+  }),
 ];
