@@ -16,7 +16,7 @@ import {
   type WaveSlider,
 } from "@/lib/distortion-wave-controls";
 import { VOICE_PICKERS, VOICE_SLIDERS, useVoiceStyle } from "@/lib/voice-glow-controls";
-import { METAL_PICKERS, METAL_SLIDERS, useMetalStyle } from "@/lib/metal-controls";
+import { METAL_PICKERS, METAL_SLIDERS, useMetalStyle } from "@/lib/metal-button-controls";
 
 type SidebarControlsProps = {
   item?: ComponentItem;
@@ -801,7 +801,7 @@ export default function SidebarControls({
       {pathname === "/components/poster-sphere" && <PosterSphereControls />}
       {pathname === "/components/distortion-wave" && <DistortionWaveControls />}
       {pathname === "/components/voice-glow" && <VoiceGlowControls />}
-      {pathname === "/components/metal" && <MetalControls />}
+      {pathname === "/components/metal-button" && <MetalControls />}
 
       <ColorSwatches showLabel />
 

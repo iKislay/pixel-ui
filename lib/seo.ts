@@ -37,7 +37,7 @@ const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
     "Swims away from pointers and ripples on click.",
   "/components/ascii-butterflies":
     "Flits away on pointer proximity and scatters on click.",
-  "/components/metal":
+  "/components/metal-button":
     "Hover the metal ring to dent it and watch the halo drift around the edge.",
   "/components/voice-glow":
     "Talk and colored light climbs up from the bottom edge, then sweeps as a beam while processing.",

@@ -285,16 +285,16 @@
       ]
     },
     {
-      "name": "metal",
+      "name": "metal-button",
       "type": "registry:ui",
-      "title": "Metal",
+      "title": "Metal Button",
       "description": "A liquid metal ring with a wandering halo for buttons, icons, text and badges.",
       "registryDependencies": [
         "utils"
       ],
       "files": [
         {
-          "path": "components/ui/metal.tsx",
+          "path": "components/ui/metal-button.tsx",
           "type": "registry:ui"
         },
         {

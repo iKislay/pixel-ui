@@ -70,14 +70,14 @@ export const REGISTRY_REPO = "ikislay/pixel-ui";
 
 export const components: ComponentItem[] = [
   {
-    name: "Metal",
-    href: "/components/metal",
+    name: "Metal Button",
+    href: "/components/metal-button",
     released: "2026-11-20",
     category: "display",
-    registry: "metal",
+    registry: "metal-button",
     description:
       "A liquid metal ring with a wandering halo for buttons, icons, text and badges.",
-    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/metal.tsx`,
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/metal-button.tsx`,
     interaction:
       "A thin ring of liquid metal flows around the button, with a soft halo of light drifting slowly around its edge. Hover the ring and it dents under the cursor; press and the dent goes deeper. Nearby elements and text catch a tint of the halo as it passes them. Text and badges shimmer with the same metal. Honors prefers-reduced-motion: the metal and halo hold still, and only the dent follows the cursor. Without WebGL the plain child renders.",
     props: [
@@ -153,7 +153,7 @@ export const components: ComponentItem[] = [
       {
         name: "useMetalBend(ref)",
         type: "RefObject<HTMLElement>",
-        description: "Pass the ref you gave MetalFx to dent the ring under the cursor.",
+        description: "Pass the ref you gave MetalButton to dent the ring under the cursor.",
       },
       {
         name: "useMetalTextReflection(metalRef, textRef)",
@@ -163,7 +163,7 @@ export const components: ComponentItem[] = [
     ],
     usage: `import { useRef } from "react"
 import { ArrowUp } from "lucide-react"
-import { MetalBadge, MetalFx, MetalText, useMetalBend } from "@/components/ui/metal"
+import { MetalBadge, MetalButton, MetalText, useMetalBend } from "@/components/ui/metal-button"
 
 export function Demo() {
   const ref = useRef<HTMLDivElement>(null)
@@ -171,14 +171,14 @@ export function Demo() {
 
   return (
     <div className="flex items-center gap-6">
-      <MetalFx preset="chromatic">
+      <MetalButton preset="chromatic">
         <button className="rounded-full bg-black px-6 py-3 text-white">Upgrade to Pro</button>
-      </MetalFx>
-      <MetalFx ref={ref} variant="circle" innerShadow>
+      </MetalButton>
+      <MetalButton ref={ref} variant="circle" innerShadow>
         <button aria-label="Send" className="flex size-12 items-center justify-center rounded-full bg-black text-white">
           <ArrowUp />
         </button>
-      </MetalFx>
+      </MetalButton>
       <MetalText font="500 24px/1.2 Inter">Pro</MetalText>
       <MetalBadge>New</MetalBadge>
     </div>

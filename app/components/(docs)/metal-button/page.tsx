@@ -2,7 +2,7 @@ import JsonLd from "@/components/JsonLd";
 import { componentJsonLd, componentPageMetadata } from "@/lib/seo";
 import Demo from "./demo";
 
-const HREF = "/components/metal";
+const HREF = "/components/metal-button";
 
 export const metadata = componentPageMetadata(HREF);
 

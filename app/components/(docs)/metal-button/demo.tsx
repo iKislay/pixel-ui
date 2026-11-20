@@ -2,9 +2,9 @@
 
 import { useRef, type RefObject } from "react";
 import { ArrowUp } from "lucide-react";
-import { MetalBadge, MetalFx, MetalText, useMetalBend, useMetalTextReflection } from "@/components/ui/metal";
+import { MetalBadge, MetalButton, MetalText, useMetalBend, useMetalTextReflection } from "@/components/ui/metal-button";
 import { usePreviewControl } from "@/components/preview/PreviewControls";
-import { useMetalStyle } from "@/lib/metal-controls";
+import { useMetalStyle } from "@/lib/metal-button-controls";
 
 type Preset = "chromatic" | "silver" | "gold";
 
@@ -85,7 +85,7 @@ function Hero({ variant, bend, reflect, ...metal }: HeroProps) {
   return (
     <div className="flex flex-col items-center gap-5">
       <div className="flex items-center gap-6">
-        <MetalFx ref={ref} variant={variant} reflectionTargets={reflect ? [neighbour] : []} {...metal}>
+        <MetalButton ref={ref} variant={variant} reflectionTargets={reflect ? [neighbour] : []} {...metal}>
           {variant === "circle" ? (
             <button
               type="button"
@@ -102,7 +102,7 @@ function Hero({ variant, bend, reflect, ...metal }: HeroProps) {
               Upgrade to Pro
             </button>
           )}
-        </MetalFx>
+        </MetalButton>
         <span ref={neighbour} className="rounded-full bg-muted px-4 py-2 text-sm text-muted-foreground">
           Later
         </span>

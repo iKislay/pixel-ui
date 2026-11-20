@@ -434,7 +434,7 @@ type MetalOptions = {
   paused?: boolean;
 };
 
-type MetalFxProps = ComponentProps<"div"> &
+type MetalButtonProps = ComponentProps<"div"> &
   MetalOptions & {
     variant?: MetalVariant;
     innerShadow?: boolean;
@@ -445,7 +445,7 @@ type MetalFxProps = ComponentProps<"div"> &
 
 const NO_TARGETS: RefObject<HTMLElement | null>[] = [];
 
-function MetalFx({
+function MetalButton({
   preset = "chromatic",
   variant = "button",
   strength = 1,
@@ -459,7 +459,7 @@ function MetalFx({
   children,
   ref,
   ...props
-}: MetalFxProps) {
+}: MetalButtonProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useImperativeHandle(ref, () => rootRef.current as HTMLDivElement, []);
@@ -478,7 +478,7 @@ function MetalFx({
   return (
     <div
       ref={rootRef}
-      data-slot="metal"
+      data-slot="metal-button"
       className={cn("relative isolate inline-flex", variant === "circle" && "rounded-full", className)}
       {...props}
     >
@@ -556,7 +556,7 @@ function MetalBadge({
   ...props
 }: ComponentProps<"span"> & MetalOptions) {
   return (
-    <MetalFx preset={preset} theme={theme} strength={strength} paused={paused} glowGain={0.6}>
+    <MetalButton preset={preset} theme={theme} strength={strength} paused={paused} glowGain={0.6}>
       <span
         data-slot="metal-badge"
         className={cn(
@@ -565,7 +565,7 @@ function MetalBadge({
         )}
         {...props}
       />
-    </MetalFx>
+    </MetalButton>
   );
 }
 
@@ -615,4 +615,4 @@ function useMetalTextReflection(metalRef: RefObject<HTMLElement | null>, textRef
   }, [metalRef, textRef]);
 }
 
-export { MetalFx, MetalText, MetalBadge, useMetalBend, useMetalTextReflection };
+export { MetalButton, MetalText, MetalBadge, useMetalBend, useMetalTextReflection };
