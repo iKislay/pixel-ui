@@ -467,4 +467,60 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("dialog", {
+    name: "Dialog",
+    category: "overlays",
+    description: "A modal window that dims the page and holds focus until it is closed.",
+    interaction:
+      "Open it and the page dims while the window rises gently into place. Tab stays inside it and the page behind cannot be scrolled. Escape, the close button or a click on the dimmed page closes it, and focus returns to where it was. Honors prefers-reduced-motion: the window only fades.",
+    props: [
+      {
+        name: "title",
+        type: "ReactNode",
+        required: true,
+        description: "The heading. It also names the dialog for screen readers.",
+      },
+      {
+        name: "description",
+        type: "ReactNode",
+        description: "A line under the title, read out when the dialog opens.",
+      },
+      {
+        name: "trigger",
+        type: "ReactElement",
+        description: "An element that opens the dialog. Leave it out when you control open yourself.",
+      },
+      {
+        name: "open",
+        type: "boolean",
+        description: "Controls the dialog. Leave it unset to let the dialog manage itself.",
+      },
+      {
+        name: "defaultOpen",
+        type: "boolean",
+        default: "false",
+        description: "The starting state when uncontrolled.",
+      },
+      {
+        name: "onOpenChange",
+        type: "(open: boolean) => void",
+        description: "Called whenever the dialog opens or closes.",
+      },
+      feedbackProp('"open" | "close"'),
+      { name: "className", type: "string", description: "Merged onto the window." },
+    ],
+    usage: `import { Dialog } from "@/components/ui/dialog"
+
+export function Demo() {
+  return (
+    <Dialog
+      title="Invite people"
+      description="They will get an email with a link."
+      trigger={<button type="button">Invite</button>}
+    >
+      <input type="email" placeholder="name@example.com" aria-label="Email" />
+    </Dialog>
+  )
+}`,
+  }),
 ];

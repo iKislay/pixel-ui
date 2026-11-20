@@ -13,6 +13,7 @@ import { Select } from "@/components/ui/select";
 import { Tabs } from "@/components/ui/tabs";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Popover } from "@/components/ui/popover";
+import { Dialog } from "@/components/ui/dialog";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -230,6 +231,29 @@ function PopoverDemo() {
   );
 }
 
+function DialogDemo() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={setOpen}
+      title="Delete this project?"
+      description="Its pages, deploys and preview links go with it. This cannot be undone."
+      trigger={<Button variant="destructive">Delete project</Button>}
+    >
+      <div className="mt-2 flex justify-end gap-2">
+        <Button variant="secondary" onClick={() => setOpen(false)}>
+          Keep it
+        </Button>
+        <Button variant="destructive" onClick={() => setOpen(false)}>
+          Delete
+        </Button>
+      </div>
+    </Dialog>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -242,6 +266,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "tabs": TabsDemo,
   "tooltip": TooltipDemo,
   "popover": PopoverDemo,
+  "dialog": DialogDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {
