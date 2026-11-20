@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type RefObject } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, ChevronDown, Plus } from "lucide-react";
 import { MetalBadge, MetalButton, MetalText, useMetalBend, useMetalTextReflection } from "@/components/ui/metal-button";
 import { usePreviewControl } from "@/components/preview/PreviewControls";
 import { useMetalStyle } from "@/lib/metal-button-controls";
@@ -44,6 +44,15 @@ export default function Demo() {
         glowGain={style.glowGain ?? 1}
         {...options}
       />
+      <PromptBox
+        key={`prompt-${bend}-${reflect}`}
+        bend={bend === "on"}
+        reflect={reflect === "on"}
+        innerShadow={inner === "on"}
+        disableGlow={glow === "off"}
+        glowGain={style.glowGain ?? 1}
+        {...options}
+      />
     </div>
   );
 }
@@ -71,7 +80,7 @@ function Reflection({
   text,
 }: {
   metal: RefObject<HTMLDivElement | null>;
-  text: RefObject<HTMLParagraphElement | null>;
+  text: RefObject<HTMLElement | null>;
 }) {
   useMetalTextReflection(metal, text);
   return null;
@@ -112,6 +121,44 @@ function Hero({ variant, bend, reflect, ...metal }: HeroProps) {
       </p>
       {bend && <Bend target={ref} />}
       {reflect && <Reflection metal={ref} text={caption} />}
+    </div>
+  );
+}
+
+function PromptBox({ bend, reflect, ...metal }: Omit<HeroProps, "variant">) {
+  const ref = useRef<HTMLDivElement>(null);
+  const auto = useRef<HTMLButtonElement>(null);
+  const pill = "flex items-center gap-1.5 rounded-full bg-neutral-800/80 px-4 py-2 text-sm text-neutral-200";
+
+  return (
+    <div className="flex w-full max-w-xl flex-col gap-4 rounded-3xl bg-neutral-900 p-4 text-neutral-200">
+      <textarea
+        rows={1}
+        placeholder="Build anything..."
+        aria-label="Prompt"
+        className="resize-none bg-transparent px-1 text-sm outline-none placeholder:text-neutral-500"
+      />
+      <div className="flex items-center gap-3">
+        <button type="button" aria-label="Attach" className="flex size-10 items-center justify-center rounded-full bg-neutral-800/80">
+          <Plus className="size-5" />
+        </button>
+        <button type="button" className={`${pill} ml-auto`}>
+          Agent <ChevronDown className="size-4" />
+        </button>
+        <button ref={auto} type="button" className={pill}>
+          Auto <ChevronDown className="size-4" />
+        </button>
+        <MetalButton ref={ref} variant="circle" reflectionTargets={reflect ? [auto] : []} {...metal}>
+          <button
+            type="button"
+            aria-label="Send"
+            className="flex size-10 items-center justify-center rounded-full bg-neutral-950 text-neutral-100"
+          >
+            <ArrowUp className="size-5" />
+          </button>
+        </MetalButton>
+      </div>
+      {bend && <Bend target={ref} />}
     </div>
   );
 }
