@@ -109,8 +109,8 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
         transition={spring}
         style={{ borderRadius: 9999 }}
         className={cn(
-          // the equal side columns keep the search bar centered on the navbar
-          "relative z-10 flex w-full max-w-5xl items-center justify-between md:grid md:grid-cols-[1fr_auto_1fr] md:gap-3 md:liquid-glass",
+          // equal 1fr side columns squeezed the links and wrapped the brand once the nav grew to four links
+          "relative z-10 flex w-full max-w-5xl items-center justify-between md:grid md:grid-cols-[auto_1fr_auto] md:gap-3 md:liquid-glass",
           !scrolled && "md:w-auto",
         )}
       >
@@ -126,7 +126,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
           >
             <BrandLogo
               iconClassName="size-7 md:size-5"
-              textClassName="hidden md:inline"
+              textClassName="hidden whitespace-nowrap md:inline"
             />
           </Link>
 
@@ -152,7 +152,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
           layout={animateLayout}
           transition={spring}
           className={cn(
-            "mx-3 min-w-0 flex-1 transition-opacity duration-150 md:mx-0 md:w-60",
+            "mx-3 min-w-0 flex-1 transition-opacity duration-150 md:mx-0 md:w-60 md:justify-self-center",
             menuOpen && "opacity-0 [&_button]:pointer-events-none",
           )}
         >
