@@ -594,4 +594,39 @@ export function Demo() {
   return <Badge tone="success" dot>Live</Badge>
 }`,
   }),
+  primitive("avatar", {
+    name: "Avatar",
+    category: "display",
+    description: "A squircle portrait with initials as a fallback and an optional status dot.",
+    interaction:
+      "The photo fades in once it loads. Until then, or if it fails, the person's initials show on a soft blue tile. A colored dot in the corner shows whether they are online.",
+    props: [
+      {
+        name: "name",
+        type: "string",
+        required: true,
+        description: "The person's name. It gives the initials and the accessible label.",
+      },
+      { name: "src", type: "string", description: "The photo URL." },
+      {
+        name: "size",
+        type: '"sm" | "md" | "lg"',
+        default: '"md"',
+        options: ["sm", "md", "lg"],
+        description: "32, 44 or 64 pixels square.",
+      },
+      {
+        name: "status",
+        type: '"online" | "away" | "offline"',
+        options: ["online", "away", "offline"],
+        description: "Shows a status dot and adds it to the label.",
+      },
+      classNameProp,
+    ],
+    usage: `import { Avatar } from "@/components/ui/avatar"
+
+export function Demo() {
+  return <Avatar name="Mira Okafor" src="/mira.jpg" status="online" />
+}`,
+  }),
 ];

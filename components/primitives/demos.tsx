@@ -16,6 +16,7 @@ import { Popover } from "@/components/ui/popover";
 import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -291,6 +292,16 @@ function BadgeDemo() {
   );
 }
 
+function AvatarDemo() {
+  return (
+    <div className="flex items-end gap-4">
+      <Avatar name="Mira Okafor" size="lg" status="online" />
+      <Avatar name="Theo Lindqvist" status="away" />
+      <Avatar name="Ana Ruiz" size="sm" status="offline" />
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -306,6 +317,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "dialog": DialogDemo,
   "dropdown-menu": DropdownMenuDemo,
   "badge": BadgeDemo,
+  "avatar": AvatarDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

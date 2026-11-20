@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "avatar",
+  "title": "Avatar",
+  "description": "A squircle portrait with initials as a fallback and an optional status dot.",
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "components/ui/avatar.tsx",
+      "content": "\"use client\";\n\nimport { useState, type ComponentProps } from \"react\";\nimport { cn } from \"@/lib/utils\";\n\nconst SIZES = {\n  sm: \"size-8 text-[11px]\",\n  md: \"size-11 text-sm\",\n  lg: \"size-16 text-lg\",\n};\n\nconst STATUS = {\n  online: \"bg-emerald-500\",\n  away: \"bg-amber-400\",\n  offline: \"bg-foreground/30\",\n};\n\nexport type AvatarProps = ComponentProps<\"span\"> & {\n  src?: string;\n  name: string;\n  size?: keyof typeof SIZES;\n  status?: keyof typeof STATUS;\n};\n\nconst initials = (name: string) =>\n  name\n    .split(/\\s+/)\n    .filter(Boolean)\n    .slice(0, 2)\n    .map((word) => word[0]?.toUpperCase())\n    .join(\"\");\n\nexport function Avatar({ src, name, size = \"md\", status, className, ...props }: AvatarProps) {\n  const [state, setState] = useState<\"loading\" | \"loaded\" | \"error\">(\"loading\");\n\n  return (\n    <span data-slot=\"avatar\" className={cn(\"relative inline-flex shrink-0\", SIZES[size], className)} {...props}>\n      <span\n        role=\"img\"\n        aria-label={status ? `${name}, ${status}` : name}\n        className=\"relative flex size-full items-center justify-center overflow-hidden rounded-[38%] bg-brand/15 font-semibold text-brand [corner-shape:squircle]\"\n      >\n        {state !== \"loaded\" && <span aria-hidden>{initials(name)}</span>}\n        {src && state !== \"error\" && (\n          // eslint-disable-next-line @next/next/no-img-element\n          <img\n            src={src}\n            alt=\"\"\n            // a cached image can finish before hydration and never fire onLoad\n            ref={(img) => {\n              if (img?.complete && img.naturalWidth) setState(\"loaded\");\n            }}\n            onLoad={() => setState(\"loaded\")}\n            onError={() => setState(\"error\")}\n            className={cn(\n              \"absolute inset-0 size-full object-cover transition-opacity duration-300 motion-reduce:transition-none\",\n              state === \"loaded\" ? \"opacity-100\" : \"opacity-0\",\n            )}\n          />\n        )}\n      </span>\n      {status && (\n        <span\n          aria-hidden\n          className={cn(\"absolute -bottom-0.5 -right-0.5 size-[30%] rounded-full ring-2 ring-background\", STATUS[status])}\n        />\n      )}\n    </span>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}
