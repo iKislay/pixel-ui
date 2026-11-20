@@ -5,6 +5,7 @@ import { ArrowRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -69,10 +70,39 @@ function TextareaDemo() {
   );
 }
 
+function CheckboxDemo() {
+  const [items, setItems] = useState([true, false, false]);
+  const labels = ["Squircle corners", "Spring motion", "Dark mode"];
+  const all = items.every(Boolean);
+  const some = items.some(Boolean);
+
+  return (
+    <div className="flex flex-col gap-3 text-sm font-medium">
+      <label className="flex cursor-pointer items-center gap-3">
+        <Checkbox
+          checked={all ? true : some ? "indeterminate" : false}
+          onCheckedChange={(next) => setItems(items.map(() => next))}
+        />
+        Everything
+      </label>
+      {labels.map((label, index) => (
+        <label key={label} className="ml-8 flex cursor-pointer items-center gap-3 text-foreground/70">
+          <Checkbox
+            checked={items[index]}
+            onCheckedChange={(next) => setItems(items.map((value, i) => (i === index ? next : value)))}
+          />
+          {label}
+        </label>
+      ))}
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
   "textarea": TextareaDemo,
+  "checkbox": CheckboxDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

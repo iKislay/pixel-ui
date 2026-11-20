@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "checkbox",
+  "title": "Checkbox",
+  "description": "A squircle checkbox whose tick draws itself in.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "components/ui/checkbox.tsx",
+      "content": "\"use client\";\n\nimport { useState, type ComponentProps } from \"react\";\nimport { motion, useReducedMotion } from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\nexport type CheckboxFeedback = \"toggle\";\nexport type CheckedState = boolean | \"indeterminate\";\n\nexport type CheckboxProps = Omit<ComponentProps<\"button\">, \"onChange\" | \"value\"> & {\n  checked?: CheckedState;\n  defaultChecked?: CheckedState;\n  onCheckedChange?: (checked: boolean) => void;\n  onFeedback?: (event: CheckboxFeedback) => void;\n};\n\nexport function Checkbox({\n  checked,\n  defaultChecked = false,\n  onCheckedChange,\n  onFeedback,\n  onClick,\n  className,\n  ...props\n}: CheckboxProps) {\n  const [inner, setInner] = useState(defaultChecked);\n  const state = checked ?? inner;\n  const on = state !== false;\n  const reduce = useReducedMotion();\n  const draw = { duration: reduce ? 0 : 0.22, ease: \"easeOut\" } as const;\n\n  return (\n    <button\n      data-slot=\"checkbox\"\n      type=\"button\"\n      role=\"checkbox\"\n      aria-checked={state === \"indeterminate\" ? \"mixed\" : state}\n      data-state={state === \"indeterminate\" ? \"indeterminate\" : on ? \"checked\" : \"unchecked\"}\n      onClick={(event) => {\n        onClick?.(event);\n        if (event.defaultPrevented) return;\n        const next = state !== true;\n        setInner(next);\n        onCheckedChange?.(next);\n        onFeedback?.(\"toggle\");\n      }}\n      className={cn(\n        \"peer inline-flex size-[22px] shrink-0 cursor-pointer items-center justify-center rounded-[8px] text-white outline-hidden ring-1 ring-inset ring-foreground/15 transition-[background-color,box-shadow,transform] duration-150 [corner-shape:squircle] hover:ring-foreground/30 active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none motion-reduce:active:scale-100\",\n        on && \"btn-primary ring-0\",\n        className,\n      )}\n      {...props}\n    >\n      <svg viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" strokeWidth={2.4} strokeLinecap=\"round\" strokeLinejoin=\"round\" className=\"size-3.5\" aria-hidden>\n        {state === \"indeterminate\" ? (\n          <motion.path d=\"M4 8h8\" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={draw} />\n        ) : (\n          <motion.path d=\"M3.5 8.5 6.5 11.5 12.5 4.5\" initial={false} animate={{ pathLength: on ? 1 : 0, opacity: on ? 1 : 0 }} transition={draw} />\n        )}\n      </svg>\n    </button>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

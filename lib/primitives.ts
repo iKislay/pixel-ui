@@ -111,4 +111,41 @@ export function Demo() {
   return <Textarea placeholder="Leave a note" aria-label="Note" />
 }`,
   }),
+  primitive("checkbox", {
+    name: "Checkbox",
+    category: "inputs",
+    description: "A squircle checkbox whose tick draws itself in.",
+    interaction:
+      "Click or press Space and the box fills blue while the tick draws in stroke by stroke. A half-checked box shows a dash. Wrap it in a label to make the text clickable too. Honors prefers-reduced-motion: the tick appears at once.",
+    props: [
+      {
+        name: "checked",
+        type: 'boolean | "indeterminate"',
+        description: "Controls the state. Leave it unset to let the checkbox manage itself.",
+      },
+      {
+        name: "defaultChecked",
+        type: 'boolean | "indeterminate"',
+        default: "false",
+        description: "The starting state when uncontrolled.",
+      },
+      {
+        name: "onCheckedChange",
+        type: "(checked: boolean) => void",
+        description: "Called with the new state. Indeterminate always turns checked.",
+      },
+      feedbackProp('"toggle"'),
+      classNameProp,
+    ],
+    usage: `import { Checkbox } from "@/components/ui/checkbox"
+
+export function Demo() {
+  return (
+    <label className="flex items-center gap-3">
+      <Checkbox defaultChecked />
+      Email me about new releases
+    </label>
+  )
+}`,
+  }),
 ];
