@@ -1,6 +1,8 @@
 "use client";
 
 import type { ComponentType } from "react";
+
+type DemoProps = { compact?: boolean };
 import { formatCompact } from "@/lib/chart";
 import { AreaChart } from "@/components/ui/area-chart";
 import { BarChart } from "@/components/ui/bar-chart";
@@ -18,9 +20,10 @@ const visitors = [1840, 2120, 1980, 2640, 3010, 2870, 3320, 3580, 3410, 3960, 42
 const returning = [920, 1010, 1140, 1180, 1360, 1490, 1520, 1710, 1840, 1900, 2150, 2380];
 const traffic = months.map((month, i) => ({ month, visitors: visitors[i], returning: returning[i] }));
 
-function LineChartDemo() {
+function LineChartDemo({ compact }: DemoProps) {
   return (
     <LineChart
+      height={compact ? 170 : undefined}
       label="Visitors by month"
       data={traffic}
       index="month"
@@ -35,9 +38,10 @@ function LineChartDemo() {
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const takings = [4200, 5100, 4800, 6300, 7900, 9400, 8100];
 
-function AreaChartDemo() {
+function AreaChartDemo({ compact }: DemoProps) {
   return (
     <AreaChart
+      height={compact ? 170 : undefined}
       label="Revenue by day"
       data={days.map((day, i) => ({ day, revenue: takings[i] }))}
       index="day"
@@ -54,9 +58,10 @@ const signups = [
   { quarter: "Q4", web: 520, mobile: 430 },
 ];
 
-function BarChartDemo() {
+function BarChartDemo({ compact }: DemoProps) {
   return (
     <BarChart
+      height={compact ? 170 : undefined}
       label="Signups by quarter"
       data={signups}
       index="quarter"
@@ -75,9 +80,10 @@ const plans = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map((month, i) => ({
   team: [12, 18, 25, 31, 36, 47][i],
 }));
 
-function StackedBarChartDemo() {
+function StackedBarChartDemo({ compact }: DemoProps) {
   return (
     <StackedBarChart
+      height={compact ? 170 : undefined}
       label="Accounts by plan"
       data={plans}
       index="month"
@@ -96,10 +102,10 @@ const trends = [
   { name: "Refunds", value: "37", data: [9, 7, 8, 6, 7, 5, 6, 4, 5, 4, 3, 4], color: "var(--chart-4)" },
 ];
 
-function SparklineDemo() {
+function SparklineDemo({ compact }: DemoProps) {
   return (
     <ul className="mx-auto flex w-full max-w-md flex-col divide-y divide-foreground/[0.06]">
-      {trends.map((trend) => (
+      {trends.slice(0, compact ? 2 : 3).map((trend) => (
         <li key={trend.name} className="flex items-center gap-6 py-4">
           <div className="flex-1">
             <p className="text-sm font-semibold text-muted-foreground">{trend.name}</p>
@@ -120,15 +126,23 @@ const sources = [
   { label: "Email", value: 620 },
 ];
 
-function DonutChartDemo() {
-  return <DonutChart label="Traffic by source" data={sources} totalLabel="Visits" />;
+function DonutChartDemo({ compact }: DemoProps) {
+  return (
+    <DonutChart
+      label="Traffic by source"
+      data={sources}
+      totalLabel="Visits"
+      className={compact ? "flex-nowrap gap-x-6 [&_ul]:min-w-0 [&_ul]:text-xs" : undefined}
+    />
+  );
 }
 
-function RadialProgressDemo() {
+function RadialProgressDemo({ compact }: DemoProps) {
+  const size = compact ? "w-32" : "w-40";
   return (
-    <div className="flex flex-wrap items-center justify-center gap-8">
-      <RadialProgress className="w-40" label="Storage used" value={72} caption="Storage" />
-      <RadialProgress className="w-40" label="Weekly goal" value={18} max={25} format={(n) => `${n}/25`} caption="Workouts" color="var(--chart-2)" />
+    <div className="flex items-center justify-center gap-8">
+      <RadialProgress className={size} label="Storage used" value={72} caption="Storage" />
+      <RadialProgress className={size} label="Weekly goal" value={18} max={25} format={(n) => `${n}/25`} caption="Workouts" color="var(--chart-2)" />
     </div>
   );
 }
@@ -141,9 +155,10 @@ const cloud = (seed: number, count: number, slope: number) =>
     return { x: +load.toFixed(2), y: Math.round(Math.max(8, 88 - load * slope + (noise - 0.5) * 26)) };
   });
 
-function ScatterChartDemo() {
+function ScatterChartDemo({ compact }: DemoProps) {
   return (
     <ScatterChart
+      height={compact ? 170 : undefined}
       label="Load time against conversion"
       xLabel="Load time (s)"
       yLabel="Conversion"
@@ -170,9 +185,9 @@ function HeatmapDemo() {
   return <Heatmap label="Sessions by day and hour" rows={days} columns={hours} data={activity} />;
 }
 
-function StatTileDemo() {
+function StatTileDemo({ compact }: DemoProps) {
   return (
-    <div className="grid w-full gap-3 sm:grid-cols-2">
+    <div className={compact ? "grid w-full max-w-64 [&>:nth-child(2)]:hidden" : "grid w-full gap-3 sm:grid-cols-2"}>
       <StatTile
         label="Revenue"
         value={48210}
@@ -197,7 +212,7 @@ function StatTileDemo() {
   );
 }
 
-export const DEMOS: Record<string, ComponentType> = {
+export const DEMOS: Record<string, ComponentType<DemoProps>> = {
   "stat-tile": StatTileDemo,
   heatmap: HeatmapDemo,
   "scatter-chart": ScatterChartDemo,
@@ -210,7 +225,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "bar-chart": BarChartDemo,
 };
 
-export default function ChartDemo({ slug }: { slug: string }) {
+export default function ChartDemo({ slug, compact }: { slug: string } & DemoProps) {
   const Demo = DEMOS[slug];
-  return Demo ? <Demo /> : null;
+  return Demo ? <Demo compact={compact} /> : null;
 }

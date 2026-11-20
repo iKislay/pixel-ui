@@ -1,18 +1,19 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import PrimitiveDemo from "@/components/primitives/demos";
 import type { ComponentItem } from "@/lib/components";
 import { feedback } from "@/lib/feedback";
 
-export default function PrimitiveCard({ item }: { item: ComponentItem }) {
+export default function PrimitiveCard({ item, preview }: { item: ComponentItem; preview?: ReactNode }) {
   return (
     <div
       className="group relative flex aspect-4/3 w-full items-center justify-center overflow-hidden rounded-[44px] bg-card isolate sm:rounded-[56px] lg:rounded-[64px]"
       style={{ cornerShape: "squircle" } as React.CSSProperties}
     >
       <div inert className="pointer-events-none flex w-full scale-[0.85] items-center justify-center px-8 select-none">
-        {item.registry && <PrimitiveDemo slug={item.registry} />}
+        {preview ?? (item.registry && <PrimitiveDemo slug={item.registry} />)}
       </div>
 
       <Link
