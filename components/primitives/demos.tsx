@@ -163,21 +163,19 @@ function SliderDemo() {
 
 function SelectDemo() {
   return (
-    <div className="flex h-72 items-start pt-6">
-      <Select
-        aria-label="Time zone"
-        placeholder="Time zone"
-        defaultValue="lisbon"
-        options={[
-          { value: "honolulu", label: "Honolulu" },
-          { value: "denver", label: "Denver" },
-          { value: "lisbon", label: "Lisbon" },
-          { value: "nairobi", label: "Nairobi" },
-          { value: "kathmandu", label: "Kathmandu" },
-          { value: "auckland", label: "Auckland", disabled: true },
-        ]}
-      />
-    </div>
+    <Select
+      aria-label="Time zone"
+      placeholder="Time zone"
+      defaultValue="lisbon"
+      options={[
+        { value: "honolulu", label: "Honolulu" },
+        { value: "denver", label: "Denver" },
+        { value: "lisbon", label: "Lisbon" },
+        { value: "nairobi", label: "Nairobi" },
+        { value: "kathmandu", label: "Kathmandu" },
+        { value: "auckland", label: "Auckland", disabled: true },
+      ]}
+    />
   );
 }
 
@@ -224,17 +222,15 @@ function TooltipDemo() {
 
 function PopoverDemo() {
   return (
-    <div className="flex h-72 items-start pt-8">
-      <Popover aria-label="Rename" align="start" trigger={<Button variant="secondary">Rename file</Button>}>
-        <form onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-3">
-          <p className="font-semibold">Rename</p>
-          <Input defaultValue="moodboard-final-v2.fig" aria-label="File name" />
-          <Button size="sm" type="submit" className="self-end">
-            Save
-          </Button>
-        </form>
-      </Popover>
-    </div>
+    <Popover aria-label="Rename" align="start" trigger={<Button variant="secondary">Rename file</Button>}>
+      <form onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-3">
+        <p className="font-semibold">Rename</p>
+        <Input defaultValue="moodboard-final-v2.fig" aria-label="File name" />
+        <Button size="sm" type="submit" className="self-end">
+          Save
+        </Button>
+      </form>
+    </Popover>
   );
 }
 
@@ -263,22 +259,20 @@ function DialogDemo() {
 
 function DropdownMenuDemo() {
   return (
-    <div className="flex h-80 items-start pt-8">
-      <DropdownMenu
-        trigger={
-          <Button variant="secondary">
-            Actions <ChevronDown />
-          </Button>
-        }
-        items={[
-          { label: "Duplicate", icon: <Copy />, shortcut: "⌘D" },
-          { label: "Share", icon: <Share />, shortcut: "⌘S" },
-          { label: "Archive", icon: <Archive />, disabled: true },
-          "separator",
-          { label: "Delete", icon: <Trash2 />, destructive: true },
-        ]}
-      />
-    </div>
+    <DropdownMenu
+      trigger={
+        <Button variant="secondary">
+          Actions <ChevronDown />
+        </Button>
+      }
+      items={[
+        { label: "Duplicate", icon: <Copy />, shortcut: "⌘D" },
+        { label: "Share", icon: <Share />, shortcut: "⌘S" },
+        { label: "Archive", icon: <Archive />, disabled: true },
+        "separator",
+        { label: "Delete", icon: <Trash2 />, destructive: true },
+      ]}
+    />
   );
 }
 
