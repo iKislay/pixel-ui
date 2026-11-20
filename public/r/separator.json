@@ -2,14 +2,17 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "separator",
   "title": "Separator",
-  "description": "A hairline that divides content, across or down.",
+  "description": "A hairline that draws itself in, with an optional label in the middle.",
+  "dependencies": [
+    "motion"
+  ],
   "registryDependencies": [
     "utils"
   ],
   "files": [
     {
       "path": "components/ui/separator.tsx",
-      "content": "import type { ComponentProps } from \"react\";\nimport { cn } from \"@/lib/utils\";\n\nexport type SeparatorProps = ComponentProps<\"div\"> & {\n  orientation?: \"horizontal\" | \"vertical\";\n  decorative?: boolean;\n};\n\nexport function Separator({ orientation = \"horizontal\", decorative = true, className, ...props }: SeparatorProps) {\n  return (\n    <div\n      data-slot=\"separator\"\n      role={decorative ? \"none\" : \"separator\"}\n      aria-orientation={decorative || orientation === \"horizontal\" ? undefined : orientation}\n      className={cn(\n        \"shrink-0 rounded-full bg-foreground/[0.08]\",\n        orientation === \"horizontal\" ? \"h-px w-full\" : \"w-px self-stretch\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n",
+      "content": "\"use client\";\n\nimport type { ComponentProps, ReactNode } from \"react\";\nimport { motion, useReducedMotion } from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\nexport type SeparatorProps = ComponentProps<\"div\"> & {\n  orientation?: \"horizontal\" | \"vertical\";\n  decorative?: boolean;\n  label?: ReactNode;\n};\n\nexport function Separator({ orientation = \"horizontal\", decorative = true, label, className, ...props }: SeparatorProps) {\n  const reduce = useReducedMotion();\n  const horizontal = orientation === \"horizontal\";\n  const line = (origin: string) => (\n    <motion.span\n      aria-hidden\n      initial={reduce ? false : horizontal ? { scaleX: 0 } : { scaleY: 0 }}\n      whileInView={horizontal ? { scaleX: 1 } : { scaleY: 1 }}\n      viewport={{ once: true }}\n      transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}\n      style={{ transformOrigin: origin }}\n      className={cn(\"block flex-1 rounded-full bg-foreground/[0.08]\", horizontal ? \"h-px\" : \"w-px\")}\n    />\n  );\n\n  return (\n    <div\n      data-slot=\"separator\"\n      role={decorative ? \"none\" : \"separator\"}\n      aria-orientation={decorative || horizontal ? undefined : orientation}\n      className={cn(\n        \"flex shrink-0 items-center\",\n        horizontal ? \"w-full gap-3\" : \"flex-col self-stretch gap-2\",\n        className,\n      )}\n      {...props}\n    >\n      {label ? (\n        <>\n          {line(horizontal ? \"right\" : \"bottom\")}\n          <span className=\"text-xs font-medium text-foreground/40\">{label}</span>\n          {line(horizontal ? \"left\" : \"top\")}\n        </>\n      ) : (\n        line(\"center\")\n      )}\n    </div>\n  );\n}\n",
       "type": "registry:ui"
     }
   ],

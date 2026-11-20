@@ -597,7 +597,10 @@
       "name": "separator",
       "type": "registry:ui",
       "title": "Separator",
-      "description": "A hairline that divides content, across or down.",
+      "description": "A hairline that draws itself in, with an optional label in the middle.",
+      "dependencies": [
+        "motion"
+      ],
       "registryDependencies": [
         "utils"
       ],
