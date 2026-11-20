@@ -4,7 +4,7 @@ import { useId } from "react";
 import { linePath, smoothPath, type Point } from "@/lib/chart";
 import { CartesianChart, type CartesianChartProps } from "@/components/ui/chart";
 
-export type AreaChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare"> & {
+export type AreaChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero"> & {
   curve?: "smooth" | "linear";
 };
 
@@ -13,7 +13,7 @@ export function AreaChart({ curve = "smooth", ...props }: AreaChartProps) {
   const draw = curve === "smooth" ? smoothPath : linePath;
 
   return (
-    <CartesianChart slot="area-chart" {...props}>
+    <CartesianChart slot="area-chart" zero {...props}>
       {({ data, series, x, y, floor, active, progress }) =>
         series.map((s, index) => {
           const points = data.map((d, i): Point => [x(i), y(Number(d[s.key]) || 0)]);

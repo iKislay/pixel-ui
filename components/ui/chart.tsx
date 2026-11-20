@@ -186,6 +186,7 @@ export type CartesianChartProps = Omit<ComponentProps<"figure">, "children"> & {
   height?: number;
   format?: Format;
   stacked?: boolean;
+  zero?: boolean;
   bars?: boolean;
   bare?: boolean;
   slot: string;
@@ -203,6 +204,7 @@ export function CartesianChart({
   height = 240,
   format = formatCompact,
   stacked = false,
+  zero = false,
   bars = false,
   bare = false,
   slot,
@@ -221,7 +223,7 @@ export function CartesianChart({
     stacked ? series.reduce((sum, s) => sum + value(row, s.key), 0) : Math.max(...series.map((s) => value(row, s.key))),
   );
   const lows = data.map((row) => Math.min(...series.map((s) => value(row, s.key))));
-  const low = bars || stacked ? Math.min(0, ...lows) : Math.min(...lows);
+  const low = bars || stacked || zero ? Math.min(0, ...lows) : Math.min(...lows);
   const ticks = niceTicks(low, Math.max(...totals), bare ? 1 : 4);
   const domain: [number, number] = bare ? [Math.min(...lows), Math.max(...totals)] : [ticks[0], ticks.at(-1)!];
 
@@ -230,7 +232,8 @@ export function CartesianChart({
   const band = plotWidth / Math.max(data.length, 1);
   const x = (i: number) => margin.left + (bars ? band * (i + 0.5) : data.length > 1 ? (plotWidth * i) / (data.length - 1) : plotWidth / 2);
   const y = scaleLinear(domain, [margin.top + plotHeight, margin.top]);
-  const every = Math.ceil(data.length / Math.max(Math.floor(plotWidth / 64), 1));
+  // keep about 48px between x labels
+  const every = Math.max(Math.ceil(48 / (bars ? band : plotWidth / Math.max(data.length - 1, 1))), 1);
 
   const pick = (clientX: number) => {
     const box = ref.current?.getBoundingClientRect();

@@ -3,7 +3,7 @@
 import { barPath } from "@/lib/chart";
 import { CartesianChart, type CartesianChartProps } from "@/components/ui/chart";
 
-export type BarChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare"> & {
+export type BarChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero"> & {
   radius?: number;
 };
 

@@ -3,7 +3,7 @@
 import { linePath, smoothPath, type Point } from "@/lib/chart";
 import { CartesianChart, type CartesianChartProps } from "@/components/ui/chart";
 
-export type LineChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare"> & {
+export type LineChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero"> & {
   curve?: "smooth" | "linear";
 };
 
