@@ -300,9 +300,9 @@ export function Demo() {
   primitive("select", {
     name: "Select",
     category: "inputs",
-    description: "A dropdown list for picking one value.",
+    description: "A select whose field grows open into its own list.",
     interaction:
-      "Click the field and a soft list springs open below it, with the current pick ticked. Use the arrow keys, Home and End to move, a letter to jump, and Enter to pick. Escape or a click outside closes it. Honors prefers-reduced-motion: the list fades instead of springing.",
+      "Click the field and it grows downward into a soft panel, the options falling in one after another with the current pick ticked. A highlight glides to whatever you point at or reach with the arrow keys; Home, End and a letter jump, and Enter picks. The field then folds back up and the new value rolls in. Escape or a click outside closes it. Honors prefers-reduced-motion: it opens and closes without movement.",
     props: [
       {
         name: "options",

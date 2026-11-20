@@ -435,7 +435,7 @@
       "name": "select",
       "type": "registry:ui",
       "title": "Select",
-      "description": "A dropdown list for picking one value.",
+      "description": "A select whose field grows open into its own list.",
       "dependencies": [
         "motion",
         "lucide-react"

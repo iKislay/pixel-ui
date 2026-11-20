@@ -110,68 +110,104 @@ export function Select({
     }
   };
 
-  return (
-    <div ref={root} data-slot="select" className={cn("relative inline-block w-56", className)}>
-      <button
-        ref={trigger}
-        type="button"
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={open ? `${id}-list` : undefined}
-        onClick={() => (open ? hide() : show())}
-        onKeyDown={(event) => {
-          if (["ArrowDown", "ArrowUp"].includes(event.key)) {
-            event.preventDefault();
-            show();
-          }
-        }}
-        {...aria}
-        className="flex h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-[18px] bg-foreground/[0.05] px-4 text-left text-sm font-medium outline-hidden ring-1 ring-inset ring-foreground/[0.06] transition-colors duration-150 [corner-shape:squircle] hover:bg-foreground/[0.08] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none"
-      >
-        <span className={cn("truncate", !current && "text-foreground/40")}>{current?.label ?? placeholder}</span>
-        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: reduce ? 0 : 0.2 }} className="text-foreground/45">
-          <ChevronDown className="size-4" />
-        </motion.span>
-      </button>
+  const spring = reduce ? { duration: 0 } : { type: "spring" as const, stiffness: 460, damping: 36 };
 
-      <AnimatePresence>
-        {open && (
-          <motion.ul
-            ref={list}
-            id={`${id}-list`}
-            role="listbox"
-            tabIndex={-1}
-            aria-activedescendant={`${id}-${active}`}
-            onKeyDown={onListKey}
-            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: -4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: -4 }}
-            transition={{ type: "spring", stiffness: 520, damping: 34 }}
-            className="absolute left-0 top-full z-50 mt-2 max-h-72 w-full origin-top overflow-auto rounded-[22px] bg-popover p-1.5 text-popover-foreground shadow-[0_12px_40px_-8px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.05)] outline-none [corner-shape:squircle] dark:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.08)]"
-          >
-            {options.map((option, index) => (
-              <li
-                key={option.value}
-                id={`${id}-${index}`}
-                role="option"
-                aria-selected={option.value === selected}
-                aria-disabled={option.disabled || undefined}
-                onPointerMove={() => !option.disabled && setActive(index)}
-                onClick={() => pick(option)}
-                className={cn(
-                  "flex cursor-pointer items-center justify-between gap-3 rounded-[14px] px-3 py-2 text-sm [corner-shape:squircle]",
-                  index === active && "bg-foreground/[0.06]",
-                  option.disabled && "cursor-not-allowed opacity-40",
-                )}
-              >
-                {option.label}
-                {option.value === selected && <Check className="size-4 text-brand" aria-hidden />}
-              </li>
-            ))}
-          </motion.ul>
+  return (
+    <div ref={root} data-slot="select" className={cn("relative h-12 w-60", className)}>
+      <div
+        className={cn(
+          "absolute inset-x-0 top-0 overflow-hidden rounded-[20px] transition-[background-color,box-shadow] duration-200 [corner-shape:squircle] motion-reduce:transition-none",
+          open
+            ? "z-50 bg-popover text-popover-foreground shadow-[0_18px_50px_-12px_rgba(0,0,0,0.3),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_18px_50px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)]"
+            : "bg-foreground/[0.05] ring-1 ring-inset ring-foreground/[0.06] hover:bg-foreground/[0.08]",
         )}
-      </AnimatePresence>
+      >
+        <button
+          ref={trigger}
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={open ? `${id}-list` : undefined}
+          onClick={() => (open ? hide() : show())}
+          onKeyDown={(event) => {
+            if (["ArrowDown", "ArrowUp"].includes(event.key)) {
+              event.preventDefault();
+              show();
+            }
+          }}
+          {...aria}
+          className="flex h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-[20px] px-4 text-left text-sm font-medium outline-hidden [corner-shape:squircle] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-45"
+        >
+          <span className="relative flex-1 overflow-hidden">
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.span
+                key={selected ?? "placeholder"}
+                initial={{ y: reduce ? 0 : "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: reduce ? 0 : "-100%", opacity: 0 }}
+                transition={spring}
+                className={cn("block truncate", !current && "text-foreground/40")}
+              >
+                {current?.label ?? placeholder}
+              </motion.span>
+            </AnimatePresence>
+          </span>
+          <motion.span animate={{ rotate: open ? 180 : 0 }} transition={spring} className="text-foreground/45">
+            <ChevronDown className="size-4" />
+          </motion.span>
+        </button>
+
+        <AnimatePresence initial={false}>
+          {open && (
+            <motion.div
+              initial={{ height: 0 }}
+              animate={{ height: "auto" }}
+              exit={{ height: 0 }}
+              transition={spring}
+            >
+              <ul
+                ref={list}
+                id={`${id}-list`}
+                role="listbox"
+                tabIndex={-1}
+                aria-activedescendant={`${id}-${active}`}
+                onKeyDown={onListKey}
+                className="max-h-64 overflow-y-auto border-t border-foreground/[0.06] p-1.5 outline-none"
+              >
+                {options.map((option, index) => (
+                  <motion.li
+                    key={option.value}
+                    id={`${id}-${index}`}
+                    role="option"
+                    aria-selected={option.value === selected}
+                    aria-disabled={option.disabled || undefined}
+                    initial={{ opacity: 0, y: reduce ? 0 : -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: reduce ? 0 : index * 0.025, duration: 0.2 }}
+                    onPointerMove={() => !option.disabled && setActive(index)}
+                    onClick={() => pick(option)}
+                    className={cn(
+                      "relative flex cursor-pointer items-center justify-between gap-3 rounded-[14px] px-3 py-2 text-sm [corner-shape:squircle]",
+                      option.disabled && "cursor-not-allowed opacity-40",
+                    )}
+                  >
+                    {index === active && (
+                      <motion.span
+                        layoutId={`${id}-highlight`}
+                        transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 600, damping: 40 }}
+                        className="absolute inset-0 rounded-[14px] bg-foreground/[0.06] [corner-shape:squircle]"
+                      />
+                    )}
+                    <span className="relative">{option.label}</span>
+                    {option.value === selected && <Check className="relative size-4 text-brand" aria-hidden />}
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
