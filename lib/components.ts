@@ -70,6 +70,176 @@ export const REGISTRY_REPO = "ikislay/pixel-ui";
 
 export const components: ComponentItem[] = [
   {
+    name: "Voice Glow",
+    href: "/components/voice-glow",
+    released: "2026-11-20",
+    category: "ai",
+    pro: true,
+    registry: "voice-glow",
+    description:
+      "A colorful glow that rises from the bottom edge of any element and blooms with a voice.",
+    interaction:
+      "Talk and soft lobes of color climb up from the bottom edge, taller in the middle, then sink back when you stop. While the reply is being worked out, the lobes gather into one beam that sweeps side to side. The glow follows the rounded corners of whatever it wraps. Honors prefers-reduced-motion: the lobes stop drifting and the beam holds still in the middle.",
+    usage: `import { useRef } from "react";
+import { VoiceGlow, useMicrophone } from "@/components/ui/voice-glow";
+
+export default function Demo({ thinking }: { thinking: boolean }) {
+  const mic = useMicrophone();
+
+  return (
+    <>
+      <VoiceGlow stream={mic.stream} processing={thinking} className="w-[350px]">
+        <input className="h-14 w-full rounded-2xl border px-4" placeholder="Ask anything" />
+      </VoiceGlow>
+      <button onClick={mic.state === "live" ? mic.stop : mic.start}>
+        {mic.state === "live" ? "Stop" : "Listen"}
+      </button>
+    </>
+  );
+}
+
+// without a mic, drive it yourself with 0 to 1, as a number or a per-frame getter
+export function Driven() {
+  const meter = useRef(0);
+  return (
+    <VoiceGlow level={() => meter.current}>
+      <div className="h-40 rounded-3xl border" />
+    </VoiceGlow>
+  );
+}`,
+    props: [
+      {
+        name: "type",
+        type: '"default" | "pill" | "mobile"',
+        default: '"default"',
+        options: ["default", "pill", "mobile"],
+        description: "Geometry preset: a chat input, a small recording pill, or the bottom of a phone screen. Sets the default reach and blur.",
+      },
+      {
+        name: "stream",
+        type: "MediaStream | null",
+        description: "Audio to react to, usually from useMicrophone. Wins over level.",
+      },
+      {
+        name: "level",
+        type: "number | (() => number)",
+        description: "Input from 0 to 1 when there is no stream. Pass a function to have it read every frame.",
+      },
+      {
+        name: "processing",
+        type: "boolean",
+        default: "false",
+        description: "Gathers the glow into one beam that sweeps side to side.",
+      },
+      {
+        name: "colorVariant",
+        type: '"colorful" | "mono" | "ocean" | "sunset" | "forest" | "candy" | "ice" | "gold"',
+        default: '"colorful"',
+        options: ["colorful", "mono", "ocean", "sunset", "forest", "candy", "ice", "gold"],
+        description: "Named palette for the lobes.",
+      },
+      {
+        name: "colors",
+        type: "string[]",
+        description: "Your own lobe colors, up to 7. Overrides colorVariant.",
+      },
+      {
+        name: "bandColors",
+        type: "{ core?: string; above?: string; mid?: string; below?: string }",
+        description: "Extra bands: core is a bright line on the edge, mid a band just above it, above a haze higher up, and below a spill under the element. Each shows only when set.",
+      },
+      {
+        name: "sensitivity",
+        type: "number",
+        default: "1.5",
+        description: "Gain applied to the input before the threshold.",
+      },
+      {
+        name: "threshold",
+        type: "number",
+        default: "0.05",
+        description: "Input below this, from 0 to 1, is treated as silence.",
+      },
+      {
+        name: "attack",
+        type: "number",
+        default: "0.06",
+        description: "Seconds the glow takes to rise toward a louder input.",
+      },
+      {
+        name: "release",
+        type: "number",
+        default: "0.35",
+        description: "Seconds the glow takes to fall back after the input drops.",
+      },
+      {
+        name: "reach",
+        type: "number",
+        description: "How high the glow can climb, as a share of the element's height. Defaults to 0.9, 1 or 0.4 for default, pill and mobile.",
+      },
+      {
+        name: "spread",
+        type: "number",
+        default: "0.8",
+        description: "How far apart the lobes sit across the width, from 0 to 1.",
+      },
+      {
+        name: "flow",
+        type: "number",
+        default: "0.5",
+        description: "How fast and far the lobes drift and wobble, from 0 to 1.",
+      },
+      {
+        name: "bend",
+        type: "number",
+        default: "0.5",
+        description: "How much shorter the lobes are toward the sides, from 0 to 1.",
+      },
+      {
+        name: "idle",
+        type: "number",
+        default: "0.12",
+        description: "Height the glow rests at during silence, from 0 to 1.",
+      },
+      {
+        name: "theme",
+        type: '"dark" | "light" | "auto"',
+        default: '"auto"',
+        options: ["auto", "dark", "light"],
+        description: "dark lightens what it covers, light paints over it. auto follows the dark class.",
+      },
+      {
+        name: "strength",
+        type: "number",
+        default: "1",
+        description: "Opacity of the effect, from 0 to 1.",
+      },
+      {
+        name: "active",
+        type: "boolean",
+        default: "true",
+        description: "Turn off to fade the glow out.",
+      },
+      {
+        name: "paused",
+        type: "boolean",
+        default: "false",
+        description: "Freezes the glow where it is.",
+      },
+      {
+        name: "scale",
+        type: "number",
+        default: "1",
+        description: "Multiplies the size and blur of the lobes.",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root, which wraps your element.",
+      },
+    ],
+  },
+  {
     name: "Poster Sphere",
     href: "/components/poster-sphere",
     released: "2026-11-19",
