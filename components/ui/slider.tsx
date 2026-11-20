@@ -96,6 +96,12 @@ export function Slider({
         return <Tick key={i} at={at} focus={focus} filled={at <= ratio + 1e-9} />;
       })}
 
+      <span
+        aria-hidden
+        style={{ left: `calc(13px + (100% - 26px) * ${ratio})` }}
+        className="pointer-events-none absolute inset-y-1.5 w-[3px] -translate-x-1/2 rounded-full bg-foreground transition-transform duration-150 group-active:scale-y-110 motion-reduce:transition-none"
+      />
+
       <AnimatePresence>
         {active && (
           <motion.span
