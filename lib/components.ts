@@ -79,7 +79,7 @@ export const components: ComponentItem[] = [
       "A liquid metal ring with a wandering halo for buttons, icons, text and badges.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/metal-button.tsx`,
     interaction:
-      "A thin ring of liquid metal flows around the button, with a soft halo of light drifting slowly around its edge. Hover the ring and it dents under the cursor; press and the dent goes deeper. Nearby elements and text catch a tint of the halo as it passes them. Text and badges shimmer with the same metal. Honors prefers-reduced-motion: the metal and halo hold still, and only the dent follows the cursor. Without WebGL the plain child renders.",
+      "A thin ring of liquid metal flows around the button, with a soft halo of light drifting slowly around its edge. Hover the ring and it dents under the cursor; press and the dent goes deeper. Nearby elements and text catch a tint of the halo as it passes them. Text and badges shimmer with the same metal. Honors prefers-reduced-motion: the metal and halo hold still, and only the dent follows the cursor. On slow loads, older machines or browsers without WebGL, a still metal ring shows instead.",
     props: [
       {
         name: "preset",

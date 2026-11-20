@@ -59,6 +59,16 @@ const PRESETS: Record<MetalPreset, Record<MetalTheme, Tuning>> = {
   },
 };
 
+// static ring shown before the shader is up, and kept when webgl is missing or too slow
+const FALLBACK: Record<MetalPreset, string> = {
+  chromatic: "linear-gradient(135deg, #ffffff, #8b93a3 30%, #c9d4ff 50%, #6d7380 70%, #f2e6ff)",
+  silver: "linear-gradient(135deg, #ffffff, #8a9099 35%, #e3e6ea 55%, #6b7079)",
+  gold: "linear-gradient(135deg, #fff4d0, #a8741e 35%, #f0c76a 55%, #6e4810)",
+};
+
+const lowEnd = () =>
+  (navigator.hardwareConcurrency ?? 8) <= 4 || ((navigator as { deviceMemory?: number }).deviceMemory ?? 8) <= 4;
+
 const VERTEX = `
 attribute vec2 aPos;
 void main() {
@@ -223,7 +233,18 @@ function useMetal(
     const root = rootRef.current;
     const canvas = canvasRef.current;
     if (!root || !canvas) return;
-    const gl = canvas.getContext("webgl", { premultipliedAlpha: true, antialias: false });
+    const fallback = root.querySelector<HTMLElement>(":scope > [data-metal-fallback]");
+    if (fallback && liveRef.current.variant === "button") {
+      const child = canvas.nextElementSibling ?? root;
+      fallback.style.borderRadius = getComputedStyle(child).borderTopLeftRadius;
+    }
+    // no software renderers: they stutter, so those machines keep the static ring
+    const gl = canvas.getContext("webgl", {
+      premultipliedAlpha: true,
+      antialias: false,
+      powerPreference: "low-power",
+      failIfMajorPerformanceCaveat: true,
+    });
     if (!gl) return;
     const compiled = createProgram(gl, VERTEX, FRAGMENT);
     if (!compiled) return;
@@ -261,6 +282,28 @@ function useMetal(
     let time = 0;
     let last = 0;
     let raf = 0;
+    let shown = false;
+    let slow = 0;
+    const maxDpr = lowEnd() ? 1 : 2;
+
+    const show = (on: boolean) => {
+      shown = on;
+      canvas.style.visibility = on ? "visible" : "hidden";
+      if (fallback) fallback.style.display = on ? "none" : "";
+      if (!textMode) return;
+      if (on) root.dataset.live = "";
+      else delete root.dataset.live;
+    };
+
+    const giveUp = () => {
+      cancelAnimationFrame(raf);
+      raf = -1;
+      show(false);
+      for (const el of touched) {
+        el.style.filter = "";
+        el.style.textShadow = "";
+      }
+    };
 
     const tuning = () => {
       const o = liveRef.current;
@@ -326,7 +369,7 @@ function useMetal(
       const radius =
         o.variant === "circle"
           ? Math.min(w, h) / 2
-          : Math.min(pxRadius(getComputedStyle(root.firstElementChild ?? root).borderTopLeftRadius, w, h), Math.min(w, h) / 2);
+          : Math.min(pxRadius(getComputedStyle(canvas.nextElementSibling ?? root).borderTopLeftRadius, w, h), Math.min(w, h) / 2);
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(loc.res, w + pad * 2, h + pad * 2);
       gl.uniform1f(loc.dpr, dpr);
@@ -344,6 +387,7 @@ function useMetal(
       gl.uniform1f(loc.inner, o.innerShadow ? 1 : 0);
       gl.uniform1f(loc.text, textMode ? 1 : 0);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
+      if (!shown) show(true);
       reflect(t);
     };
 
@@ -352,6 +396,9 @@ function useMetal(
       const o = liveRef.current;
       const dt = last ? Math.min((now - last) / 1000, 0.1) : 0;
       last = now;
+      // sustained frames over 50ms mean the gpu can't keep up, so drop to the static ring
+      slow = dt > 0.05 ? slow + 1 : Math.max(0, slow - 1);
+      if (slow > 30) return giveUp();
       const moving = !o.paused && !motion.matches;
       if (moving) time += dt;
       const bend = bends.get(root);
@@ -373,7 +420,7 @@ function useMetal(
     const resize = () => {
       w = root.offsetWidth;
       h = root.offsetHeight;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
       canvas.width = Math.round((w + pad * 2) * dpr);
       canvas.height = Math.round((h + pad * 2) * dpr);
       if (textMode) paintMask();
@@ -400,7 +447,8 @@ function useMetal(
     motion.addEventListener("change", wake);
     root.addEventListener("metal:wake", wake);
     dark = isDark(root);
-    if (textMode) root.dataset.live = "";
+    const lost = () => giveUp();
+    canvas.addEventListener("webglcontextlost", lost);
     document.fonts?.ready.then(() => {
       if (raf !== -1) resize();
     });
@@ -415,11 +463,8 @@ function useMetal(
       intersection.disconnect();
       motion.removeEventListener("change", wake);
       root.removeEventListener("metal:wake", wake);
-      delete root.dataset.live;
-      for (const el of touched) {
-        el.style.filter = "";
-        el.style.textShadow = "";
-      }
+      canvas.removeEventListener("webglcontextlost", lost);
+      giveUp();
       gl.deleteBuffer(buffer);
       if (texture) gl.deleteTexture(texture);
       compiled.dispose();
@@ -442,6 +487,9 @@ type MetalButtonProps = ComponentProps<"div"> &
     disableGlow?: boolean;
     glowGain?: number;
   };
+
+// inline so the canvas stays out of layout and invisible even before the stylesheet loads
+const CANVAS_STYLE = { position: "absolute", pointerEvents: "none", visibility: "hidden" } as const;
 
 const NO_TARGETS: RefObject<HTMLElement | null>[] = [];
 
@@ -482,11 +530,23 @@ function MetalButton({
       className={cn("relative isolate inline-flex", variant === "circle" && "rounded-full", className)}
       {...props}
     >
+      <span
+        data-metal-fallback
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: -2,
+          zIndex: -1,
+          pointerEvents: "none",
+          borderRadius: 9999,
+          background: FALLBACK[preset],
+          opacity: strength,
+        }}
+      />
       <canvas
         ref={canvasRef}
         aria-hidden
-        className="pointer-events-none absolute -z-10"
-        style={{ inset: -HALO, width: `calc(100% + ${HALO * 2}px)`, height: `calc(100% + ${HALO * 2}px)` }}
+        style={{ ...CANVAS_STYLE, inset: -HALO, width: `calc(100% + ${HALO * 2}px)`, height: `calc(100% + ${HALO * 2}px)`, zIndex: -1 }}
       />
       {children}
     </div>
@@ -539,8 +599,7 @@ function MetalText({
       <canvas
         ref={canvasRef}
         aria-hidden
-        className="pointer-events-none absolute"
-        style={{ inset: -TEXT_PAD, width: `calc(100% + ${TEXT_PAD * 2}px)`, height: `calc(100% + ${TEXT_PAD * 2}px)` }}
+        style={{ ...CANVAS_STYLE, inset: -TEXT_PAD, width: `calc(100% + ${TEXT_PAD * 2}px)`, height: `calc(100% + ${TEXT_PAD * 2}px)` }}
       />
       {children}
     </span>
