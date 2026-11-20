@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "textarea",
+  "title": "Textarea",
+  "description": "A soft multi-line field that grows with its text.",
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "components/ui/textarea.tsx",
+      "content": "import type { ComponentProps } from \"react\";\nimport { cn } from \"@/lib/utils\";\n\nexport type TextareaProps = ComponentProps<\"textarea\"> & {\n  invalid?: boolean;\n};\n\nexport function Textarea({ invalid = false, className, ...props }: TextareaProps) {\n  return (\n    <textarea\n      data-slot=\"textarea\"\n      aria-invalid={invalid || undefined}\n      className={cn(\n        \"min-h-24 w-full resize-none rounded-[22px] bg-foreground/[0.05] px-4 py-3 text-sm leading-relaxed text-foreground outline-none ring-1 ring-inset ring-foreground/[0.06] transition-[box-shadow,background-color] duration-150 [field-sizing:content] [corner-shape:squircle] placeholder:text-foreground/35 hover:bg-foreground/[0.07] focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-brand/60 disabled:cursor-not-allowed disabled:opacity-45 aria-invalid:ring-2 aria-invalid:ring-red-500/60 motion-reduce:transition-none\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

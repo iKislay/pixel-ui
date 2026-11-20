@@ -4,6 +4,7 @@ import { useState, type ComponentType } from "react";
 import { ArrowRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -58,9 +59,20 @@ function InputDemo() {
   );
 }
 
+function TextareaDemo() {
+  return (
+    <Textarea
+      className="max-w-sm"
+      placeholder="What should we build next? It grows as you write."
+      aria-label="Feedback"
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
+  "textarea": TextareaDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

@@ -85,4 +85,30 @@ export function Demo() {
   return <Input type="email" placeholder="you@example.com" aria-label="Email" />
 }`,
   }),
+  primitive("textarea", {
+    name: "Textarea",
+    category: "inputs",
+    description: "A soft multi-line field that grows with its text.",
+    interaction:
+      "Type and the field grows a line at a time instead of scrolling. Focus shows a blue ring; an invalid field shows a red one.",
+    props: [
+      {
+        name: "invalid",
+        type: "boolean",
+        default: "false",
+        description: "Marks the field invalid with a red ring and aria-invalid.",
+      },
+      {
+        name: "rows",
+        type: "number",
+        description: "Sets the starting height. The field still grows past it as you type.",
+      },
+      classNameProp,
+    ],
+    usage: `import { Textarea } from "@/components/ui/textarea"
+
+export function Demo() {
+  return <Textarea placeholder="Leave a note" aria-label="Note" />
+}`,
+  }),
 ];
