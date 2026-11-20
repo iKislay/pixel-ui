@@ -16,6 +16,7 @@ import {
   type WaveSlider,
 } from "@/lib/distortion-wave-controls";
 import { VOICE_PICKERS, VOICE_SLIDERS, useVoiceStyle } from "@/lib/voice-glow-controls";
+import { METAL_PICKERS, METAL_SLIDERS, useMetalStyle } from "@/lib/metal-controls";
 
 type SidebarControlsProps = {
   item?: ComponentItem;
@@ -733,6 +734,39 @@ function VoiceGlowControls() {
   );
 }
 
+function MetalControls() {
+  const [style, setStyle, resetStyle] = useMetalStyle();
+
+  return (
+    <div className="flex flex-col gap-5">
+      {METAL_PICKERS.map((picker) => (
+        <WavePicker key={picker.name} {...picker} />
+      ))}
+
+      <div className="flex flex-col gap-3">
+        <SectionHeader title="Intensity" />
+        {METAL_SLIDERS.map(({ key, fallback, ...slider }) => (
+          <WaveRange
+            key={key}
+            {...slider}
+            value={style[key] ?? fallback}
+            changed={key in style}
+            onChange={(v) => setStyle(key, v)}
+          />
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={resetStyle}
+        className="rounded-xl bg-muted/40 px-3 py-2.5 text-xs font-semibold text-foreground transition-all hover:bg-muted/80"
+      >
+        Reset intensity
+      </button>
+    </div>
+  );
+}
+
 export default function SidebarControls({
   item,
   onOpenCode,
@@ -767,6 +801,7 @@ export default function SidebarControls({
       {pathname === "/components/poster-sphere" && <PosterSphereControls />}
       {pathname === "/components/distortion-wave" && <DistortionWaveControls />}
       {pathname === "/components/voice-glow" && <VoiceGlowControls />}
+      {pathname === "/components/metal" && <MetalControls />}
 
       <ColorSwatches showLabel />
 
