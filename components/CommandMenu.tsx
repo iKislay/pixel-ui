@@ -18,6 +18,7 @@ import {
   docsItems,
   type ComponentItem,
 } from "@/lib/components";
+import { charts } from "@/lib/charts";
 import { primitives } from "@/lib/primitives";
 import { useOpenSound } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
@@ -58,8 +59,8 @@ const suggestOrder = [...components]
   .sort((a, b) => rankCategory(a) - rankCategory(b))
   .sort((a, b) => promote(b) - promote(a));
 
-// primitives are searchable but stay out of the empty-query suggestions
-const searchable = [...suggestOrder, ...primitives];
+// primitives and charts are searchable but stay out of the empty-query suggestions
+const searchable = [...suggestOrder, ...primitives, ...charts];
 
 const categories = CATEGORY_ORDER.filter((c) =>
   docsItems.some((item) => item.category === c),

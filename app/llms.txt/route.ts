@@ -4,6 +4,7 @@ import {
   installCommand,
   REGISTRY_HOMEPAGE,
 } from "@/lib/components";
+import { charts } from "@/lib/charts";
 import { primitives } from "@/lib/primitives";
 import { SITE_URL } from "@/lib/site";
 
@@ -78,6 +79,12 @@ export function GET() {
     "Small building blocks: buttons, fields, menus and overlays. Interactive ones take an optional onFeedback prop that reports moments like press, toggle, open, close, select and error.",
     "",
     primitives.map(describe).join("\n\n"),
+    "",
+    "## Charts",
+    "",
+    "SVG charts drawn by hand, with no charting library. Each one takes a label for screen readers; the plotted ones also render a hidden data table and read out values from the keyboard. They color series with the --chart-1 to --chart-5 tokens.",
+    "",
+    charts.map(describe).join("\n\n"),
     "",
     "## Notes",
     "",
