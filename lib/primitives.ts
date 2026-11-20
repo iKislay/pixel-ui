@@ -173,9 +173,9 @@ export function Demo() {
   primitive("switch", {
     name: "Switch",
     category: "inputs",
-    description: "An on and off switch with a springy thumb.",
+    description: "An on and off switch whose thumb stretches as it travels.",
     interaction:
-      "Click or press Space and the thumb springs across as the track fills blue. Hold it down and the thumb stretches a little, like a finger pressing it. Honors prefers-reduced-motion: the thumb jumps across.",
+      "Click or press Space and the thumb's front edge darts across while its back edge catches up, so it stretches like a drop of liquid and settles round. The track fills blue and a small tick draws inside the thumb. Honors prefers-reduced-motion: the thumb jumps across.",
     props: [
       {
         name: "checked",

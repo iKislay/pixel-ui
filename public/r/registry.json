@@ -381,7 +381,7 @@
       "name": "switch",
       "type": "registry:ui",
       "title": "Switch",
-      "description": "An on and off switch with a springy thumb.",
+      "description": "An on and off switch whose thumb stretches as it travels.",
       "dependencies": [
         "motion"
       ],
