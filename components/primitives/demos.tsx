@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup } from "@/components/ui/radio-group";
+import { Slider } from "@/components/ui/slider";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -134,6 +135,20 @@ function RadioGroupDemo() {
   );
 }
 
+function SliderDemo() {
+  const [volume, setVolume] = useState(64);
+
+  return (
+    <div className="flex w-full max-w-xs flex-col gap-3">
+      <div className="flex items-center justify-between text-sm font-medium">
+        <span>Volume</span>
+        <span className="font-mono text-xs text-foreground/50 tabular-nums">{volume}%</span>
+      </div>
+      <Slider aria-label="Volume" value={volume} onValueChange={setVolume} />
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -141,6 +156,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "checkbox": CheckboxDemo,
   "switch": SwitchDemo,
   "radio-group": RadioGroupDemo,
+  "slider": SliderDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

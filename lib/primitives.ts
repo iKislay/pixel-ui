@@ -231,4 +231,42 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("slider", {
+    name: "Slider",
+    category: "inputs",
+    description: "A single-value slider with a soft round thumb.",
+    interaction:
+      "Drag the thumb or click anywhere on the track and the blue fill follows. The thumb swells a little while held. With focus, the arrow keys step it and Home and End jump to the ends. Honors prefers-reduced-motion: the thumb does not swell.",
+    props: [
+      {
+        name: "value",
+        type: "number",
+        description: "Controls the value. Leave it unset to let the slider manage itself.",
+      },
+      {
+        name: "defaultValue",
+        type: "number",
+        description: "The starting value when uncontrolled. Defaults to min.",
+      },
+      { name: "min", type: "number", default: "0", description: "The lowest value." },
+      { name: "max", type: "number", default: "100", description: "The highest value." },
+      { name: "step", type: "number", default: "1", description: "The size of each step." },
+      {
+        name: "onValueChange",
+        type: "(value: number) => void",
+        description: "Called on every step while the value moves.",
+      },
+      feedbackProp('"select"'),
+      {
+        name: "className",
+        type: "string",
+        description: "Merged onto the root. Other props, like aria-label, go to the inner range input.",
+      },
+    ],
+    usage: `import { Slider } from "@/components/ui/slider"
+
+export function Demo() {
+  return <Slider aria-label="Volume" defaultValue={40} />
+}`,
+  }),
 ];
