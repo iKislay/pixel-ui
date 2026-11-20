@@ -203,10 +203,10 @@ export function Driven() {
       },
       {
         name: "theme",
-        type: '"dark" | "light" | "auto"',
+        type: '"dark" | "light" | "auto" | "dither"',
         default: '"auto"',
-        options: ["auto", "dark", "light"],
-        description: "dark lightens what it covers, light paints over it. auto follows the dark class.",
+        options: ["auto", "dark", "light", "dither"],
+        description: "dark lightens what it covers, light paints over it, auto follows the dark class. dither draws the glow in 4 pixel dots that thin out toward its edges.",
       },
       {
         name: "strength",

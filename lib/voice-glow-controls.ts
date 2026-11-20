@@ -5,7 +5,7 @@ import { usePreviewControl } from "@/components/preview/PreviewControls";
 export const VOICE_PICKERS = [
   { name: "vg-type", title: "Type", options: ["default", "pill", "mobile"] },
   { name: "vg-variant", title: "Color variant", options: ["colorful", "mono", "ocean", "sunset", "forest", "candy", "ice", "gold"] },
-  { name: "vg-theme", title: "Theme", options: ["auto", "dark", "light"] },
+  { name: "vg-theme", title: "Theme", options: ["auto", "dark", "light", "dither"] },
   { name: "vg-processing", title: "Processing", options: ["off", "on"] },
   { name: "vg-active", title: "Active", options: ["on", "off"] },
   { name: "vg-paused", title: "Paused", options: ["off", "on"] },
