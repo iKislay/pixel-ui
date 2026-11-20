@@ -15,6 +15,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { Popover } from "@/components/ui/popover";
 import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -276,6 +277,20 @@ function DropdownMenuDemo() {
   );
 }
 
+function BadgeDemo() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2">
+      <Badge>Draft</Badge>
+      <Badge tone="brand">New</Badge>
+      <Badge tone="success" dot>
+        Live
+      </Badge>
+      <Badge tone="warning">Pending</Badge>
+      <Badge tone="danger">Failed</Badge>
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -290,6 +305,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "popover": PopoverDemo,
   "dialog": DialogDemo,
   "dropdown-menu": DropdownMenuDemo,
+  "badge": BadgeDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

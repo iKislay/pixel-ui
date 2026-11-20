@@ -567,4 +567,31 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("badge", {
+    name: "Badge",
+    category: "display",
+    description: "A small tinted label for status, counts and tags.",
+    interaction: "A quiet, tinted label. An optional dot in the same color marks live status.",
+    props: [
+      {
+        name: "tone",
+        type: '"neutral" | "brand" | "success" | "warning" | "danger"',
+        default: '"neutral"',
+        options: ["neutral", "brand", "success", "warning", "danger"],
+        description: "The tint.",
+      },
+      {
+        name: "dot",
+        type: "boolean",
+        default: "false",
+        description: "Shows a small dot before the text.",
+      },
+      classNameProp,
+    ],
+    usage: `import { Badge } from "@/components/ui/badge"
+
+export function Demo() {
+  return <Badge tone="success" dot>Live</Badge>
+}`,
+  }),
 ];
