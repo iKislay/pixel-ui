@@ -397,9 +397,9 @@ export function Demo() {
   primitive("tooltip", {
     name: "Tooltip",
     category: "overlays",
-    description: "A small label that floats beside an element on hover or focus.",
+    description: "A small label that grows out of an element on hover or focus.",
     interaction:
-      "Rest the pointer on the element and, after a short pause, a label springs out beside it. Focus with the keyboard and it shows at once. Escape or moving away hides it. Honors prefers-reduced-motion: the label only fades.",
+      "Rest the pointer on the element and, after a short pause, a label grows out of the edge facing it, coming into focus from a slight blur with a little tail pointing back. Focus with the keyboard and it shows at once. Escape or moving away shrinks it away. Honors prefers-reduced-motion: the label only fades.",
     props: [
       {
         name: "content",

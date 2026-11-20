@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 export type TooltipFeedback = "open" | "close";
 
 const SIDES = {
-  top: { box: "bottom-full left-1/2 mb-2 -translate-x-1/2", from: { y: 4 } },
-  bottom: { box: "top-full left-1/2 mt-2 -translate-x-1/2", from: { y: -4 } },
-  left: { box: "right-full top-1/2 mr-2 -translate-y-1/2", from: { x: 4 } },
-  right: { box: "left-full top-1/2 ml-2 -translate-y-1/2", from: { x: -4 } },
+  top: { box: "bottom-full left-1/2 mb-2.5 -translate-x-1/2", origin: "50% 100%", tail: "left-1/2 top-full -translate-x-1/2 -translate-y-1/2", from: { y: 6 } },
+  bottom: { box: "top-full left-1/2 mt-2.5 -translate-x-1/2", origin: "50% 0%", tail: "left-1/2 bottom-full -translate-x-1/2 translate-y-1/2", from: { y: -6 } },
+  left: { box: "right-full top-1/2 mr-2.5 -translate-y-1/2", origin: "100% 50%", tail: "top-1/2 left-full -translate-y-1/2 -translate-x-1/2", from: { x: 6 } },
+  right: { box: "left-full top-1/2 ml-2.5 -translate-y-1/2", origin: "0% 50%", tail: "top-1/2 right-full -translate-y-1/2 translate-x-1/2", from: { x: -6 } },
 };
 
 export type TooltipProps = {
@@ -67,10 +67,11 @@ export function Tooltip({ content, children, side = "top", delay = 300, classNam
           <motion.span
             id={id}
             role="tooltip"
-            initial={{ opacity: 0, scale: reduce ? 1 : 0.94, ...(reduce ? {} : SIDES[side].from) }}
-            animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
-            exit={{ opacity: 0, scale: reduce ? 1 : 0.94 }}
-            transition={{ type: "spring", stiffness: 600, damping: 36 }}
+            style={{ transformOrigin: SIDES[side].origin }}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.5, filter: "blur(4px)", ...SIDES[side].from }}
+            animate={{ opacity: 1, scale: 1, filter: "blur(0px)", x: 0, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.7, filter: "blur(2px)" }}
+            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 640, damping: 30 }}
             className={cn(
               "pointer-events-none absolute z-50 whitespace-nowrap rounded-[12px] bg-foreground px-2.5 py-1.5 text-xs font-semibold text-background shadow-lg [corner-shape:squircle]",
               SIDES[side].box,
@@ -78,6 +79,7 @@ export function Tooltip({ content, children, side = "top", delay = 300, classNam
             )}
           >
             {content}
+            <span aria-hidden className={cn("absolute size-2 rotate-45 rounded-[2px] bg-foreground", SIDES[side].tail)} />
           </motion.span>
         )}
       </AnimatePresence>

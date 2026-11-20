@@ -472,7 +472,7 @@
       "name": "tooltip",
       "type": "registry:ui",
       "title": "Tooltip",
-      "description": "A small label that floats beside an element on hover or focus.",
+      "description": "A small label that grows out of an element on hover or focus.",
       "dependencies": [
         "motion",
         "@radix-ui/react-slot"
