@@ -2,7 +2,7 @@
 
 import { useState, type ComponentType } from "react";
 import { Archive, ArrowRight, ChevronDown, Copy, Plus, Share, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, type ButtonStatus } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -23,24 +23,36 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function ButtonDemo() {
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<ButtonStatus>("idle");
+  const [fail, setFail] = useState<ButtonStatus>("idle");
+
+  const run = (set: (s: ButtonStatus) => void, end: ButtonStatus) => {
+    set("loading");
+    setTimeout(() => set(end), 1400);
+    setTimeout(() => set("idle"), 2800);
+  };
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-3">
-      <Button
-        loading={loading}
-        onClick={() => {
-          setLoading(true);
-          setTimeout(() => setLoading(false), 1600);
-        }}
-      >
-        Continue <ArrowRight />
-      </Button>
-      <Button variant="secondary">Cancel</Button>
-      <Button variant="ghost">Skip</Button>
-      <Button size="icon" variant="secondary" aria-label="Add">
-        <Plus />
-      </Button>
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex items-center gap-3">
+        <Button status={status} onClick={() => run(setStatus, "success")}>
+          Publish site <ArrowRight />
+        </Button>
+        <Button variant="secondary" status={fail} onClick={() => run(setFail, "error")}>
+          Retry payment
+        </Button>
+      </div>
+      <div className="flex items-center gap-3">
+        <Button size="sm" variant="ghost">
+          Skip
+        </Button>
+        <Button size="sm" variant="secondary">
+          Cancel
+        </Button>
+        <Button size="icon" variant="secondary" aria-label="Add">
+          <Plus />
+        </Button>
+      </div>
     </div>
   );
 }

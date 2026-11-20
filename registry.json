@@ -307,10 +307,11 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "A soft squircle button in four variants and four sizes.",
+      "description": "A squircle button that changes shape to show its state.",
       "dependencies": [
         "motion",
-        "lucide-react"
+        "lucide-react",
+        "react-use-measure"
       ],
       "registryDependencies": [
         "utils"

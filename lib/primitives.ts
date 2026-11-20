@@ -30,16 +30,23 @@ export const primitives: ComponentItem[] = [
   primitive("button", {
     name: "Button",
     category: "buttons",
-    description: "A soft squircle button in four variants and four sizes.",
+    description: "A squircle button that changes shape to show its state.",
     interaction:
-      "Press and the button gives a little under your finger. While loading, a spinner blurs in over the label and the button keeps focus. Honors prefers-reduced-motion: the press holds still.",
+      "Press and the button squashes a little under your finger. While it works, the label blurs away and the button springs down into a round spinner; when the work is done it lands on a green tick or a red cross, then grows back to its label. Focus stays on it the whole time. Honors prefers-reduced-motion: the states swap without movement.",
     props: [
+      {
+        name: "status",
+        type: '"idle" | "loading" | "success" | "error"',
+        default: '"idle"',
+        options: ["idle", "loading", "success", "error"],
+        description: "What the button is doing. Anything but idle shows an icon and ignores clicks.",
+      },
       {
         name: "variant",
         type: '"primary" | "secondary" | "ghost" | "destructive"',
         default: '"primary"',
         options: ["primary", "secondary", "ghost", "destructive"],
-        description: "The look. Primary uses the brand blue.",
+        description: "The look while idle. Primary uses the brand blue.",
       },
       {
         name: "size",
@@ -48,19 +55,23 @@ export const primitives: ComponentItem[] = [
         options: ["sm", "md", "lg", "icon"],
         description: "Height and padding. Icon is a square for a single icon.",
       },
-      {
-        name: "loading",
-        type: "boolean",
-        default: "false",
-        description: "Swaps the label for a spinner and ignores clicks, without dropping focus.",
-      },
-      feedbackProp('"press"'),
+      feedbackProp('"press" | "error"'),
       classNameProp,
     ],
-    usage: `import { Button } from "@/components/ui/button"
+    usage: `import { useState } from "react"
+import { Button, type ButtonStatus } from "@/components/ui/button"
 
 export function Demo() {
-  return <Button onClick={() => console.log("saved")}>Save changes</Button>
+  const [status, setStatus] = useState<ButtonStatus>("idle")
+
+  async function save() {
+    setStatus("loading")
+    await fetch("/api/save", { method: "POST" })
+    setStatus("success")
+    setTimeout(() => setStatus("idle"), 1500)
+  }
+
+  return <Button status={status} onClick={save}>Save changes</Button>
 }`,
   }),
   primitive("input", {
