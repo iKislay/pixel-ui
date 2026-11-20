@@ -5,6 +5,7 @@ import { formatCompact } from "@/lib/chart";
 import { AreaChart } from "@/components/ui/area-chart";
 import { BarChart } from "@/components/ui/bar-chart";
 import { DonutChart } from "@/components/ui/donut-chart";
+import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
 import { ScatterChart } from "@/components/ui/scatter-chart";
@@ -155,7 +156,21 @@ function ScatterChartDemo() {
   );
 }
 
+const hours = Array.from({ length: 12 }, (_, i) => `${(i * 2).toString().padStart(2, "0")}h`);
+const activity = days.map((_, d) =>
+  hours.map((_, h) => {
+    const daytime = Math.max(0, Math.sin(((h - 3) / 12) * Math.PI * 2) * 0.5 + Math.sin(((h - 2) / 12) * Math.PI) * 0.6);
+    const weekend = d >= 5 ? 0.55 : 1;
+    return Math.round((daytime * weekend + (Math.sin(d * 5 + h * 3) * 0.5 + 0.5) * 0.15) * 120);
+  }),
+);
+
+function HeatmapDemo() {
+  return <Heatmap label="Sessions by day and hour" rows={days} columns={hours} data={activity} />;
+}
+
 export const DEMOS: Record<string, ComponentType> = {
+  heatmap: HeatmapDemo,
   "scatter-chart": ScatterChartDemo,
   "radial-progress": RadialProgressDemo,
   "donut-chart": DonutChartDemo,

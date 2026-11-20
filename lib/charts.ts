@@ -411,4 +411,62 @@ export function Demo() {
   return <ScatterChart label="Load time against conversion" series={series} xLabel="Load (s)" yLabel="Conversion" />
 }`,
   }),
+  chart("heatmap", {
+    name: "Heatmap",
+    category: "comparison",
+    description: "A grid of soft cells whose shade shows each value.",
+    interaction:
+      "The cells fade in from the top left corner. Hover a cell, or tab in and use the arrow keys to move across and down, and a soft tooltip reads its row, column and value. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: the grid appears at once.",
+    props: [
+      {
+        name: "data",
+        type: "number[][]",
+        required: true,
+        description: "One array of values per row, in column order.",
+      },
+      {
+        name: "rows",
+        type: "string[]",
+        required: true,
+        description: "Labels down the left side.",
+      },
+      {
+        name: "columns",
+        type: "string[]",
+        required: true,
+        description: "Labels across the top. Some are skipped when the grid is too narrow to fit them all.",
+      },
+      labelProp,
+      formatProp,
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color. The lowest value shows a faint tint of it and the highest shows it in full.",
+      },
+      {
+        name: "gap",
+        type: "number",
+        default: "3",
+        description: "Space between cells in pixels.",
+      },
+      classNameProp,
+    ],
+    usage: `import { Heatmap } from "@/components/ui/heatmap"
+
+export function Demo() {
+  return (
+    <Heatmap
+      label="Orders by day and shift"
+      rows={["Mon", "Tue", "Wed"]}
+      columns={["Morning", "Noon", "Evening"]}
+      data={[
+        [12, 30, 18],
+        [9, 26, 22],
+        [14, 34, 27],
+      ]}
+    />
+  )
+}`,
+  }),
 ];

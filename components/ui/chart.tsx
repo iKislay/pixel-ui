@@ -131,12 +131,13 @@ export function ChartTooltip({
   );
 }
 
-// arrow keys walk the data, home and end jump, escape lets go
-export function useChartNav(count: number) {
+// arrow keys walk the data (up and down by a row in a grid), home and end jump, escape lets go
+export function useChartNav(count: number, columns = 1) {
   const [active, setActive] = useState<number | null>(null);
 
   const onKeyDown = (event: KeyboardEvent) => {
-    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
+    const row = columns > 1 ? columns : 1;
+    const step = { ArrowRight: 1, ArrowDown: row, ArrowLeft: -1, ArrowUp: -row }[event.key];
     let next: number | null | undefined;
     if (step) next = active === null ? 0 : (active + step + count) % count;
     else if (event.key === "Home") next = 0;
