@@ -5,6 +5,7 @@ import { formatCompact } from "@/lib/chart";
 import { AreaChart } from "@/components/ui/area-chart";
 import { BarChart } from "@/components/ui/bar-chart";
 import { LineChart } from "@/components/ui/line-chart";
+import { StackedBarChart } from "@/components/ui/stacked-bar-chart";
 
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const visitors = [1840, 2120, 1980, 2640, 3010, 2870, 3320, 3580, 3410, 3960, 4280, 4620];
@@ -61,7 +62,30 @@ function BarChartDemo() {
   );
 }
 
+const plans = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map((month, i) => ({
+  month,
+  free: [120, 150, 170, 165, 198, 230][i],
+  pro: [40, 52, 61, 70, 84, 96][i],
+  team: [12, 18, 25, 31, 36, 47][i],
+}));
+
+function StackedBarChartDemo() {
+  return (
+    <StackedBarChart
+      label="Accounts by plan"
+      data={plans}
+      index="month"
+      series={[
+        { key: "free", label: "Free" },
+        { key: "pro", label: "Pro" },
+        { key: "team", label: "Team" },
+      ]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
+  "stacked-bar-chart": StackedBarChartDemo,
   "line-chart": LineChartDemo,
   "area-chart": AreaChartDemo,
   "bar-chart": BarChartDemo,

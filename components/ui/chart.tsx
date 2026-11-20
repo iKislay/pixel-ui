@@ -312,7 +312,14 @@ export function CartesianChart({
           y={active === null ? margin.top : y(totals[active])}
           width={width}
           title={row ? String(row[index]) : undefined}
-          rows={row ? series.map((s) => ({ label: s.label, color: s.color, value: format(value(row, s.key)) })) : null}
+          rows={
+            row
+              ? [
+                  ...series.map((s) => ({ label: s.label, color: s.color, value: format(value(row, s.key)) })),
+                  ...(stacked ? [{ label: "Total", value: format(totals[active!]) }] : []),
+                ]
+              : null
+          }
         />
         <p aria-live="polite" className="sr-only">
           {row ? `${row[index]}: ${series.map((s) => `${s.label} ${format(value(row, s.key))}`).join(", ")}` : ""}

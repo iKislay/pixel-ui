@@ -173,4 +173,44 @@ export function Demo() {
   )
 }`,
   }),
+  chart("stacked-bar-chart", {
+    name: "Stacked Bar Chart",
+    category: "comparison",
+    description: "A bar chart that stacks each series into one column per label.",
+    interaction: `Each column builds upward, one after another, with a thin gap between its parts. ${cartesianInteraction("each column and its total")}`,
+    props: [
+      ...cartesianProps.map((prop) =>
+        prop.name === "series" ? { ...prop, description: `${prop.description} Negative values count as zero.` } : prop,
+      ),
+      {
+        name: "radius",
+        type: "number",
+        default: "6",
+        description: "Corner radius at the top of each column. It shrinks to fit a short column.",
+      },
+      classNameProp,
+    ],
+    usage: `import { StackedBarChart } from "@/components/ui/stacked-bar-chart"
+
+const data = [
+  { month: "Jan", free: 120, pro: 40, team: 12 },
+  { month: "Feb", free: 150, pro: 52, team: 18 },
+  { month: "Mar", free: 170, pro: 61, team: 25 },
+]
+
+export function Demo() {
+  return (
+    <StackedBarChart
+      label="Plans by month"
+      data={data}
+      index="month"
+      series={[
+        { key: "free", label: "Free" },
+        { key: "pro", label: "Pro" },
+        { key: "team", label: "Team" },
+      ]}
+    />
+  )
+}`,
+  }),
 ];

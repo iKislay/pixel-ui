@@ -718,6 +718,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "stacked-bar-chart",
+      "type": "registry:ui",
+      "title": "Stacked Bar Chart",
+      "description": "A bar chart that stacks each series into one column per label.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/stacked-bar-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }
