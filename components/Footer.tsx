@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import { SUPPORT_EMAIL } from "@/lib/legal";
+import { NAV_LINKS } from "@/lib/sections";
 import AsciiSkyline from "./AsciiSkyline";
 import { BrandLogo } from "./BrandLogo";
 import { GithubLogo, PixelUILogo, XLogo, type LogoProps } from "./logos";
@@ -17,9 +18,7 @@ type FooterLink = {
 
 const LINKS: FooterLink[] = [
   { label: "Home", href: "/" },
-  { label: "Components", href: "/components" },
-  { label: "MCP", href: "/mcp" },
-  { label: "Pricing", href: "/pricing" },
+  ...NAV_LINKS,
   { label: "GitHub", href: GITHUB_URL, external: true, icon: GithubLogo },
   { label: "X / Twitter", href: X_URL, external: true, icon: XLogo },
 ];

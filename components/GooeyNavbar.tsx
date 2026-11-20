@@ -13,12 +13,8 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { NavbarActions } from "@/components/NavbarActions";
 import { CommandSearchBar } from "@/components/CommandSearchBar";
 import { cn } from "@/lib/utils";
+import { NAV_LINKS } from "@/lib/sections";
 
-const LINKS = [
-  { label: "Components", href: "/components" },
-  { label: "MCP", href: "/mcp" },
-  { label: "Pricing", href: "/pricing" },
-];
 
 const pill = "rounded-full liquid-glass";
 
@@ -135,7 +131,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
           </Link>
 
           <div className="hidden h-12 items-center md:flex">
-            {LINKS.map((link) => (
+            {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -251,7 +247,7 @@ export default function GooeyNavbar({ stars }: { stars?: number | null }) {
               style={{ width: menuFrame.width }}
               className="flex flex-col px-4 pb-4 pt-[76px]"
             >
-              {LINKS.map((link) => (
+              {NAV_LINKS.map((link) => (
                 <motion.div key={link.href} variants={rise}>
                   <Link
                     href={link.href}

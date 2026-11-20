@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { components } from "@/lib/components";
+import { liveSections } from "@/lib/sections";
 import { SITE_URL } from "@/lib/site";
 
 const lastModified = new Date("2026-07-30");
@@ -12,12 +13,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
-    {
-      url: `${SITE_URL}/components`,
+    ...liveSections.map((section) => ({
+      url: `${SITE_URL}${section.href}`,
       lastModified,
-      changeFrequency: "weekly",
+      changeFrequency: "weekly" as const,
       priority: 0.9,
-    },
+    })),
     {
       url: `${SITE_URL}/mcp`,
       lastModified: new Date("2026-10-05"),

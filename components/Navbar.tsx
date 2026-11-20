@@ -6,13 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
+import { NAV_LINKS } from "@/lib/sections";
 import { BrandLogo } from "@/components/BrandLogo";
 
-const LINKS = [
-  { label: "Components", href: "/components" },
-  { label: "MCP", href: "/mcp" },
-  { label: "Pricing", href: "/pricing" },
-];
 
 const GITHUB_URL = "https://github.com/ikislay/pixel-ui";
 
@@ -72,7 +68,7 @@ export default function Navbar() {
         </Link>
 
         <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2">
-          {LINKS.map((link) => {
+          {NAV_LINKS.map((link) => {
             const active = pathname === link.href;
             const bumped = hovered ? hovered === link.href : active;
             return (
