@@ -662,4 +662,35 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("separator", {
+    name: "Separator",
+    category: "display",
+    description: "A hairline that divides content, across or down.",
+    interaction: "A thin, quiet line. By default screen readers skip it.",
+    props: [
+      {
+        name: "orientation",
+        type: '"horizontal" | "vertical"',
+        default: '"horizontal"',
+        options: ["horizontal", "vertical"],
+        description: "Across the full width, or down the full height of its row.",
+      },
+      {
+        name: "decorative",
+        type: "boolean",
+        default: "true",
+        description: "Turn it off when the line marks a real break, so it is announced as a separator.",
+      },
+      classNameProp,
+    ],
+    usage: `import { Separator } from "@/components/ui/separator"
+
+export function Demo() {
+  return (
+    <div className="flex h-5 items-center gap-3">
+      Docs <Separator orientation="vertical" /> Blog
+    </div>
+  )
+}`,
+  }),
 ];

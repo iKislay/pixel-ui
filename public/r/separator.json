@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "separator",
+  "title": "Separator",
+  "description": "A hairline that divides content, across or down.",
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "components/ui/separator.tsx",
+      "content": "import type { ComponentProps } from \"react\";\nimport { cn } from \"@/lib/utils\";\n\nexport type SeparatorProps = ComponentProps<\"div\"> & {\n  orientation?: \"horizontal\" | \"vertical\";\n  decorative?: boolean;\n};\n\nexport function Separator({ orientation = \"horizontal\", decorative = true, className, ...props }: SeparatorProps) {\n  return (\n    <div\n      data-slot=\"separator\"\n      role={decorative ? \"none\" : \"separator\"}\n      aria-orientation={decorative || orientation === \"horizontal\" ? undefined : orientation}\n      className={cn(\n        \"shrink-0 rounded-full bg-foreground/[0.08]\",\n        orientation === \"horizontal\" ? \"h-px w-full\" : \"w-px self-stretch\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

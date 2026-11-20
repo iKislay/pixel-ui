@@ -18,6 +18,7 @@ import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -318,6 +319,25 @@ function CardDemo() {
   );
 }
 
+function SeparatorDemo() {
+  return (
+    <div className="flex w-full max-w-xs flex-col gap-4 text-sm">
+      <div className="flex flex-col gap-1">
+        <p className="font-semibold">Pixel UI</p>
+        <p className="text-foreground/55">Small parts, carefully made.</p>
+      </div>
+      <Separator />
+      <div className="flex h-5 items-center gap-4 font-medium text-foreground/70">
+        Docs
+        <Separator orientation="vertical" />
+        Primitives
+        <Separator orientation="vertical" />
+        Blog
+      </div>
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -335,6 +355,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "badge": BadgeDemo,
   "avatar": AvatarDemo,
   "card": CardDemo,
+  "separator": SeparatorDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {
