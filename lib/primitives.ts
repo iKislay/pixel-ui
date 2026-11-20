@@ -269,4 +269,56 @@ export function Demo() {
   return <Slider aria-label="Volume" defaultValue={40} />
 }`,
   }),
+  primitive("select", {
+    name: "Select",
+    category: "inputs",
+    description: "A dropdown list for picking one value.",
+    interaction:
+      "Click the field and a soft list springs open below it, with the current pick ticked. Use the arrow keys, Home and End to move, a letter to jump, and Enter to pick. Escape or a click outside closes it. Honors prefers-reduced-motion: the list fades instead of springing.",
+    props: [
+      {
+        name: "options",
+        type: "{ value: string; label: ReactNode; disabled?: boolean }[]",
+        required: true,
+        description: "The choices, in order.",
+      },
+      {
+        name: "value",
+        type: "string",
+        description: "Controls the picked value. Leave it unset to let the select manage itself.",
+      },
+      {
+        name: "defaultValue",
+        type: "string",
+        description: "The starting pick when uncontrolled.",
+      },
+      {
+        name: "onValueChange",
+        type: "(value: string) => void",
+        description: "Called with the newly picked value.",
+      },
+      {
+        name: "placeholder",
+        type: "ReactNode",
+        default: '"Choose…"',
+        description: "Shown while nothing is picked.",
+      },
+      feedbackProp('"open" | "close" | "select"'),
+      classNameProp,
+    ],
+    usage: `import { Select } from "@/components/ui/select"
+
+export function Demo() {
+  return (
+    <Select
+      aria-label="Theme"
+      options={[
+        { value: "light", label: "Light" },
+        { value: "dark", label: "Dark" },
+        { value: "system", label: "System" },
+      ]}
+    />
+  )
+}`,
+  }),
 ];

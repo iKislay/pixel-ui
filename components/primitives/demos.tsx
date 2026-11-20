@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
+import { Select } from "@/components/ui/select";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -149,6 +150,26 @@ function SliderDemo() {
   );
 }
 
+function SelectDemo() {
+  return (
+    <div className="flex h-72 items-start pt-6">
+      <Select
+        aria-label="Time zone"
+        placeholder="Time zone"
+        defaultValue="lisbon"
+        options={[
+          { value: "honolulu", label: "Honolulu" },
+          { value: "denver", label: "Denver" },
+          { value: "lisbon", label: "Lisbon" },
+          { value: "nairobi", label: "Nairobi" },
+          { value: "kathmandu", label: "Kathmandu" },
+          { value: "auckland", label: "Auckland", disabled: true },
+        ]}
+      />
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -157,6 +178,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "switch": SwitchDemo,
   "radio-group": RadioGroupDemo,
   "slider": SliderDemo,
+  "select": SelectDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {
