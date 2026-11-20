@@ -1,6 +1,8 @@
 "use client";
 
 import type { ComponentType } from "react";
+import { formatCompact } from "@/lib/chart";
+import { AreaChart } from "@/components/ui/area-chart";
 import { LineChart } from "@/components/ui/line-chart";
 
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -22,8 +24,24 @@ function LineChartDemo() {
   );
 }
 
+const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const takings = [4200, 5100, 4800, 6300, 7900, 9400, 8100];
+
+function AreaChartDemo() {
+  return (
+    <AreaChart
+      label="Revenue by day"
+      data={days.map((day, i) => ({ day, revenue: takings[i] }))}
+      index="day"
+      series={[{ key: "revenue", label: "Revenue" }]}
+      format={(n) => "$" + formatCompact(n)}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   "line-chart": LineChartDemo,
+  "area-chart": AreaChartDemo,
 };
 
 export default function ChartDemo({ slug }: { slug: string }) {

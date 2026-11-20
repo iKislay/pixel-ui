@@ -100,4 +100,40 @@ export function Demo() {
   )
 }`,
   }),
+  chart("area-chart", {
+    name: "Area Chart",
+    category: "trends",
+    description: "A line chart with a soft fill that fades down to its baseline.",
+    interaction: `The lines draw in and the fill rises softly beneath them. ${cartesianInteraction("each point")}`,
+    props: [
+      ...cartesianProps,
+      {
+        name: "curve",
+        type: '"smooth" | "linear"',
+        default: '"smooth"',
+        options: ["smooth", "linear"],
+        description: "Smooth bends through every point without overshooting it; linear joins them with straight lines.",
+      },
+      classNameProp,
+    ],
+    usage: `import { AreaChart } from "@/components/ui/area-chart"
+
+const data = [
+  { day: "Mon", revenue: 4200 },
+  { day: "Tue", revenue: 5100 },
+  { day: "Wed", revenue: 4800 },
+]
+
+export function Demo() {
+  return (
+    <AreaChart
+      label="Revenue by day"
+      data={data}
+      index="day"
+      series={[{ key: "revenue", label: "Revenue" }]}
+      format={(n) => "$" + n.toLocaleString()}
+    />
+  )
+}`,
+  }),
 ];

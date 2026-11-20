@@ -171,6 +171,7 @@ export type CartesianContext = {
   x: (index: number) => number;
   band: number;
   y: (value: number) => number;
+  floor: number;
   active: number | null;
   progress: number;
 };
@@ -302,7 +303,7 @@ export function CartesianChart({
                 className="text-foreground/25"
               />
             )}
-            {children({ data, series, width, height, x, band, y, active, progress })}
+            {children({ data, series, width, height, x, band, y, floor: y(domain[0]), active, progress })}
           </svg>
         )}
         <ChartTooltip
