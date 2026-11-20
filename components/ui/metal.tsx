@@ -46,8 +46,8 @@ const tune = (stops: string[], glow: string, glowAlpha: number, iris: number): T
 
 const PRESETS: Record<MetalPreset, Record<MetalTheme, Tuning>> = {
   chromatic: {
-    dark: tune(["#1d2027", "#7d838e", "#d5d9e0", "#ffffff"], "#c9d4ff", 0.75, 0.85),
-    light: tune(["#5d626c", "#a3a8b1", "#e2e5ea", "#ffffff"], "#8f9cff", 0.5, 0.6),
+    dark: tune(["#1d2027", "#7d838e", "#d5d9e0", "#ffffff"], "#8fb0ff", 0.8, 0.3),
+    light: tune(["#5d626c", "#a3a8b1", "#e2e5ea", "#ffffff"], "#7f98ff", 0.55, 0.2),
   },
   silver: {
     dark: tune(["#24272d", "#868c96", "#d9dde3", "#ffffff"], "#d3dae4", 0.6, 0),
@@ -161,8 +161,8 @@ void main() {
   float tube = sqrt(max(0.0, 1.0 - pow(2.0 * u - 1.0, 2.0)));
   vec2 normal = normalize(p / (uBox + 1.0) + 1e-4) * (2.0 * u - 1.0);
   float lit = 0.5 + 0.5 * dot(normal, vec2(-0.4, -0.9));
-  float spec = pow(max(0.0, sin(ang * 3.0 + flow * 6.0 + dent * 3.0 - t * 0.8)), 16.0) * tube;
-  float l = 0.15 + 0.5 * liquid + 0.35 * lit - 0.25 * (1.0 - tube) + 0.6 * spec;
+  float spec = pow(max(0.0, sin(ang * 2.0 + flow * 4.0 + dent * 3.0 - t * 0.8)), 24.0) * tube;
+  float l = 0.25 + 0.55 * lit + 0.3 * (liquid - 0.45) - 0.2 * (1.0 - tube) + 0.7 * spec;
   l *= 1.0 - 0.35 * dent;
   vec3 col = iris(ramp(l), flow * 1.5 + ang / 6.2832 + t * 0.05);
   float rim = uInner * (1.0 - smoothstep(0.0, 1.6, d)) * clamp(-p.y / uBox.y, 0.0, 1.0);
@@ -170,9 +170,9 @@ void main() {
   float cover = clamp(d * uDpr + 0.5, 0.0, 1.0) * clamp((ring - d) * uDpr + 0.5, 0.0, 1.0);
 
   float phase = t * 0.45 + sin(t * 0.7) * 1.4;
-  float wander = 0.3 + 0.7 * pow(0.5 + 0.5 * cos(ang - phase), 3.0);
-  float halo = exp(-max(d - ring, 0.0) / 7.0) * wander * (1.0 - cover) * step(0.0, d);
-  vec3 glow = mix(uGlow, hue(ang / 6.2832 + t * 0.07) * 0.8 + 0.2, uIris);
+  float wander = pow(0.5 + 0.5 * cos(ang - phase), 8.0);
+  float halo = exp(-max(d - ring, 0.0) / 6.0) * wander * (1.0 - cover) * step(0.0, d);
+  vec3 glow = mix(uGlow, hue(ang / 6.2832 + t * 0.07) * 0.8 + 0.2, uIris * 0.4);
 
   float a = cover * uAlpha + halo * uGlowAlpha;
   gl_FragColor = vec4(col * cover * uAlpha + glow * halo * uGlowAlpha, min(a, 1.0));
@@ -197,7 +197,7 @@ const hue = (h: number): RGB =>
 
 const glowColor = (t: Tuning, ang: number, time: number): RGB => {
   const h = hue(ang / TAU + time * 0.07);
-  return t.glow.map((g, i) => g + (h[i] * 0.8 + 0.2 - g) * t.iris) as RGB;
+  return t.glow.map((g, i) => g + (h[i] * 0.8 + 0.2 - g) * t.iris * 0.4) as RGB;
 };
 
 const pxRadius = (value: string, w: number, h: number) => {
@@ -306,7 +306,7 @@ function useMetal(
           Math.max(0, Math.abs(dy) - (r.height + box.height) / 2),
         );
         const ang = Math.atan2(dy, dx);
-        const wander = 0.3 + 0.7 * (0.5 + 0.5 * Math.cos(ang - phase)) ** 3;
+        const wander = (0.5 + 0.5 * Math.cos(ang - phase)) ** 8;
         const k = o.disableGlow ? 0 : t.glowAlpha * o.glowGain * o.strength * wander * Math.exp(-gap / REFLECT_RANGE);
         const [cr, cg, cb] = glowColor(t, ang, time).map((c) => Math.round(c * 255));
         const len = Math.hypot(dx, dy) || 1;
@@ -332,7 +332,7 @@ function useMetal(
       gl.uniform1f(loc.dpr, dpr);
       gl.uniform2f(loc.box, w / 2, h / 2);
       gl.uniform1f(loc.radius, radius);
-      gl.uniform1f(loc.ring, Math.min(Math.max(Math.min(w, h) * 0.09, 2), 5));
+      gl.uniform1f(loc.ring, Math.min(Math.max(Math.min(w, h) * 0.04, 1.5), 2.5));
       gl.uniform1f(loc.time, time);
       gl.uniform3f(loc.bend, bend?.x ?? 0, bend?.y ?? 0, bend?.amount ?? 0);
       gl.uniform3fv(loc.stops, t.stops);
@@ -423,7 +423,6 @@ function useMetal(
       gl.deleteBuffer(buffer);
       if (texture) gl.deleteTexture(texture);
       compiled.dispose();
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, [rootRef, canvasRef, textMode]);
 }
@@ -487,7 +486,7 @@ function MetalFx({
         ref={canvasRef}
         aria-hidden
         className="pointer-events-none absolute -z-10"
-        style={{ inset: -HALO }}
+        style={{ inset: -HALO, width: `calc(100% + ${HALO * 2}px)`, height: `calc(100% + ${HALO * 2}px)` }}
       />
       {children}
     </div>
@@ -541,7 +540,7 @@ function MetalText({
         ref={canvasRef}
         aria-hidden
         className="pointer-events-none absolute"
-        style={{ inset: -TEXT_PAD }}
+        style={{ inset: -TEXT_PAD, width: `calc(100% + ${TEXT_PAD * 2}px)`, height: `calc(100% + ${TEXT_PAD * 2}px)` }}
       />
       {children}
     </span>
