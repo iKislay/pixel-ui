@@ -411,4 +411,60 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("popover", {
+    name: "Popover",
+    category: "overlays",
+    description: "A floating panel anchored to a trigger, for small forms and details.",
+    interaction:
+      "Click the trigger and a soft panel grows out of it, taking focus. Escape closes it and returns focus to the trigger; a click outside closes it too. Honors prefers-reduced-motion: the panel only fades.",
+    props: [
+      {
+        name: "trigger",
+        type: "ReactElement",
+        required: true,
+        description: "One focusable element that toggles the panel. It gets aria-expanded.",
+      },
+      {
+        name: "open",
+        type: "boolean",
+        description: "Controls the panel. Leave it unset to let the popover manage itself.",
+      },
+      {
+        name: "defaultOpen",
+        type: "boolean",
+        default: "false",
+        description: "The starting state when uncontrolled.",
+      },
+      {
+        name: "onOpenChange",
+        type: "(open: boolean) => void",
+        description: "Called whenever the panel opens or closes.",
+      },
+      {
+        name: "side",
+        type: '"top" | "bottom"',
+        default: '"bottom"',
+        options: ["top", "bottom"],
+        description: "Which side of the trigger the panel opens on. It does not flip at the screen edge.",
+      },
+      {
+        name: "align",
+        type: '"start" | "center" | "end"',
+        default: '"center"',
+        options: ["start", "center", "end"],
+        description: "How the panel lines up with the trigger.",
+      },
+      feedbackProp('"open" | "close"'),
+      { name: "className", type: "string", description: "Merged onto the panel." },
+    ],
+    usage: `import { Popover } from "@/components/ui/popover"
+
+export function Demo() {
+  return (
+    <Popover aria-label="Details" trigger={<button type="button">Details</button>}>
+      Shipping takes four to six days.
+    </Popover>
+  )
+}`,
+  }),
 ];

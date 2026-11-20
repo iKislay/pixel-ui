@@ -12,6 +12,7 @@ import { Slider } from "@/components/ui/slider";
 import { Select } from "@/components/ui/select";
 import { Tabs } from "@/components/ui/tabs";
 import { Tooltip } from "@/components/ui/tooltip";
+import { Popover } from "@/components/ui/popover";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -213,6 +214,22 @@ function TooltipDemo() {
   );
 }
 
+function PopoverDemo() {
+  return (
+    <div className="flex h-72 items-start pt-8">
+      <Popover aria-label="Rename" align="start" trigger={<Button variant="secondary">Rename file</Button>}>
+        <form onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-3">
+          <p className="font-semibold">Rename</p>
+          <Input defaultValue="moodboard-final-v2.fig" aria-label="File name" />
+          <Button size="sm" type="submit" className="self-end">
+            Save
+          </Button>
+        </form>
+      </Popover>
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -224,6 +241,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "select": SelectDemo,
   "tabs": TabsDemo,
   "tooltip": TooltipDemo,
+  "popover": PopoverDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

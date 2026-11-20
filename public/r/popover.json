@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "popover",
+  "title": "Popover",
+  "description": "A floating panel anchored to a trigger, for small forms and details.",
+  "dependencies": [
+    "motion",
+    "@radix-ui/react-slot"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "components/ui/popover.tsx",
+      "content": "\"use client\";\n\nimport { useEffect, useId, useRef, useState, type ReactElement, type ReactNode } from \"react\";\nimport { Slot } from \"@radix-ui/react-slot\";\nimport { AnimatePresence, motion, useReducedMotion } from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\nexport type PopoverFeedback = \"open\" | \"close\";\n\nconst PLACEMENT = {\n  bottom: { start: \"top-full left-0 mt-2 origin-top-left\", center: \"top-full left-1/2 mt-2 -translate-x-1/2 origin-top\", end: \"top-full right-0 mt-2 origin-top-right\" },\n  top: { start: \"bottom-full left-0 mb-2 origin-bottom-left\", center: \"bottom-full left-1/2 mb-2 -translate-x-1/2 origin-bottom\", end: \"bottom-full right-0 mb-2 origin-bottom-right\" },\n};\n\nexport type PopoverProps = {\n  trigger: ReactElement;\n  children: ReactNode;\n  open?: boolean;\n  defaultOpen?: boolean;\n  onOpenChange?: (open: boolean) => void;\n  side?: keyof typeof PLACEMENT;\n  align?: \"start\" | \"center\" | \"end\";\n  className?: string;\n  \"aria-label\"?: string;\n  onFeedback?: (event: PopoverFeedback) => void;\n};\n\nexport function Popover({\n  trigger,\n  children,\n  open,\n  defaultOpen = false,\n  onOpenChange,\n  side = \"bottom\",\n  align = \"center\",\n  className,\n  onFeedback,\n  \"aria-label\": label,\n}: PopoverProps) {\n  const [inner, setInner] = useState(defaultOpen);\n  const shown = open ?? inner;\n  const root = useRef<HTMLSpanElement>(null);\n  const panel = useRef<HTMLDivElement>(null);\n  const id = useId();\n  const reduce = useReducedMotion();\n\n  const set = (next: boolean, refocus = false) => {\n    setInner(next);\n    onOpenChange?.(next);\n    onFeedback?.(next ? \"open\" : \"close\");\n    if (refocus) root.current?.querySelector<HTMLElement>(\"[aria-haspopup]\")?.focus();\n  };\n\n  useEffect(() => {\n    if (!shown) return;\n    panel.current?.focus();\n    const onPointer = (event: PointerEvent) => {\n      if (!root.current?.contains(event.target as Node)) set(false);\n    };\n    const onKey = (event: KeyboardEvent) => event.key === \"Escape\" && set(false, true);\n    document.addEventListener(\"pointerdown\", onPointer);\n    document.addEventListener(\"keydown\", onKey);\n    return () => {\n      document.removeEventListener(\"pointerdown\", onPointer);\n      document.removeEventListener(\"keydown\", onKey);\n    };\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [shown]);\n\n  return (\n    <span ref={root} data-slot=\"popover\" className=\"relative inline-flex\">\n      <Slot\n        aria-haspopup=\"dialog\"\n        aria-expanded={shown}\n        aria-controls={shown ? id : undefined}\n        onClick={() => set(!shown)}\n      >\n        {trigger}\n      </Slot>\n      <AnimatePresence>\n        {shown && (\n          <motion.div\n            ref={panel}\n            id={id}\n            role=\"dialog\"\n            aria-label={label}\n            tabIndex={-1}\n            initial={{ opacity: 0, scale: reduce ? 1 : 0.94 }}\n            animate={{ opacity: 1, scale: 1 }}\n            exit={{ opacity: 0, scale: reduce ? 1 : 0.94 }}\n            transition={{ type: \"spring\", stiffness: 520, damping: 34 }}\n            className={cn(\n              \"absolute z-50 w-72 rounded-[26px] bg-popover p-4 text-sm text-popover-foreground shadow-[0_16px_48px_-12px_rgba(0,0,0,0.28),0_0_0_1px_rgba(0,0,0,0.05)] outline-none [corner-shape:squircle] dark:shadow-[0_16px_48px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.08)]\",\n              PLACEMENT[side][align],\n              className,\n            )}\n          >\n            {children}\n          </motion.div>\n        )}\n      </AnimatePresence>\n    </span>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}
