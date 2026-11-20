@@ -1287,7 +1287,7 @@ const PM_EXECUTORS: Record<PackageManager, string> = {
 export const PACKAGE_MANAGERS = Object.keys(PM_EXECUTORS) as PackageManager[];
 
 export function installCommand(
-  item: ComponentItem,
+  item: Pick<ComponentItem, "registry" | "pro">,
   pm: PackageManager = "npm",
 ): string | null {
   if (!item.registry) return null;

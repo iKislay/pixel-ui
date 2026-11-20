@@ -19,7 +19,7 @@ const ACTIVE_COLOR: Record<PackageManager, string> = {
   bun: "#FF9557",
 };
 
-export default function InstallCommand({ item }: { item: ComponentItem }) {
+export default function InstallCommand({ item }: { item: Pick<ComponentItem, "registry" | "pro"> }) {
   const [pm, setPm] = useState<PackageManager>("npm");
   const command = installCommand(item, pm);
   if (!command) return null;
