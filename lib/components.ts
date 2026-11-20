@@ -117,7 +117,7 @@ export const components: ComponentItem[] = [
       {
         name: "reflectionTargets",
         type: "RefObject<HTMLElement>[]",
-        description: "Neighbouring elements that catch a tint of the halo as it passes them.",
+        description: "Neighbouring elements that catch a light rim on the edge facing the metal. It sets their box-shadow.",
       },
       {
         name: "disableGlow",

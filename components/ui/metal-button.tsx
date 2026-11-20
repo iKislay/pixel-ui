@@ -300,7 +300,7 @@ function useMetal(
       raf = -1;
       show(false);
       for (const el of touched) {
-        el.style.filter = "";
+        el.style.boxShadow = "";
         el.style.textShadow = "";
       }
     };
@@ -349,14 +349,15 @@ function useMetal(
           Math.max(0, Math.abs(dy) - (r.height + box.height) / 2),
         );
         const ang = Math.atan2(dy, dx);
-        const wander = (0.5 + 0.5 * Math.cos(ang - phase)) ** 8;
+        const wander = 0.45 + 0.55 * (0.5 + 0.5 * Math.cos(ang - phase)) ** 8;
         const k = o.disableGlow ? 0 : t.glowAlpha * o.glowGain * o.strength * wander * Math.exp(-gap / REFLECT_RANGE);
-        const [cr, cg, cb] = glowColor(t, ang, time).map((c) => Math.round(c * 255));
+        const glow = glowColor(t, ang, time);
+        const [cr, cg, cb] = t.stops.slice(9).map((c, i) => Math.round(((c + glow[i]) / 2) * 255));
         const len = Math.hypot(dx, dy) || 1;
-        const shadow = `${((-dx / len) * 3).toFixed(1)}px ${((-dy / len) * 3).toFixed(1)}px`;
         const color = `rgba(${cr}, ${cg}, ${cb}, ${k.toFixed(3)})`;
-        if (text) el.style.textShadow = `${shadow} 8px ${color}`;
-        else el.style.filter = `drop-shadow(${shadow} 10px ${color})`;
+        if (text) el.style.textShadow = `${((-dx / len) * 3).toFixed(1)}px ${((-dy / len) * 3).toFixed(1)}px 8px ${color}`;
+        // an inset shadow offset away from the metal lights the edge that faces it
+        else el.style.boxShadow = `inset ${((dx / len) * 2.5).toFixed(1)}px ${((dy / len) * 2.5).toFixed(1)}px 4px -1px ${color}`;
         touched.add(el);
       }
     };
