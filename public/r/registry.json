@@ -615,7 +615,7 @@
       "name": "progress",
       "type": "registry:ui",
       "title": "Progress",
-      "description": "A slim bar that shows how far along a task is.",
+      "description": "A slim bar with a glowing edge that turns green when the task is done.",
       "dependencies": [
         "motion"
       ],

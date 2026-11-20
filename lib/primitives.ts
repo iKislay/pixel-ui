@@ -743,9 +743,9 @@ export function Demo() {
   primitive("progress", {
     name: "Progress",
     category: "feedback",
-    description: "A slim bar that shows how far along a task is.",
+    description: "A slim bar with a glowing edge that turns green when the task is done.",
     interaction:
-      "The blue fill springs forward each time the value moves. With no value, a short bar sweeps across on a loop to show work is happening. Honors prefers-reduced-motion: the fill jumps and the sweep holds still.",
+      "The blue fill springs forward each time the value moves, a sheen running along it and a soft glow at its leading edge. At the end it turns green and a faint ring pulses once around the track. With no value, a short bar sweeps across on a loop. Honors prefers-reduced-motion: the fill jumps, the sheen and pulse are off and the sweep holds still.",
     props: [
       {
         name: "value",
