@@ -139,7 +139,7 @@ export default function CommandMenu({
 
   const matches = useMemo(() => search(query), [query]);
   const results = category
-    ? matches.filter((item) => item.category === category)
+    ? (query.trim() ? matches : searchable).filter((item) => item.category === category)
     : matches;
   const activeItem = results[active];
   const searching = !!query.trim();
