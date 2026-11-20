@@ -442,9 +442,9 @@ export function Demo() {
   primitive("popover", {
     name: "Popover",
     category: "overlays",
-    description: "A floating panel anchored to a trigger, for small forms and details.",
+    description: "A panel that unfolds out of its trigger, for small forms and details.",
     interaction:
-      "Click the trigger and a soft panel grows out of it, taking focus. Escape closes it and returns focus to the trigger; a click outside closes it too. Honors prefers-reduced-motion: the panel only fades.",
+      "Click the trigger and the panel unfolds from the trigger's own outline, its contents fading in as it opens, then takes focus. Escape closes it back into the trigger and returns focus there; a click outside closes it too. Honors prefers-reduced-motion: the panel only fades.",
     props: [
       {
         name: "trigger",
