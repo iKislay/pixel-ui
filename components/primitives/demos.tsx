@@ -16,7 +16,7 @@ import { Popover } from "@/components/ui/popover";
 import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarGroup } from "@/components/ui/avatar";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
@@ -315,10 +315,20 @@ function BadgeDemo() {
 
 function AvatarDemo() {
   return (
-    <div className="flex items-end gap-4">
-      <Avatar name="Mira Okafor" size="lg" status="online" />
-      <Avatar name="Theo Lindqvist" status="away" />
-      <Avatar name="Ana Ruiz" size="sm" status="offline" />
+    <div className="flex flex-col items-center gap-8">
+      <div className="flex items-end gap-4">
+        <Avatar name="Mira Okafor" size="lg" status="online" />
+        <Avatar name="Theo Lindqvist" status="away" />
+        <Avatar name="Ana Ruiz" size="sm" status="offline" />
+      </div>
+      <AvatarGroup max={4}>
+        <Avatar name="Mira Okafor" />
+        <Avatar name="Theo Lindqvist" />
+        <Avatar name="Ana Ruiz" />
+        <Avatar name="Kenji Mori" />
+        <Avatar name="Sade Bello" />
+        <Avatar name="Lena Fox" />
+      </AvatarGroup>
     </div>
   );
 }

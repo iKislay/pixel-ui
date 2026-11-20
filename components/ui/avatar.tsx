@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentProps } from "react";
+import { Children, useState, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const SIZES = {
@@ -53,8 +53,8 @@ export function Avatar({ src, name, size = "md", status, className, ...props }: 
             onLoad={() => setState("loaded")}
             onError={() => setState("error")}
             className={cn(
-              "absolute inset-0 size-full object-cover transition-opacity duration-300 motion-reduce:transition-none",
-              state === "loaded" ? "opacity-100" : "opacity-0",
+              "absolute inset-0 size-full object-cover transition-[opacity,scale,filter] duration-500 ease-out motion-reduce:transition-none",
+              state === "loaded" ? "scale-100 opacity-100 blur-0" : "scale-110 opacity-0 blur-sm",
             )}
           />
         )}
@@ -66,5 +66,47 @@ export function Avatar({ src, name, size = "md", status, className, ...props }: 
         />
       )}
     </span>
+  );
+}
+
+export type AvatarGroupProps = ComponentProps<"div"> & {
+  max?: number;
+  size?: keyof typeof SIZES;
+  children: ReactNode;
+};
+
+export function AvatarGroup({ max = 4, size = "md", className, children, ...props }: AvatarGroupProps) {
+  const all = Children.toArray(children);
+  const shown = all.slice(0, max);
+  const extra = all.length - shown.length;
+  const overlap = size === "sm" ? "-ml-2.5" : size === "lg" ? "-ml-5" : "-ml-3.5";
+
+  return (
+    <div data-slot="avatar-group" className={cn("group/avatars flex items-center", className)} {...props}>
+      {[...shown, ...(extra > 0 ? [`+${extra}`] : [])].map((child, index) => (
+        <span
+          key={index}
+          style={{ zIndex: all.length - index }}
+          className={cn(
+            "relative rounded-[38%] ring-[3px] ring-background transition-[margin,translate] duration-300 ease-[cubic-bezier(0.3,1.4,0.5,1)] [corner-shape:squircle] first:ml-0 hover:-translate-y-1 group-hover/avatars:ml-1 motion-reduce:transition-none",
+            overlap,
+          )}
+        >
+          {typeof child === "string" ? (
+            <span
+              aria-label={`${extra} more`}
+              className={cn(
+                "flex items-center justify-center rounded-[38%] bg-foreground/[0.08] font-semibold text-foreground/60 [corner-shape:squircle]",
+                SIZES[size],
+              )}
+            >
+              {child}
+            </span>
+          ) : (
+            child
+          )}
+        </span>
+      ))}
+    </div>
   );
 }
