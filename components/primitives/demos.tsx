@@ -17,6 +17,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -302,6 +303,21 @@ function AvatarDemo() {
   );
 }
 
+function CardDemo() {
+  return (
+    <Card className="w-full max-w-sm bg-background shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_32px_-12px_rgba(0,0,0,0.12)]">
+      <div className="flex items-center justify-between">
+        <CardTitle>Weekly digest</CardTitle>
+        <Badge tone="brand">Beta</Badge>
+      </div>
+      <CardDescription>A short summary of what changed across your projects, every Monday morning.</CardDescription>
+      <Button size="sm" variant="secondary" className="self-start">
+        Turn on
+      </Button>
+    </Card>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -318,6 +334,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "dropdown-menu": DropdownMenuDemo,
   "badge": BadgeDemo,
   "avatar": AvatarDemo,
+  "card": CardDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

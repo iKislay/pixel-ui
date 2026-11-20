@@ -567,6 +567,21 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "A large soft squircle surface for grouping related content.",
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/card.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }

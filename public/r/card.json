@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card",
+  "title": "Card",
+  "description": "A large soft squircle surface for grouping related content.",
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "components/ui/card.tsx",
+      "content": "import type { ComponentProps } from \"react\";\nimport { cn } from \"@/lib/utils\";\n\nexport function Card({ className, ...props }: ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"card\"\n      className={cn(\n        \"flex flex-col gap-4 rounded-[36px] bg-card p-7 text-card-foreground [corner-shape:squircle]\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function CardTitle({ className, ...props }: ComponentProps<\"h3\">) {\n  return <h3 data-slot=\"card-title\" className={cn(\"text-lg font-semibold tracking-tight\", className)} {...props} />;\n}\n\nexport function CardDescription({ className, ...props }: ComponentProps<\"p\">) {\n  return <p data-slot=\"card-description\" className={cn(\"text-sm leading-relaxed text-foreground/55\", className)} {...props} />;\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

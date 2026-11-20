@@ -629,4 +629,37 @@ export function Demo() {
   return <Avatar name="Mira Okafor" src="/mira.jpg" status="online" />
 }`,
   }),
+  primitive("card", {
+    name: "Card",
+    category: "display",
+    description: "A large soft squircle surface for grouping related content.",
+    interaction: "A calm surface with generous squircle corners. Title and description parts keep the type consistent.",
+    props: [
+      {
+        name: "Card",
+        type: "ComponentProps<\"div\">",
+        description: "The surface. Children stack with an even gap.",
+      },
+      {
+        name: "CardTitle",
+        type: "ComponentProps<\"h3\">",
+        description: "The heading inside a card.",
+      },
+      {
+        name: "CardDescription",
+        type: "ComponentProps<\"p\">",
+        description: "Muted body text under the title.",
+      },
+    ],
+    usage: `import { Card, CardDescription, CardTitle } from "@/components/ui/card"
+
+export function Demo() {
+  return (
+    <Card>
+      <CardTitle>Storage</CardTitle>
+      <CardDescription>You have used 3.2 GB of 10 GB.</CardDescription>
+    </Card>
+  )
+}`,
+  }),
 ];
