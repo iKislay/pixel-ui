@@ -29,7 +29,7 @@ const formatProp: ComponentProp = {
   name: "format",
   type: "(value: number) => string",
   default: "compact",
-  description: "Formats values on the axis and in the tooltip. Defaults to short numbers like 12.4K.",
+  description: "Formats values wherever the chart shows them. Defaults to short numbers like 12.4K.",
 };
 
 const cartesianProps: ComponentProp[] = [
