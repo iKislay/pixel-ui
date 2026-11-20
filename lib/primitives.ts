@@ -148,4 +148,41 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("switch", {
+    name: "Switch",
+    category: "inputs",
+    description: "An on and off switch with a springy thumb.",
+    interaction:
+      "Click or press Space and the thumb springs across as the track fills blue. Hold it down and the thumb stretches a little, like a finger pressing it. Honors prefers-reduced-motion: the thumb jumps across.",
+    props: [
+      {
+        name: "checked",
+        type: "boolean",
+        description: "Controls the state. Leave it unset to let the switch manage itself.",
+      },
+      {
+        name: "defaultChecked",
+        type: "boolean",
+        default: "false",
+        description: "The starting state when uncontrolled.",
+      },
+      {
+        name: "onCheckedChange",
+        type: "(checked: boolean) => void",
+        description: "Called with the new state.",
+      },
+      feedbackProp('"toggle"'),
+      classNameProp,
+    ],
+    usage: `import { Switch } from "@/components/ui/switch"
+
+export function Demo() {
+  return (
+    <label className="flex items-center gap-3">
+      <Switch defaultChecked />
+      Airplane mode
+    </label>
+  )
+}`,
+  }),
 ];

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -98,11 +99,31 @@ function CheckboxDemo() {
   );
 }
 
+function SwitchDemo() {
+  const rows = [
+    ["Notifications", true],
+    ["Sync over cellular", false],
+    ["Reduce transparency", false],
+  ] as const;
+
+  return (
+    <div className="flex w-full max-w-xs flex-col gap-4 text-sm font-medium">
+      {rows.map(([label, on]) => (
+        <label key={label} className="flex cursor-pointer items-center justify-between gap-6">
+          {label}
+          <Switch defaultChecked={on} />
+        </label>
+      ))}
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
   "textarea": TextareaDemo,
   "checkbox": CheckboxDemo,
+  "switch": SwitchDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {
