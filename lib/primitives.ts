@@ -554,9 +554,9 @@ export function Demo() {
   primitive("dropdown-menu", {
     name: "Dropdown Menu",
     category: "overlays",
-    description: "A menu of actions that drops from a trigger.",
+    description: "A menu of actions that blooms from its trigger.",
     interaction:
-      "Click the trigger, or press the down arrow on it, and the menu springs open with the first action focused. Move with the arrow keys, Home and End, and pick with Enter. Escape closes it and returns focus to the trigger. Honors prefers-reduced-motion: the menu only fades.",
+      "Click the trigger, or press the down arrow on it, and the menu blooms out of the trigger's corner, sharpening from a blur while its actions cascade in. A soft highlight glides to whatever you point at or reach with the arrow keys, Home and End; Enter picks. Escape closes it and returns focus to the trigger. Honors prefers-reduced-motion: the menu only fades and the highlight jumps.",
     props: [
       {
         name: "trigger",
