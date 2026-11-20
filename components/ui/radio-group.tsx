@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ComponentProps, type KeyboardEvent, type ReactNode } from "react";
+import { useId, useRef, useState, type ComponentProps, type KeyboardEvent, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +36,8 @@ export function RadioGroup({
   const selected = value ?? inner;
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const reduce = useReducedMotion();
+  const id = useId();
+  const glide = reduce ? { duration: 0 } : { type: "spring" as const, stiffness: 420, damping: 34 };
   const enabled = options.filter((o) => !o.disabled);
   // with nothing selected, the first enabled radio takes the tab stop
   const tabStop = enabled.some((o) => o.value === selected) ? selected : enabled[0]?.value;
@@ -77,22 +79,27 @@ export function RadioGroup({
             tabIndex={option.value === tabStop ? 0 : -1}
             onClick={() => choose(option.value)}
             onKeyDown={(event) => onKeyDown(event, index)}
-            className="group flex cursor-pointer items-start gap-3 rounded-[18px] px-3 py-2.5 text-left outline-hidden transition-colors duration-150 [corner-shape:squircle] hover:bg-foreground/[0.04] focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none"
+            className="group relative flex cursor-pointer items-start gap-3 rounded-[20px] px-3.5 py-3 text-left outline-hidden transition-colors duration-150 hover:bg-foreground/[0.03] motion-reduce:transition-none [corner-shape:squircle] focus-visible:outline-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-45"
           >
-            <span
-              className={cn(
-                "mt-px flex size-5 shrink-0 items-center justify-center rounded-full ring-1 ring-inset ring-foreground/15 transition-colors duration-150 group-hover:ring-foreground/30 motion-reduce:transition-none",
-                checked && "btn-primary",
-              )}
-            >
+            {checked && (
               <motion.span
-                initial={false}
-                animate={{ scale: checked ? 1 : 0 }}
-                transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 600, damping: 24 }}
-                className="size-2 rounded-full bg-white"
+                layoutId={`${id}-card`}
+                transition={glide}
+                className="absolute inset-0 rounded-[20px] bg-background shadow-[0_1px_3px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.04)] [corner-shape:squircle] dark:bg-foreground/[0.08]"
               />
+            )}
+            <span className="relative mt-px flex size-5 shrink-0 items-center justify-center rounded-full ring-1 ring-inset ring-foreground/15 transition-colors duration-150 group-hover:ring-foreground/30 motion-reduce:transition-none">
+              {checked && (
+                <motion.span
+                  layoutId={`${id}-dot`}
+                  transition={glide}
+                  className="btn-primary flex size-5 items-center justify-center rounded-full"
+                >
+                  <span className="size-2 rounded-full bg-white" />
+                </motion.span>
+              )}
             </span>
-            <span className="flex flex-col gap-0.5">
+            <span className="relative flex flex-col gap-0.5">
               <span className="text-sm font-medium text-foreground">{option.label}</span>
               {option.description && <span className="text-xs text-foreground/50">{option.description}</span>}
             </span>

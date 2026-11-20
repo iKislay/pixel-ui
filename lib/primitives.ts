@@ -210,9 +210,9 @@ export function Demo() {
   primitive("radio-group", {
     name: "Radio Group",
     category: "inputs",
-    description: "A list of options where exactly one can be picked.",
+    description: "A list of options where the pick glides from one to the next.",
     interaction:
-      "Click an option and its dot pops in with a small spring. Tab lands on the group once; the arrow keys move between options and pick as they go. Honors prefers-reduced-motion: the dot appears at once.",
+      "Click an option and the soft card behind the old pick slides over to it, carrying the blue dot along. Tab lands on the group once; the arrow keys move between options and pick as they go. Honors prefers-reduced-motion: the card and dot jump.",
     props: [
       {
         name: "options",

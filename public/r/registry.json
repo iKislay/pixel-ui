@@ -399,7 +399,7 @@
       "name": "radio-group",
       "type": "registry:ui",
       "title": "Radio Group",
-      "description": "A list of options where exactly one can be picked.",
+      "description": "A list of options where the pick glides from one to the next.",
       "dependencies": [
         "motion"
       ],
