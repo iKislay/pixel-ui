@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup } from "@/components/ui/radio-group";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -118,12 +119,28 @@ function SwitchDemo() {
   );
 }
 
+function RadioGroupDemo() {
+  return (
+    <RadioGroup
+      aria-label="Delivery"
+      defaultValue="standard"
+      className="w-full max-w-xs"
+      options={[
+        { value: "standard", label: "Standard", description: "Four to six days, free" },
+        { value: "express", label: "Express", description: "Next day, $12" },
+        { value: "pickup", label: "Pick up", description: "Not offered in your area", disabled: true },
+      ]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
   "textarea": TextareaDemo,
   "checkbox": CheckboxDemo,
   "switch": SwitchDemo,
+  "radio-group": RadioGroupDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

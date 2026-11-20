@@ -185,4 +185,50 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("radio-group", {
+    name: "Radio Group",
+    category: "inputs",
+    description: "A list of options where exactly one can be picked.",
+    interaction:
+      "Click an option and its dot pops in with a small spring. Tab lands on the group once; the arrow keys move between options and pick as they go. Honors prefers-reduced-motion: the dot appears at once.",
+    props: [
+      {
+        name: "options",
+        type: "{ value: string; label: ReactNode; description?: ReactNode; disabled?: boolean }[]",
+        required: true,
+        description: "The choices, in order. A description shows under its label.",
+      },
+      {
+        name: "value",
+        type: "string",
+        description: "Controls the picked option. Leave it unset to let the group manage itself.",
+      },
+      {
+        name: "defaultValue",
+        type: "string",
+        description: "The starting pick when uncontrolled. Nothing is picked by default.",
+      },
+      {
+        name: "onValueChange",
+        type: "(value: string) => void",
+        description: "Called with the newly picked value.",
+      },
+      feedbackProp('"select"'),
+      classNameProp,
+    ],
+    usage: `import { RadioGroup } from "@/components/ui/radio-group"
+
+export function Demo() {
+  return (
+    <RadioGroup
+      aria-label="Plan"
+      defaultValue="monthly"
+      options={[
+        { value: "monthly", label: "Monthly" },
+        { value: "yearly", label: "Yearly", description: "Two months free" },
+      ]}
+    />
+  )
+}`,
+  }),
 ];
