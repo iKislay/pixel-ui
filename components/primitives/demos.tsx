@@ -20,6 +20,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -362,6 +363,18 @@ function ProgressDemo() {
   );
 }
 
+function SkeletonDemo() {
+  return (
+    <div className="flex w-full max-w-xs items-center gap-4" aria-busy aria-label="Loading profile">
+      <Skeleton className="size-12 rounded-[38%]" />
+      <div className="flex flex-1 flex-col gap-2.5">
+        <Skeleton className="h-3.5 w-3/4" />
+        <Skeleton className="h-3.5 w-1/2" />
+      </div>
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -381,6 +394,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "card": CardDemo,
   "separator": SeparatorDemo,
   "progress": ProgressDemo,
+  "skeleton": SkeletonDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

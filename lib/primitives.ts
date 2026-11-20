@@ -714,4 +714,23 @@ export function Demo() {
   return <Progress value={64} aria-label="Upload" />
 }`,
   }),
+  primitive("skeleton", {
+    name: "Skeleton",
+    category: "feedback",
+    description: "A soft placeholder block that stands in for content while it loads.",
+    interaction:
+      "A muted block with a gentle sheen that sweeps across it now and then. Screen readers skip it. Honors prefers-reduced-motion: the sheen is off.",
+    props: [
+      {
+        name: "className",
+        type: "string",
+        description: "Set the size and shape here, for example h-4 w-32 or size-11 rounded-full.",
+      },
+    ],
+    usage: `import { Skeleton } from "@/components/ui/skeleton"
+
+export function Demo() {
+  return <Skeleton className="h-4 w-40" />
+}`,
+  }),
 ];
