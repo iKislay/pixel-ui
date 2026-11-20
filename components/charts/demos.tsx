@@ -7,6 +7,7 @@ import { BarChart } from "@/components/ui/bar-chart";
 import { DonutChart } from "@/components/ui/donut-chart";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
+import { ScatterChart } from "@/components/ui/scatter-chart";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StackedBarChart } from "@/components/ui/stacked-bar-chart";
 
@@ -130,7 +131,32 @@ function RadialProgressDemo() {
   );
 }
 
+// a fixed pseudo-random cloud so the server and client render the same dots
+const cloud = (seed: number, count: number, slope: number) =>
+  Array.from({ length: count }, (_, i) => {
+    const noise = Math.sin(seed * 97 + i * 13.37) * 0.5 + 0.5;
+    const load = 0.4 + ((i * 7 + seed * 3) % count) / count * 3.2;
+    return { x: +load.toFixed(2), y: Math.round(Math.max(8, 88 - load * slope + (noise - 0.5) * 26)) };
+  });
+
+function ScatterChartDemo() {
+  return (
+    <ScatterChart
+      label="Load time against conversion"
+      xLabel="Load time (s)"
+      yLabel="Conversion"
+      format={(n) => `${n}%`}
+      formatX={(n) => `${n}s`}
+      series={[
+        { label: "Desktop", points: cloud(1, 22, 16) },
+        { label: "Mobile", points: cloud(2, 22, 22) },
+      ]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
+  "scatter-chart": ScatterChartDemo,
   "radial-progress": RadialProgressDemo,
   "donut-chart": DonutChartDemo,
   sparkline: SparklineDemo,

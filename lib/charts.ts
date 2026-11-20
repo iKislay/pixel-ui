@@ -353,4 +353,62 @@ export function Demo() {
   return <RadialProgress label="Storage used" value={72} caption="of 50 GB" />
 }`,
   }),
+  chart("scatter-chart", {
+    name: "Scatter Chart",
+    category: "comparison",
+    description: "A dot plot that shows how two measures relate across many items.",
+    interaction:
+      "The dots pop in from left to right. Hover near a dot, or tab in and use the arrow keys, and it grows while a soft tooltip reads both of its values. A hidden table carries every point for screen readers. Honors prefers-reduced-motion: the dots appear at once.",
+    props: [
+      {
+        name: "series",
+        type: "{ label: string; color?: string; points: { x: number; y: number; label?: string }[] }[]",
+        required: true,
+        description: "Groups of points. Colors follow the chart palette in order unless you set one.",
+      },
+      labelProp,
+      {
+        name: "xLabel",
+        type: "string",
+        default: '"x"',
+        description: "Names the horizontal measure under the axis and in the tooltip.",
+      },
+      {
+        name: "yLabel",
+        type: "string",
+        default: '"y"',
+        description: "Names the vertical measure in the tooltip.",
+      },
+      {
+        name: "height",
+        type: "number",
+        default: "280",
+        description: "Height in pixels. The width fills the parent.",
+      },
+      formatProp,
+      {
+        name: "formatX",
+        type: "(value: number) => string",
+        default: "compact",
+        description: "Formats horizontal values, like format does for vertical ones.",
+      },
+      classNameProp,
+    ],
+    usage: `import { ScatterChart } from "@/components/ui/scatter-chart"
+
+const series = [
+  {
+    label: "Pages",
+    points: [
+      { x: 1.2, y: 64, label: "Home" },
+      { x: 2.8, y: 41, label: "Pricing" },
+      { x: 0.6, y: 82, label: "Docs" },
+    ],
+  },
+]
+
+export function Demo() {
+  return <ScatterChart label="Load time against conversion" series={series} xLabel="Load (s)" yLabel="Conversion" />
+}`,
+  }),
 ];
