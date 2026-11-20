@@ -104,10 +104,15 @@ export function Demo() {
   primitive("textarea", {
     name: "Textarea",
     category: "inputs",
-    description: "A soft multi-line field that grows with its text.",
+    description: "A multi-line field that grows with its text and counts down to its limit.",
     interaction:
-      "Type and the field grows a line at a time instead of scrolling. Focus shows a blue ring; an invalid field shows a red one.",
+      "Type and the field grows a line at a time instead of scrolling. With a character limit, a small ring in the corner fills as you write; near the end it turns amber and swells, the remaining count slides in beside it, and at the limit it turns red. Honors prefers-reduced-motion: the ring fills without springing.",
     props: [
+      {
+        name: "maxLength",
+        type: "number",
+        description: "The character limit. Setting it shows the countdown ring.",
+      },
       {
         name: "invalid",
         type: "boolean",
@@ -119,12 +124,13 @@ export function Demo() {
         type: "number",
         description: "Sets the starting height. The field still grows past it as you type.",
       },
-      classNameProp,
+      feedbackProp('"error"'),
+      { name: "className", type: "string", description: "Merged onto the wrapper. Other props go to the textarea." },
     ],
     usage: `import { Textarea } from "@/components/ui/textarea"
 
 export function Demo() {
-  return <Textarea placeholder="Leave a note" aria-label="Note" />
+  return <Textarea placeholder="Leave a note" aria-label="Note" maxLength={140} />
 }`,
   }),
   primitive("checkbox", {

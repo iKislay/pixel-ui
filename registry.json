@@ -345,7 +345,10 @@
       "name": "textarea",
       "type": "registry:ui",
       "title": "Textarea",
-      "description": "A soft multi-line field that grows with its text.",
+      "description": "A multi-line field that grows with its text and counts down to its limit.",
+      "dependencies": [
+        "motion"
+      ],
       "registryDependencies": [
         "utils"
       ],

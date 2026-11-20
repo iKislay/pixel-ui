@@ -90,7 +90,9 @@ function TextareaDemo() {
   return (
     <Textarea
       className="max-w-sm"
-      placeholder="What should we build next? It grows as you write."
+      maxLength={80}
+      defaultValue="Ship the squircle cards on Friday, then"
+      placeholder="What should we build next?"
       aria-label="Feedback"
     />
   );
