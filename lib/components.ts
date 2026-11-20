@@ -70,6 +70,122 @@ export const REGISTRY_REPO = "ikislay/pixel-ui";
 
 export const components: ComponentItem[] = [
   {
+    name: "Metal",
+    href: "/components/metal",
+    released: "2026-11-20",
+    category: "display",
+    registry: "metal",
+    description:
+      "A liquid metal ring with a wandering halo for buttons, icons, text and badges.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/metal.tsx`,
+    interaction:
+      "A thin ring of liquid metal flows around the button, with a soft halo of light drifting slowly around its edge. Hover the ring and it dents under the cursor; press and the dent goes deeper. Nearby elements and text catch a tint of the halo as it passes them. Text and badges shimmer with the same metal. Honors prefers-reduced-motion: the metal and halo hold still, and only the dent follows the cursor. Without WebGL the plain child renders.",
+    props: [
+      {
+        name: "preset",
+        type: '"chromatic" | "silver" | "gold"',
+        default: '"chromatic"',
+        options: ["chromatic", "silver", "gold"],
+        description: "The metal. Each one has a dark and a light tuning.",
+      },
+      {
+        name: "variant",
+        type: '"button" | "circle"',
+        default: '"button"',
+        options: ["button", "circle"],
+        description: "Button follows the child's corner radius; circle rounds the ring fully.",
+      },
+      {
+        name: "strength",
+        type: "number",
+        default: "1",
+        description: "From 0 to 1. Scales the opacity of the metal and its glow.",
+      },
+      {
+        name: "theme",
+        type: '"light" | "dark"',
+        options: ["light", "dark"],
+        description: "Picks the preset's tuning. Left unset, it follows the page's text color.",
+      },
+      {
+        name: "innerShadow",
+        type: "boolean",
+        default: "false",
+        options: ["true", "false"],
+        description: "Adds a light rim along the top inside edge of the ring.",
+      },
+      {
+        name: "reflectionTargets",
+        type: "RefObject<HTMLElement>[]",
+        description: "Neighbouring elements that catch a tint of the halo as it passes them.",
+      },
+      {
+        name: "disableGlow",
+        type: "boolean",
+        default: "false",
+        options: ["true", "false"],
+        description: "Turns off the halo and the reflections.",
+      },
+      {
+        name: "glowGain",
+        type: "number",
+        default: "1",
+        description: "Multiplies the halo's brightness.",
+      },
+      {
+        name: "paused",
+        type: "boolean",
+        default: "false",
+        options: ["true", "false"],
+        description: "Freezes the flow. The cursor dent still works.",
+      },
+      {
+        name: "MetalText font",
+        type: "string",
+        description: "CSS font shorthand for the metal text, like \"500 24px/1.2 Inter\". Takes preset, theme, strength and paused too.",
+      },
+      {
+        name: "MetalText color",
+        type: "string",
+        default: '"#e2e2e2"',
+        description: "Tints the metal text, and colors it when WebGL is missing.",
+      },
+      {
+        name: "useMetalBend(ref)",
+        type: "RefObject<HTMLElement>",
+        description: "Pass the ref you gave MetalFx to dent the ring under the cursor.",
+      },
+      {
+        name: "useMetalTextReflection(metalRef, textRef)",
+        type: "RefObject<HTMLElement>",
+        description: "Makes a text element catch the halo with a soft colored text shadow.",
+      },
+    ],
+    usage: `import { useRef } from "react"
+import { ArrowUp } from "lucide-react"
+import { MetalBadge, MetalFx, MetalText, useMetalBend } from "@/components/ui/metal"
+
+export function Demo() {
+  const ref = useRef<HTMLDivElement>(null)
+  useMetalBend(ref)
+
+  return (
+    <div className="flex items-center gap-6">
+      <MetalFx preset="chromatic">
+        <button className="rounded-full bg-black px-6 py-3 text-white">Upgrade to Pro</button>
+      </MetalFx>
+      <MetalFx ref={ref} variant="circle" innerShadow>
+        <button aria-label="Send" className="flex size-12 items-center justify-center rounded-full bg-black text-white">
+          <ArrowUp />
+        </button>
+      </MetalFx>
+      <MetalText font="500 24px/1.2 Inter">Pro</MetalText>
+      <MetalBadge>New</MetalBadge>
+    </div>
+  )
+}`,
+  },
+  {
     name: "Voice Glow",
     href: "/components/voice-glow",
     released: "2026-11-20",
