@@ -71,18 +71,17 @@ function InputDemo() {
       }}
       className="flex w-full max-w-sm flex-col gap-3"
     >
+      <Input label="Full name" autoComplete="name" />
       <Input
+        label="Email"
         type="email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
-        invalid={invalid}
-        placeholder="you@example.com"
-        aria-label="Email"
-        aria-describedby="input-demo-hint"
+        error={invalid ? "That email looks incomplete." : undefined}
       />
-      <p id="input-demo-hint" className="px-1 text-xs text-foreground/45">
-        {invalid ? "That email looks incomplete." : "Press Enter to check it."}
-      </p>
+      <Button type="submit" className="self-end">
+        Continue
+      </Button>
     </form>
   );
 }
@@ -237,7 +236,7 @@ function PopoverDemo() {
     <Popover aria-label="Rename" align="start" trigger={<Button variant="secondary">Rename file</Button>}>
       <form onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-3">
         <p className="font-semibold">Rename</p>
-        <Input defaultValue="moodboard-final-v2.fig" aria-label="File name" />
+        <Input label="File name" defaultValue="moodboard-final-v2.fig" />
         <Button size="sm" type="submit" className="self-end">
           Save
         </Button>

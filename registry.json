@@ -327,7 +327,7 @@
       "name": "input",
       "type": "registry:ui",
       "title": "Input",
-      "description": "A soft text field that lifts on focus and shakes when invalid.",
+      "description": "A text field whose label floats up out of the way as you type.",
       "dependencies": [
         "motion"
       ],

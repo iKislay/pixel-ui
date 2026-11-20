@@ -77,23 +77,28 @@ export function Demo() {
   primitive("input", {
     name: "Input",
     category: "inputs",
-    description: "A soft text field that lifts on focus and shakes when invalid.",
+    description: "A text field whose label floats up out of the way as you type.",
     interaction:
-      "Focus the field and it brightens with a blue ring. When it turns invalid the ring goes red and the field gives a short shake. Honors prefers-reduced-motion: the shake is skipped.",
+      "The label sits inside the empty field. Focus it and the label lifts into a small blue tag above your text, with a slight overshoot. When there is an error the field shakes once, its ring turns red, and the message slides out from underneath. Honors prefers-reduced-motion: no shake, and the message appears in place.",
     props: [
       {
-        name: "invalid",
-        type: "boolean",
-        default: "false",
-        description: "Marks the field invalid with a red ring and aria-invalid.",
+        name: "label",
+        type: "string",
+        required: true,
+        description: "The field's name. It doubles as the placeholder and stays visible once filled.",
+      },
+      {
+        name: "error",
+        type: "ReactNode",
+        description: "An error message. Setting it marks the field invalid and announces the message.",
       },
       feedbackProp('"error"'),
-      classNameProp,
+      { name: "className", type: "string", description: "Merged onto the wrapper. Other props go to the input." },
     ],
     usage: `import { Input } from "@/components/ui/input"
 
 export function Demo() {
-  return <Input type="email" placeholder="you@example.com" aria-label="Email" />
+  return <Input label="Email" type="email" />
 }`,
   }),
   primitive("textarea", {
