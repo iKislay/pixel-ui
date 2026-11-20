@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { Select } from "@/components/ui/select";
+import { Tabs } from "@/components/ui/tabs";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -170,6 +171,27 @@ function SelectDemo() {
   );
 }
 
+function TabsDemo() {
+  const panel = (title: string, body: string) => (
+    <div className="flex flex-col gap-1 px-1">
+      <p className="text-sm font-semibold">{title}</p>
+      <p className="text-sm text-foreground/55">{body}</p>
+    </div>
+  );
+
+  return (
+    <Tabs
+      aria-label="Project"
+      className="max-w-sm"
+      items={[
+        { value: "overview", label: "Overview", content: panel("Overview", "Three deploys today, all green.") },
+        { value: "activity", label: "Activity", content: panel("Activity", "Mira merged the onboarding branch.") },
+        { value: "settings", label: "Settings", content: panel("Settings", "Preview links expire after a week.") },
+      ]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -179,6 +201,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "radio-group": RadioGroupDemo,
   "slider": SliderDemo,
   "select": SelectDemo,
+  "tabs": TabsDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

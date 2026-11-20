@@ -321,4 +321,49 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("tabs", {
+    name: "Tabs",
+    category: "navigation",
+    description: "A row of tabs with a sliding pill that switches between panels.",
+    interaction:
+      "Click a tab and a soft pill glides under it while the panel below cross-fades. With focus on the tabs, the arrow keys, Home and End move and switch together. Honors prefers-reduced-motion: the pill jumps and the panel only fades.",
+    props: [
+      {
+        name: "items",
+        type: "{ value: string; label: ReactNode; content: ReactNode }[]",
+        required: true,
+        description: "The tabs and the panel each one shows.",
+      },
+      {
+        name: "value",
+        type: "string",
+        description: "Controls the open tab. Leave it unset to let the tabs manage themselves.",
+      },
+      {
+        name: "defaultValue",
+        type: "string",
+        description: "The starting tab when uncontrolled. Defaults to the first one.",
+      },
+      {
+        name: "onValueChange",
+        type: "(value: string) => void",
+        description: "Called with the newly opened tab.",
+      },
+      feedbackProp('"select"'),
+      classNameProp,
+    ],
+    usage: `import { Tabs } from "@/components/ui/tabs"
+
+export function Demo() {
+  return (
+    <Tabs
+      aria-label="Account"
+      items={[
+        { value: "profile", label: "Profile", content: <p>Your public details.</p> },
+        { value: "billing", label: "Billing", content: <p>Plans and invoices.</p> },
+      ]}
+    />
+  )
+}`,
+  }),
 ];
