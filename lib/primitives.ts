@@ -523,4 +523,48 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("dropdown-menu", {
+    name: "Dropdown Menu",
+    category: "overlays",
+    description: "A menu of actions that drops from a trigger.",
+    interaction:
+      "Click the trigger, or press the down arrow on it, and the menu springs open with the first action focused. Move with the arrow keys, Home and End, and pick with Enter. Escape closes it and returns focus to the trigger. Honors prefers-reduced-motion: the menu only fades.",
+    props: [
+      {
+        name: "trigger",
+        type: "ReactElement",
+        required: true,
+        description: "One focusable element that toggles the menu.",
+      },
+      {
+        name: "items",
+        type: '({ label: ReactNode; icon?: ReactNode; shortcut?: string; onSelect?: () => void; destructive?: boolean; disabled?: boolean } | "separator")[]',
+        required: true,
+        description: "The actions, in order. A separator draws a thin line; destructive turns an action red.",
+      },
+      {
+        name: "align",
+        type: '"start" | "end"',
+        default: '"start"',
+        options: ["start", "end"],
+        description: "Which edge of the trigger the menu lines up with.",
+      },
+      feedbackProp('"open" | "close" | "select"'),
+      { name: "className", type: "string", description: "Merged onto the menu." },
+    ],
+    usage: `import { DropdownMenu } from "@/components/ui/dropdown-menu"
+
+export function Demo() {
+  return (
+    <DropdownMenu
+      trigger={<button type="button">Options</button>}
+      items={[
+        { label: "Rename", onSelect: () => console.log("rename") },
+        "separator",
+        { label: "Delete", destructive: true },
+      ]}
+    />
+  )
+}`,
+  }),
 ];

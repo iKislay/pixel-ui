@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ComponentType } from "react";
-import { ArrowRight, Plus } from "lucide-react";
+import { Archive, ArrowRight, ChevronDown, Copy, Plus, Share, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +14,7 @@ import { Tabs } from "@/components/ui/tabs";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Popover } from "@/components/ui/popover";
 import { Dialog } from "@/components/ui/dialog";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -254,6 +255,27 @@ function DialogDemo() {
   );
 }
 
+function DropdownMenuDemo() {
+  return (
+    <div className="flex h-80 items-start pt-8">
+      <DropdownMenu
+        trigger={
+          <Button variant="secondary">
+            Actions <ChevronDown />
+          </Button>
+        }
+        items={[
+          { label: "Duplicate", icon: <Copy />, shortcut: "⌘D" },
+          { label: "Share", icon: <Share />, shortcut: "⌘S" },
+          { label: "Archive", icon: <Archive />, disabled: true },
+          "separator",
+          { label: "Delete", icon: <Trash2 />, destructive: true },
+        ]}
+      />
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -267,6 +289,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "tooltip": TooltipDemo,
   "popover": PopoverDemo,
   "dialog": DialogDemo,
+  "dropdown-menu": DropdownMenuDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {
