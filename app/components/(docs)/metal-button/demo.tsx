@@ -11,7 +11,6 @@ type Preset = "chromatic" | "silver" | "gold";
 export default function Demo() {
   const [preset] = usePreviewControl("mt-preset", "chromatic");
   const [variant] = usePreviewControl("mt-variant", "button");
-  const [theme] = usePreviewControl("mt-theme", "auto");
   const [inner] = usePreviewControl("mt-inner", "on");
   const [glow] = usePreviewControl("mt-glow", "on");
   const [bend] = usePreviewControl("mt-bend", "on");
@@ -21,7 +20,6 @@ export default function Demo() {
 
   const options = {
     preset: preset as Preset,
-    theme: theme === "auto" ? undefined : (theme as "light" | "dark"),
     strength: style.strength ?? 1,
     paused: paused === "on",
   };
@@ -65,7 +63,6 @@ type HeroProps = {
   disableGlow: boolean;
   glowGain: number;
   preset: Preset;
-  theme?: "light" | "dark";
   strength: number;
   paused: boolean;
 };

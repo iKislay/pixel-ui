@@ -5,7 +5,6 @@ import { usePreviewControl } from "@/components/preview/PreviewControls";
 export const METAL_PICKERS = [
   { name: "mt-preset", title: "Preset", options: ["chromatic", "silver", "gold"] },
   { name: "mt-variant", title: "Variant", options: ["button", "circle"] },
-  { name: "mt-theme", title: "Theme", options: ["auto", "dark", "light"] },
   { name: "mt-inner", title: "Inner shadow", options: ["on", "off"] },
   { name: "mt-glow", title: "Glow", options: ["on", "off"] },
   { name: "mt-bend", title: "Cursor bend", options: ["on", "off"] },
