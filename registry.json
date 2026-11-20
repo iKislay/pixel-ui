@@ -633,7 +633,7 @@
       "name": "skeleton",
       "type": "registry:ui",
       "title": "Skeleton",
-      "description": "A soft placeholder block that stands in for content while it loads.",
+      "description": "A soft placeholder that melts into the real content once it loads.",
       "dependencies": [
         "motion"
       ],

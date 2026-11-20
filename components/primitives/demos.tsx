@@ -391,13 +391,26 @@ function ProgressDemo() {
 }
 
 function SkeletonDemo() {
+  const [loading, setLoading] = useState(true);
+
   return (
-    <div className="flex w-full max-w-xs items-center gap-4" aria-busy aria-label="Loading profile">
-      <Skeleton className="size-12 rounded-[38%]" />
-      <div className="flex flex-1 flex-col gap-2.5">
-        <Skeleton className="h-3.5 w-3/4" />
-        <Skeleton className="h-3.5 w-1/2" />
+    <div className="flex w-full max-w-xs flex-col items-center gap-6">
+      <div className="flex w-full items-center gap-4" aria-busy={loading} aria-label="Profile">
+        <Skeleton loading={loading} className="size-12 rounded-[38%]">
+          <Avatar name="Mira Okafor" size="md" status="online" className="size-12" />
+        </Skeleton>
+        <div className="flex flex-1 flex-col gap-2.5">
+          <Skeleton loading={loading} className="h-3.5 w-3/4">
+            <p className="text-sm font-semibold">Mira Okafor</p>
+          </Skeleton>
+          <Skeleton loading={loading} className="h-3.5 w-1/2">
+            <p className="text-xs text-foreground/50">Design engineer</p>
+          </Skeleton>
+        </div>
       </div>
+      <Button size="sm" variant="secondary" onClick={() => setLoading((l) => !l)}>
+        {loading ? "Load profile" : "Reset"}
+      </Button>
     </div>
   );
 }

@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "skeleton",
   "title": "Skeleton",
-  "description": "A soft placeholder block that stands in for content while it loads.",
+  "description": "A soft placeholder that melts into the real content once it loads.",
   "dependencies": [
     "motion"
   ],
@@ -12,7 +12,7 @@
   "files": [
     {
       "path": "components/ui/skeleton.tsx",
-      "content": "\"use client\";\n\nimport type { ComponentProps } from \"react\";\nimport { motion, useReducedMotion } from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\nexport function Skeleton({ className, ...props }: ComponentProps<\"div\">) {\n  const reduce = useReducedMotion();\n\n  return (\n    <div\n      data-slot=\"skeleton\"\n      aria-hidden\n      className={cn(\"relative overflow-hidden rounded-[14px] bg-foreground/[0.07] [corner-shape:squircle]\", className)}\n      {...props}\n    >\n      {!reduce && (\n        <motion.div\n          className=\"absolute inset-0 bg-linear-to-r from-transparent via-foreground/[0.06] to-transparent\"\n          initial={{ x: \"-100%\" }}\n          animate={{ x: \"100%\" }}\n          transition={{ duration: 1.6, ease: \"easeInOut\", repeat: Infinity, repeatDelay: 0.3 }}\n        />\n      )}\n    </div>\n  );\n}\n",
+      "content": "\"use client\";\n\nimport type { ComponentProps, ReactNode } from \"react\";\nimport { AnimatePresence, motion, useReducedMotion } from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\nexport type SkeletonProps = Omit<ComponentProps<\"div\">, \"children\"> & {\n  loading?: boolean;\n  children?: ReactNode;\n};\n\nexport function Skeleton({ loading = true, className, children, ...props }: SkeletonProps) {\n  const reduce = useReducedMotion();\n\n  return (\n    <AnimatePresence mode=\"popLayout\" initial={false}>\n      {loading ? (\n        <motion.div\n          key=\"skeleton\"\n          data-slot=\"skeleton\"\n          aria-hidden\n          exit={{ opacity: 0, filter: reduce ? \"none\" : \"blur(4px)\" }}\n          transition={{ duration: 0.25 }}\n          className={cn(\"relative overflow-hidden rounded-[14px] bg-foreground/[0.07] [corner-shape:squircle]\", className)}\n          {...(props as ComponentProps<typeof motion.div>)}\n        >\n          {!reduce && (\n            <motion.div\n              className=\"absolute inset-0 bg-linear-to-r from-transparent via-foreground/[0.06] to-transparent\"\n              initial={{ x: \"-100%\" }}\n              animate={{ x: \"100%\" }}\n              transition={{ duration: 1.6, ease: \"easeInOut\", repeat: Infinity, repeatDelay: 0.3 }}\n            />\n          )}\n        </motion.div>\n      ) : (\n        <motion.div\n          key=\"content\"\n          initial={{ opacity: 0, filter: reduce ? \"none\" : \"blur(6px)\", y: reduce ? 0 : 4 }}\n          animate={{ opacity: 1, filter: \"blur(0px)\", y: 0 }}\n          transition={{ duration: 0.35, ease: \"easeOut\" }}\n        >\n          {children}\n        </motion.div>\n      )}\n    </AnimatePresence>\n  );\n}\n",
       "type": "registry:ui"
     }
   ],

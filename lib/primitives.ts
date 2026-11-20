@@ -764,20 +764,35 @@ export function Demo() {
   primitive("skeleton", {
     name: "Skeleton",
     category: "feedback",
-    description: "A soft placeholder block that stands in for content while it loads.",
+    description: "A soft placeholder that melts into the real content once it loads.",
     interaction:
-      "A muted block with a gentle sheen that sweeps across it now and then. Screen readers skip it. Honors prefers-reduced-motion: the sheen is off.",
+      "A muted block with a gentle sheen that sweeps across it now and then. When loading ends, it blurs away while the real content sharpens into the same spot. Screen readers skip the placeholder. Honors prefers-reduced-motion: no sheen, and the swap is a plain fade.",
     props: [
+      {
+        name: "loading",
+        type: "boolean",
+        default: "true",
+        description: "Shows the placeholder while true and the children once false.",
+      },
+      {
+        name: "children",
+        type: "ReactNode",
+        description: "The real content to reveal when loading ends.",
+      },
       {
         name: "className",
         type: "string",
-        description: "Set the size and shape here, for example h-4 w-32 or size-11 rounded-full.",
+        description: "Sizes and shapes the placeholder, for example h-4 w-32 or size-11 rounded-full.",
       },
     ],
     usage: `import { Skeleton } from "@/components/ui/skeleton"
 
-export function Demo() {
-  return <Skeleton className="h-4 w-40" />
+export function Demo({ user }: { user?: { name: string } }) {
+  return (
+    <Skeleton loading={!user} className="h-4 w-40">
+      <p>{user?.name}</p>
+    </Skeleton>
+  )
 }`,
   }),
 ];
