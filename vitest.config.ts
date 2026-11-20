@@ -19,7 +19,7 @@ export default defineConfig({
         resolve: { alias: { '@': dirname } },
         test: {
           name: 'unit',
-          include: ['lib/**/*.test.ts'],
+          include: ['lib/**/*.test.ts', 'pro/**/*.test.ts'],
           environment: 'node',
         },
       },
