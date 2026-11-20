@@ -15,8 +15,10 @@ import {
   CATEGORY_ORDER,
   isNew,
   components,
+  docsItems,
   type ComponentItem,
 } from "@/lib/components";
+import { primitives } from "@/lib/primitives";
 import { useOpenSound } from "@/lib/feedback";
 import { cn } from "@/lib/utils";
 import {
@@ -56,14 +58,17 @@ const suggestOrder = [...components]
   .sort((a, b) => rankCategory(a) - rankCategory(b))
   .sort((a, b) => promote(b) - promote(a));
 
+// primitives are searchable but stay out of the empty-query suggestions
+const searchable = [...suggestOrder, ...primitives];
+
 const categories = CATEGORY_ORDER.filter((c) =>
-  components.some((item) => item.category === c),
+  docsItems.some((item) => item.category === c),
 );
 
 const haystacks = new Map(
-  components.map((item) => [
+  docsItems.map((item) => [
     item,
-    `${item.name} ${CATEGORY_LABELS[item.category]} ${item.description ?? ""}`.toLowerCase(),
+    `${item.name} ${CATEGORY_LABELS[item.category]} ${item.href.split("/")[1]} ${item.description ?? ""}`.toLowerCase(),
   ]),
 );
 
@@ -79,7 +84,7 @@ const search = (query: string): ComponentItem[] => {
     return 2;
   };
 
-  return suggestOrder
+  return searchable
     .filter((item) => terms.every((t) => haystacks.get(item)!.includes(t)))
     .sort((a, b) => rank(a) - rank(b));
 };

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { components } from "@/lib/components";
+import { docsItems } from "@/lib/components";
 import { liveSections } from "@/lib/sections";
 import { SITE_URL } from "@/lib/site";
 
@@ -49,7 +49,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.3,
     },
-    ...components.map((component) => ({
+    ...docsItems.map((component) => ({
       url: `${SITE_URL}${component.href}`,
       lastModified,
       changeFrequency: "monthly" as const,

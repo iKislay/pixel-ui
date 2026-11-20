@@ -1,14 +1,16 @@
 import {
   components,
+  type ComponentItem,
   installCommand,
   REGISTRY_HOMEPAGE,
 } from "@/lib/components";
+import { primitives } from "@/lib/primitives";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-static";
 
 export function GET() {
-  const componentSections = components.map((item) => {
+  const describe = (item: ComponentItem) => {
     const lines = [
       `### ${item.name}`,
       "",
@@ -26,7 +28,7 @@ export function GET() {
       );
     }
     return lines.join("\n");
-  });
+  };
 
   const body = [
     "# Pixel UI",
@@ -69,7 +71,13 @@ export function GET() {
     "",
     "## Components",
     "",
-    componentSections.join("\n\n"),
+    components.map(describe).join("\n\n"),
+    "",
+    "## Primitives",
+    "",
+    "Small building blocks: buttons, fields, menus and overlays. Interactive ones take an optional onFeedback prop that reports moments like press, toggle, open, close, select and error.",
+    "",
+    primitives.map(describe).join("\n\n"),
     "",
     "## Notes",
     "",
