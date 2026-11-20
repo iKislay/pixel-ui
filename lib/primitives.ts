@@ -693,4 +693,25 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("progress", {
+    name: "Progress",
+    category: "feedback",
+    description: "A slim bar that shows how far along a task is.",
+    interaction:
+      "The blue fill springs forward each time the value moves. With no value, a short bar sweeps across on a loop to show work is happening. Honors prefers-reduced-motion: the fill jumps and the sweep holds still.",
+    props: [
+      {
+        name: "value",
+        type: "number",
+        description: "How far along, from 0 to max. Leave it unset for an indeterminate sweep.",
+      },
+      { name: "max", type: "number", default: "100", description: "The value that means done." },
+      classNameProp,
+    ],
+    usage: `import { Progress } from "@/components/ui/progress"
+
+export function Demo() {
+  return <Progress value={64} aria-label="Upload" />
+}`,
+  }),
 ];

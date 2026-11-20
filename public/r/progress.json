@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "progress",
+  "title": "Progress",
+  "description": "A slim bar that shows how far along a task is.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "utils"
+  ],
+  "files": [
+    {
+      "path": "components/ui/progress.tsx",
+      "content": "\"use client\";\n\nimport type { ComponentProps } from \"react\";\nimport { motion, useReducedMotion } from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\nexport type ProgressProps = ComponentProps<\"div\"> & {\n  value?: number;\n  max?: number;\n};\n\nexport function Progress({ value, max = 100, className, ...props }: ProgressProps) {\n  const reduce = useReducedMotion();\n  const indeterminate = value === undefined;\n  const ratio = indeterminate ? 0 : Math.min(Math.max(value / max, 0), 1);\n\n  return (\n    <div\n      data-slot=\"progress\"\n      role=\"progressbar\"\n      aria-valuemin={0}\n      aria-valuemax={max}\n      aria-valuenow={indeterminate ? undefined : value}\n      className={cn(\"relative h-2 w-full overflow-hidden rounded-full bg-foreground/[0.08]\", className)}\n      {...props}\n    >\n      {indeterminate ? (\n        <motion.div\n          className=\"btn-primary absolute inset-y-0 w-2/5 rounded-full\"\n          initial={{ x: reduce ? \"75%\" : \"-100%\" }}\n          animate={reduce ? undefined : { x: \"250%\" }}\n          transition={{ duration: 1.4, ease: [0.65, 0, 0.35, 1], repeat: Infinity }}\n        />\n      ) : (\n        <motion.div\n          className=\"btn-primary absolute inset-0 origin-left rounded-full\"\n          initial={false}\n          animate={{ scaleX: ratio }}\n          transition={reduce ? { duration: 0 } : { type: \"spring\", stiffness: 140, damping: 24 }}\n        />\n      )}\n    </div>\n  );\n}\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

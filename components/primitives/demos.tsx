@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -338,6 +339,29 @@ function SeparatorDemo() {
   );
 }
 
+function ProgressDemo() {
+  const [value, setValue] = useState(32);
+
+  return (
+    <div className="flex w-full max-w-xs flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between text-sm font-medium">
+          <span>Uploading</span>
+          <span className="font-mono text-xs text-foreground/50 tabular-nums">{value}%</span>
+        </div>
+        <Progress value={value} aria-label="Upload" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium">Preparing</span>
+        <Progress aria-label="Preparing" />
+      </div>
+      <Button size="sm" variant="secondary" className="self-start" onClick={() => setValue((v) => (v >= 100 ? 0 : Math.min(v + 23, 100)))}>
+        Step
+      </Button>
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -356,6 +380,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "avatar": AvatarDemo,
   "card": CardDemo,
   "separator": SeparatorDemo,
+  "progress": ProgressDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {
