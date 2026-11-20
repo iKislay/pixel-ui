@@ -14,7 +14,7 @@ export const SECTIONS: Section[] = [
   { id: "components", label: "Components", href: "/components", group: "build", live: true },
   { id: "blocks", label: "Blocks", href: "/blocks", group: "build", live: false },
   { id: "screens", label: "Screens", href: "/screens", group: "build", live: false },
-  { id: "charts", label: "Charts", href: "/charts", group: "build", live: false },
+  { id: "charts", label: "Charts", href: "/charts", group: "build", live: true },
   { id: "styles", label: "Styles", href: "/styles", group: "feel", live: false },
   { id: "sounds", label: "Sounds", href: "/sounds", group: "feel", live: true },
   { id: "haptics", label: "Haptics", href: "/haptics", group: "feel", live: false },
