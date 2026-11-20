@@ -63,4 +63,26 @@ export function Demo() {
   return <Button onClick={() => console.log("saved")}>Save changes</Button>
 }`,
   }),
+  primitive("input", {
+    name: "Input",
+    category: "inputs",
+    description: "A soft text field that lifts on focus and shakes when invalid.",
+    interaction:
+      "Focus the field and it brightens with a blue ring. When it turns invalid the ring goes red and the field gives a short shake. Honors prefers-reduced-motion: the shake is skipped.",
+    props: [
+      {
+        name: "invalid",
+        type: "boolean",
+        default: "false",
+        description: "Marks the field invalid with a red ring and aria-invalid.",
+      },
+      feedbackProp('"error"'),
+      classNameProp,
+    ],
+    usage: `import { Input } from "@/components/ui/input"
+
+export function Demo() {
+  return <Input type="email" placeholder="you@example.com" aria-label="Email" />
+}`,
+  }),
 ];
