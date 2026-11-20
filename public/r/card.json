@@ -2,14 +2,14 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "card",
   "title": "Card",
-  "description": "A large soft squircle surface for grouping related content.",
+  "description": "A large soft squircle surface, with an optional spotlight that follows the pointer.",
   "registryDependencies": [
     "utils"
   ],
   "files": [
     {
       "path": "components/ui/card.tsx",
-      "content": "import type { ComponentProps } from \"react\";\nimport { cn } from \"@/lib/utils\";\n\nexport function Card({ className, ...props }: ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"card\"\n      className={cn(\n        \"flex flex-col gap-4 rounded-[36px] bg-card p-7 text-card-foreground [corner-shape:squircle]\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport function CardTitle({ className, ...props }: ComponentProps<\"h3\">) {\n  return <h3 data-slot=\"card-title\" className={cn(\"text-lg font-semibold tracking-tight\", className)} {...props} />;\n}\n\nexport function CardDescription({ className, ...props }: ComponentProps<\"p\">) {\n  return <p data-slot=\"card-description\" className={cn(\"text-sm leading-relaxed text-foreground/55\", className)} {...props} />;\n}\n",
+      "content": "\"use client\";\n\nimport type { ComponentProps } from \"react\";\nimport { cn } from \"@/lib/utils\";\n\nexport type CardProps = ComponentProps<\"div\"> & {\n  spotlight?: boolean;\n};\n\nexport function Card({ spotlight = false, className, children, onPointerMove, ...props }: CardProps) {\n  return (\n    <div\n      data-slot=\"card\"\n      onPointerMove={(event) => {\n        onPointerMove?.(event);\n        if (!spotlight) return;\n        const box = event.currentTarget.getBoundingClientRect();\n        event.currentTarget.style.setProperty(\"--spot-x\", `${event.clientX - box.left}px`);\n        event.currentTarget.style.setProperty(\"--spot-y\", `${event.clientY - box.top}px`);\n      }}\n      className={cn(\n        \"group/card relative isolate flex flex-col gap-4 overflow-hidden rounded-[36px] bg-card p-7 text-card-foreground [corner-shape:squircle]\",\n        className,\n      )}\n      {...props}\n    >\n      {spotlight && (\n        <div\n          aria-hidden\n          className=\"pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover/card:opacity-100 motion-reduce:transition-none [background:radial-gradient(320px_circle_at_var(--spot-x,50%)_var(--spot-y,0%),rgb(var(--brand-rgb)/0.14),transparent_70%)]\"\n        />\n      )}\n      {children}\n    </div>\n  );\n}\n\nexport function CardTitle({ className, ...props }: ComponentProps<\"h3\">) {\n  return <h3 data-slot=\"card-title\" className={cn(\"text-lg font-semibold tracking-tight\", className)} {...props} />;\n}\n\nexport function CardDescription({ className, ...props }: ComponentProps<\"p\">) {\n  return <p data-slot=\"card-description\" className={cn(\"text-sm leading-relaxed text-foreground/55\", className)} {...props} />;\n}\n",
       "type": "registry:ui"
     }
   ],

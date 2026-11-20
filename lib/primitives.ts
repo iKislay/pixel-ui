@@ -666,13 +666,20 @@ export function Demo() {
   primitive("card", {
     name: "Card",
     category: "display",
-    description: "A large soft squircle surface for grouping related content.",
-    interaction: "A calm surface with generous squircle corners. Title and description parts keep the type consistent.",
+    description: "A large soft squircle surface, with an optional spotlight that follows the pointer.",
+    interaction:
+      "A calm surface with generous squircle corners. With the spotlight on, a soft blue glow fades in under the pointer and follows it across the card. Title and description parts keep the type consistent.",
     props: [
       {
         name: "Card",
         type: "ComponentProps<\"div\">",
         description: "The surface. Children stack with an even gap.",
+      },
+      {
+        name: "spotlight",
+        type: "boolean",
+        default: "false",
+        description: "Adds a soft glow that follows the pointer while it is over the card.",
       },
       {
         name: "CardTitle",
@@ -699,8 +706,9 @@ export function Demo() {
   primitive("separator", {
     name: "Separator",
     category: "display",
-    description: "A hairline that divides content, across or down.",
-    interaction: "A thin, quiet line. By default screen readers skip it.",
+    description: "A hairline that draws itself in, with an optional label in the middle.",
+    interaction:
+      "A thin, quiet line that draws outward from its middle the first time it scrolls into view. A label sits in a gap at the centre, for breaks like \"or\". By default screen readers skip it. Honors prefers-reduced-motion: the line is simply there.",
     props: [
       {
         name: "orientation",
@@ -714,6 +722,11 @@ export function Demo() {
         type: "boolean",
         default: "true",
         description: "Turn it off when the line marks a real break, so it is announced as a separator.",
+      },
+      {
+        name: "label",
+        type: "ReactNode",
+        description: "Text shown in a gap in the middle of the line.",
       },
       classNameProp,
     ],

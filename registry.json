@@ -582,7 +582,7 @@
       "name": "card",
       "type": "registry:ui",
       "title": "Card",
-      "description": "A large soft squircle surface for grouping related content.",
+      "description": "A large soft squircle surface, with an optional spotlight that follows the pointer.",
       "registryDependencies": [
         "utils"
       ],

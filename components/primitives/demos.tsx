@@ -335,7 +335,7 @@ function AvatarDemo() {
 
 function CardDemo() {
   return (
-    <Card className="w-full max-w-sm bg-background shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_32px_-12px_rgba(0,0,0,0.12)]">
+    <Card spotlight className="w-full max-w-sm bg-background shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_32px_-12px_rgba(0,0,0,0.12)]">
       <div className="flex items-center justify-between">
         <CardTitle>Weekly digest</CardTitle>
         <Badge tone="brand">Beta</Badge>
@@ -355,7 +355,7 @@ function SeparatorDemo() {
         <p className="font-semibold">Pixel UI</p>
         <p className="text-foreground/55">Small parts, carefully made.</p>
       </div>
-      <Separator />
+      <Separator label="or" />
       <div className="flex h-5 items-center gap-4 font-medium text-foreground/70">
         Docs
         <Separator orientation="vertical" />
