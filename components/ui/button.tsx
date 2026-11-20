@@ -61,7 +61,7 @@ export function Button({
         onClick?.(event);
       }}
       className={cn(
-        "relative inline-flex shrink-0 cursor-pointer select-none items-center justify-center font-semibold whitespace-nowrap outline-none transition-colors duration-150 [corner-shape:squircle] focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-45 aria-busy:cursor-progress [&_svg]:size-4 [&_svg]:shrink-0",
+        "relative inline-flex shrink-0 cursor-pointer select-none items-center justify-center font-semibold whitespace-nowrap outline-hidden transition-colors duration-150 [corner-shape:squircle] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-45 aria-busy:cursor-progress [&_svg]:size-4 [&_svg]:shrink-0",
         VARIANTS[variant],
         SIZES[size],
         className,
