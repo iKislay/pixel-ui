@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactElement, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, animate, usePresence, useReducedMotion } from "motion/react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +49,20 @@ export function Dialog({
   );
 }
 
+const OPEN = "inset(-64px -64px -64px -64px round 36px)";
+const SPRING = { type: "spring" as const, stiffness: 300, damping: 32 };
+
+// the window starts clipped to the trigger's own box and unfolds from there, so it reads as the trigger growing
+function reveal(panel: HTMLElement, anchor: HTMLElement) {
+  const from = anchor.getBoundingClientRect();
+  const to = panel.getBoundingClientRect();
+  return {
+    x: from.left - to.left,
+    y: from.top - to.top,
+    clip: `inset(0px ${to.width - from.width}px ${to.height - from.height}px 0px round 18px)`,
+  };
+}
+
 function Sheet({
   title,
   description,
@@ -57,24 +71,57 @@ function Sheet({
   onClose,
 }: Pick<DialogProps, "title" | "description" | "children" | "className"> & { onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  const content = useRef<HTMLDivElement>(null);
+  const anchor = useRef<HTMLElement | null>(null);
   const id = useId();
   const reduce = useReducedMotion();
+  const [present, safeToRemove] = usePresence();
 
   // the native modal dialog gives the focus trap, inert page and escape key for free
-  useEffect(() => {
-    const returnTo = document.activeElement as HTMLElement | null;
+  useLayoutEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    anchor.current = opener && opener !== document.body ? opener : null;
     const root = document.documentElement;
     const overflow = root.style.overflow;
     root.style.overflow = "hidden";
     ref.current?.showModal();
+
+    const el = panel.current;
+    ref.current?.style.setProperty("opacity", "0");
+    content.current?.style.setProperty("opacity", "0");
+    if (ref.current) animate(ref.current, { opacity: [0, 1] }, { duration: 0.2 });
+    if (el && content.current) animate(content.current, { opacity: [0, 1] }, { duration: 0.2, delay: reduce ? 0 : 0.1 });
+    if (el && anchor.current && !reduce) {
+      const { x, y, clip } = reveal(el, anchor.current);
+      el.style.setProperty("clip-path", clip);
+      el.style.setProperty("transform", `translate(${x}px, ${y}px)`);
+      animate(el, { clipPath: [clip, OPEN], x: [x, 0], y: [y, 0] }, SPRING);
+    } else if (el && !reduce) {
+      animate(el, { scale: [0.94, 1], y: [8, 0] }, SPRING);
+    }
+
     return () => {
       root.style.overflow = overflow;
-      returnTo?.focus();
+      opener?.focus();
     };
-  }, []);
+  }, [reduce]);
+
+  useEffect(() => {
+    if (present) return;
+    const el = panel.current;
+    const steps: Promise<unknown>[] = [];
+    if (ref.current) steps.push(animate(ref.current, { opacity: 0 }, { duration: 0.24 }).finished);
+    if (content.current) animate(content.current, { opacity: 0 }, { duration: 0.1 });
+    if (el && anchor.current?.isConnected && !reduce) {
+      const { x, y, clip } = reveal(el, anchor.current);
+      steps.push(animate(el, { clipPath: clip, x, y }, { duration: 0.26, ease: [0.4, 0, 0.2, 1] }).finished);
+    }
+    Promise.all(steps).then(safeToRemove);
+  }, [present, reduce, safeToRemove]);
 
   return (
-    <motion.dialog
+    <dialog
       ref={ref}
       data-slot="dialog"
       aria-labelledby={`${id}-title`}
@@ -84,44 +131,37 @@ function Sheet({
         onClose();
       }}
       onClick={(event) => event.target === event.currentTarget && onClose()}
-      initial="closed"
-      animate="open"
-      exit="closed"
-      variants={{ open: { opacity: 1 }, closed: { opacity: 0 } }}
-      transition={{ duration: 0.18 }}
       className="fixed inset-0 m-0 flex h-dvh max-h-none w-screen max-w-none items-center justify-center bg-black/40 p-4 backdrop-blur-[2px] backdrop:bg-transparent"
     >
-      <motion.div
-        variants={{
-          open: { opacity: 1, scale: 1, y: 0 },
-          closed: reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 },
-        }}
-        transition={{ type: "spring", stiffness: 480, damping: 34 }}
+      <div
+        ref={panel}
         className={cn(
-          "relative flex w-full max-w-md flex-col gap-4 rounded-[36px] bg-popover p-7 text-popover-foreground shadow-[0_24px_80px_-16px_rgba(0,0,0,0.4)] [corner-shape:squircle]",
+          "relative w-full max-w-md rounded-[36px] bg-popover text-popover-foreground shadow-[0_24px_80px_-16px_rgba(0,0,0,0.4)] [corner-shape:squircle]",
           className,
         )}
       >
-        <div className="flex flex-col gap-1.5 pr-8">
-          <h2 id={`${id}-title`} className="text-lg font-semibold tracking-tight">
-            {title}
-          </h2>
-          {description && (
-            <p id={`${id}-description`} className="text-sm leading-relaxed text-foreground/55">
-              {description}
-            </p>
-          )}
+        <div ref={content} className="flex flex-col gap-4 p-7">
+          <div className="flex flex-col gap-1.5 pr-8">
+            <h2 id={`${id}-title`} className="text-lg font-semibold tracking-tight">
+              {title}
+            </h2>
+            {description && (
+              <p id={`${id}-description`} className="text-sm leading-relaxed text-foreground/55">
+                {description}
+              </p>
+            )}
+          </div>
+          {children}
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+            className="absolute right-5 top-5 flex size-8 cursor-pointer items-center justify-center rounded-full text-foreground/45 outline-hidden transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-2 focus-visible:outline-brand"
+          >
+            <X className="size-4" />
+          </button>
         </div>
-        {children}
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={onClose}
-          className="absolute right-5 top-5 flex size-8 cursor-pointer items-center justify-center rounded-full text-foreground/45 outline-hidden transition-colors hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-2 focus-visible:outline-brand"
-        >
-          <X className="size-4" />
-        </button>
-      </motion.div>
-    </motion.dialog>
+      </div>
+    </dialog>
   );
 }

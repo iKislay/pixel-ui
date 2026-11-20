@@ -238,7 +238,7 @@ function TooltipDemo() {
 
 function PopoverDemo() {
   return (
-    <Popover aria-label="Rename" align="start" trigger={<Button variant="secondary">Rename file</Button>}>
+    <Popover aria-label="Rename" trigger={<Button variant="secondary">Rename file</Button>}>
       <form onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-3">
         <p className="font-semibold">Rename</p>
         <Input label="File name" defaultValue="moodboard-final-v2.fig" />

@@ -498,9 +498,9 @@ export function Demo() {
   primitive("dialog", {
     name: "Dialog",
     category: "overlays",
-    description: "A modal window that dims the page and holds focus until it is closed.",
+    description: "A modal window that unfolds out of the button that opened it.",
     interaction:
-      "Open it and the page dims while the window rises gently into place. Tab stays inside it and the page behind cannot be scrolled. Escape, the close button or a click on the dimmed page closes it, and focus returns to where it was. Honors prefers-reduced-motion: the window only fades.",
+      "Press the trigger and the page dims while the window unfolds from the button itself, growing from its outline to full size before the contents fade in. Tab stays inside it and the page behind cannot be scrolled. Escape, the close button or a click on the dimmed page folds it back into the button, and focus returns there. Opened without a trigger, it rises gently in place. Honors prefers-reduced-motion: the window only fades.",
     props: [
       {
         name: "title",

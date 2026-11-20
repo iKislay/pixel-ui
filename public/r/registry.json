@@ -510,7 +510,7 @@
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",
-      "description": "A modal window that dims the page and holds focus until it is closed.",
+      "description": "A modal window that unfolds out of the button that opened it.",
       "dependencies": [
         "motion",
         "lucide-react",
