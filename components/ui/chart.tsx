@@ -307,7 +307,7 @@ export function CartesianChart({
         )}
         <ChartTooltip
           x={active === null ? 0 : x(active)}
-          y={margin.top}
+          y={active === null ? margin.top : y(totals[active])}
           width={width}
           title={row ? String(row[index]) : undefined}
           rows={row ? series.map((s) => ({ label: s.label, color: s.color, value: format(value(row, s.key)) })) : null}
