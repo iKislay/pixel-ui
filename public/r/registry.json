@@ -796,6 +796,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "radial-progress",
+      "type": "registry:ui",
+      "title": "Radial Progress",
+      "description": "A ring that fills toward a goal, with the value in its center.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/radial-progress.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

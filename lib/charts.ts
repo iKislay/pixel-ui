@@ -298,4 +298,59 @@ export function Demo() {
   return <DonutChart label="Traffic by source" data={data} totalLabel="Visits" />
 }`,
   }),
+  chart("radial-progress", {
+    name: "Radial Progress",
+    category: "composition",
+    description: "A ring that fills toward a goal, with the value in its center.",
+    interaction:
+      "The ring sweeps round to its value as the number counts up beside it. Screen readers hear it as a meter with its value. Honors prefers-reduced-motion: the ring and number appear at once.",
+    props: [
+      {
+        name: "value",
+        type: "number",
+        required: true,
+        description: "The current value. It is clamped between 0 and max.",
+      },
+      {
+        name: "max",
+        type: "number",
+        default: "100",
+        description: "The value that fills the ring.",
+      },
+      {
+        name: "label",
+        type: "string",
+        required: true,
+        description: "Names the meter for screen readers.",
+      },
+      {
+        name: "caption",
+        type: "string",
+        description: "A short line under the value.",
+      },
+      {
+        name: "format",
+        type: "(value: number) => string",
+        description: "Formats the center value. Without it the ring shows a percentage.",
+      },
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for the filled part of the ring.",
+      },
+      {
+        name: "thickness",
+        type: "number",
+        default: "10",
+        description: "Width of the ring, on a 100 unit wide meter.",
+      },
+      classNameProp,
+    ],
+    usage: `import { RadialProgress } from "@/components/ui/radial-progress"
+
+export function Demo() {
+  return <RadialProgress label="Storage used" value={72} caption="of 50 GB" />
+}`,
+  }),
 ];
