@@ -549,7 +549,10 @@
       "name": "badge",
       "type": "registry:ui",
       "title": "Badge",
-      "description": "A small tinted label for status, counts and tags.",
+      "description": "A small tinted label whose counts roll like an odometer.",
+      "dependencies": [
+        "motion"
+      ],
       "registryDependencies": [
         "utils"
       ],

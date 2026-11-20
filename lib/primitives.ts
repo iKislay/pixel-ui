@@ -598,8 +598,9 @@ export function Demo() {
   primitive("badge", {
     name: "Badge",
     category: "display",
-    description: "A small tinted label for status, counts and tags.",
-    interaction: "A quiet, tinted label. An optional dot in the same color marks live status.",
+    description: "A small tinted label whose counts roll like an odometer.",
+    interaction:
+      "A quiet, tinted label. Give it a number and each digit rolls to its new value when the count changes. The optional live dot gives off a slow ping. Honors prefers-reduced-motion: digits switch at once and the dot holds still.",
     props: [
       {
         name: "tone",
@@ -612,14 +613,19 @@ export function Demo() {
         name: "dot",
         type: "boolean",
         default: "false",
-        description: "Shows a small dot before the text.",
+        description: "Shows a pinging dot before the text, for live status.",
+      },
+      {
+        name: "children",
+        type: "ReactNode",
+        description: "The label. A whole number rolls digit by digit when it changes.",
       },
       classNameProp,
     ],
     usage: `import { Badge } from "@/components/ui/badge"
 
-export function Demo() {
-  return <Badge tone="success" dot>Live</Badge>
+export function Demo({ unread }: { unread: number }) {
+  return <Badge tone="brand">{unread}</Badge>
 }`,
   }),
   primitive("avatar", {

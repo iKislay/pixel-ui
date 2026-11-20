@@ -293,15 +293,22 @@ function DropdownMenuDemo() {
 }
 
 function BadgeDemo() {
+  const [count, setCount] = useState(18);
+
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
-      <Badge>Draft</Badge>
-      <Badge tone="brand">New</Badge>
-      <Badge tone="success" dot>
-        Live
-      </Badge>
-      <Badge tone="warning">Pending</Badge>
-      <Badge tone="danger">Failed</Badge>
+    <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <Badge>Draft</Badge>
+        <Badge tone="brand">{count}</Badge>
+        <Badge tone="success" dot>
+          Live
+        </Badge>
+        <Badge tone="warning">Pending</Badge>
+        <Badge tone="danger">Failed</Badge>
+      </div>
+      <Button size="sm" variant="secondary" onClick={() => setCount((c) => c + 7)}>
+        New messages
+      </Button>
     </div>
   );
 }
