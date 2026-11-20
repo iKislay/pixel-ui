@@ -11,6 +11,7 @@ import { RadioGroup } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { Select } from "@/components/ui/select";
 import { Tabs } from "@/components/ui/tabs";
+import { Tooltip } from "@/components/ui/tooltip";
 
 function ButtonDemo() {
   const [loading, setLoading] = useState(false);
@@ -192,6 +193,26 @@ function TabsDemo() {
   );
 }
 
+function TooltipDemo() {
+  return (
+    <div className="flex items-center gap-3">
+      <Tooltip content="Bold">
+        <Button size="icon" variant="secondary" aria-label="Bold">
+          <span className="font-bold">B</span>
+        </Button>
+      </Tooltip>
+      <Tooltip content="Italic" side="bottom">
+        <Button size="icon" variant="secondary" aria-label="Italic">
+          <span className="font-serif text-lg italic">i</span>
+        </Button>
+      </Tooltip>
+      <Tooltip content="Publish to the web" side="right">
+        <Button>Publish</Button>
+      </Tooltip>
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
   button: ButtonDemo,
   input: InputDemo,
@@ -202,6 +223,7 @@ export const DEMOS: Record<string, ComponentType> = {
   "slider": SliderDemo,
   "select": SelectDemo,
   "tabs": TabsDemo,
+  "tooltip": TooltipDemo,
 };
 
 export default function PrimitiveDemo({ slug }: { slug: string }) {

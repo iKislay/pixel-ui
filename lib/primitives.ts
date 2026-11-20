@@ -366,4 +366,49 @@ export function Demo() {
   )
 }`,
   }),
+  primitive("tooltip", {
+    name: "Tooltip",
+    category: "overlays",
+    description: "A small label that floats beside an element on hover or focus.",
+    interaction:
+      "Rest the pointer on the element and, after a short pause, a label springs out beside it. Focus with the keyboard and it shows at once. Escape or moving away hides it. Honors prefers-reduced-motion: the label only fades.",
+    props: [
+      {
+        name: "content",
+        type: "ReactNode",
+        required: true,
+        description: "What the label says.",
+      },
+      {
+        name: "children",
+        type: "ReactElement",
+        required: true,
+        description: "One focusable element. It gets the hover and focus handlers and aria-describedby.",
+      },
+      {
+        name: "side",
+        type: '"top" | "bottom" | "left" | "right"',
+        default: '"top"',
+        options: ["top", "bottom", "left", "right"],
+        description: "Where the label sits. It does not flip at the screen edge.",
+      },
+      {
+        name: "delay",
+        type: "number",
+        default: "300",
+        description: "Milliseconds of hover before it shows.",
+      },
+      feedbackProp('"open" | "close"'),
+      { name: "className", type: "string", description: "Merged onto the label." },
+    ],
+    usage: `import { Tooltip } from "@/components/ui/tooltip"
+
+export function Demo() {
+  return (
+    <Tooltip content="Copy link">
+      <button type="button">Share</button>
+    </Tooltip>
+  )
+}`,
+  }),
 ];
