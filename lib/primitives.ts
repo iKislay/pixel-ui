@@ -352,9 +352,9 @@ export function Demo() {
   primitive("tabs", {
     name: "Tabs",
     category: "navigation",
-    description: "A row of tabs with a sliding pill that switches between panels.",
+    description: "A row of tabs whose pill stretches across to the one you pick.",
     interaction:
-      "Click a tab and a soft pill glides under it while the panel below cross-fades. With focus on the tabs, the arrow keys, Home and End move and switch together. Honors prefers-reduced-motion: the pill jumps and the panel only fades.",
+      "Click a tab and the pill's front edge reaches for it first while the back edge catches up, so the pill stretches across and settles. The panel below slides in from the side you moved toward. With focus on the tabs, the arrow keys, Home and End move and switch together. Honors prefers-reduced-motion: the pill jumps and the panel swaps in place.",
     props: [
       {
         name: "items",

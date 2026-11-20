@@ -454,7 +454,7 @@
       "name": "tabs",
       "type": "registry:ui",
       "title": "Tabs",
-      "description": "A row of tabs with a sliding pill that switches between panels.",
+      "description": "A row of tabs whose pill stretches across to the one you pick.",
       "dependencies": [
         "motion"
       ],

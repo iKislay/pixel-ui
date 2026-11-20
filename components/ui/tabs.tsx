@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState, type ComponentProps, type KeyboardEvent, type ReactNode } from "react";
+import { useId, useLayoutEffect, useRef, useState, type ComponentProps, type KeyboardEvent, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +33,38 @@ export function Tabs({
   const reduce = useReducedMotion();
   const currentIndex = items.findIndex((item) => item.value === selected);
   const current = items[currentIndex];
+  const list = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState<{ left: number; right: number; dir: number } | null>(null);
+  const last = useRef(currentIndex);
+
+  // the pill is measured from the real tab, so labels of any width line up
+  useLayoutEffect(() => {
+    const measure = () => {
+      const tab = refs.current[currentIndex];
+      const box = list.current;
+      if (!tab || !box) return;
+      const dir = Math.sign(currentIndex - last.current);
+      last.current = currentIndex;
+      setEdges((prev) => ({
+        left: tab.offsetLeft,
+        right: box.clientWidth - tab.offsetLeft - tab.offsetWidth,
+        dir: dir || prev?.dir || 1,
+      }));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (list.current) observer.observe(list.current);
+    return () => observer.disconnect();
+  }, [currentIndex]);
+
+  const lead = { type: "spring" as const, stiffness: 700, damping: 40 };
+  const trail = { type: "spring" as const, stiffness: 240, damping: 28 };
+  // the edge heading toward the new tab leads and the other trails, so the pill stretches across
+  const edgeSprings = reduce
+    ? { left: { duration: 0 }, right: { duration: 0 } }
+    : edges?.dir === 1
+      ? { left: trail, right: lead }
+      : { left: lead, right: trail };
 
   const choose = (next: string) => {
     if (next === selected) return;
@@ -58,10 +90,20 @@ export function Tabs({
   return (
     <div data-slot="tabs" className={cn("flex w-full flex-col gap-4", className)} {...props}>
       <div
+        ref={list}
         role="tablist"
         aria-label={label}
-        className="inline-flex w-fit gap-1 rounded-[20px] bg-foreground/[0.05] p-1 [corner-shape:squircle]"
+        className="relative inline-flex w-fit gap-1 rounded-[20px] bg-foreground/[0.05] p-1 [corner-shape:squircle]"
       >
+        {edges && (
+          <motion.span
+            aria-hidden
+            initial={false}
+            animate={{ left: edges.left, right: edges.right }}
+            transition={edgeSprings}
+            className="absolute inset-y-1 rounded-[16px] bg-background shadow-[0_1px_3px_rgba(0,0,0,0.08),0_0_0_0.5px_rgba(0,0,0,0.05)] [corner-shape:squircle] dark:bg-foreground/[0.12]"
+          />
+        )}
         {items.map((item, index) => {
           const active = item.value === selected;
           return (
@@ -79,38 +121,39 @@ export function Tabs({
               onClick={() => choose(item.value)}
               onKeyDown={(event) => onKeyDown(event, index)}
               className={cn(
-                "relative h-9 cursor-pointer rounded-[16px] px-4 text-sm font-semibold outline-hidden transition-colors duration-150 [corner-shape:squircle] focus-visible:outline-2 focus-visible:outline-brand motion-reduce:transition-none",
+                "relative h-9 cursor-pointer rounded-[16px] px-4 text-sm font-semibold outline-hidden transition-colors duration-200 [corner-shape:squircle] focus-visible:outline-2 focus-visible:outline-brand motion-reduce:transition-none",
                 active ? "text-foreground" : "text-foreground/50 hover:text-foreground/80",
               )}
             >
-              {active && (
-                <motion.span
-                  layoutId={`${id}-pill`}
-                  transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 36 }}
-                  className="absolute inset-0 rounded-[16px] bg-background shadow-[0_1px_3px_rgba(0,0,0,0.08),0_0_0_0.5px_rgba(0,0,0,0.05)] [corner-shape:squircle] dark:bg-foreground/[0.12]"
-                />
-              )}
-              <span className="relative">{item.label}</span>
+              {item.label}
             </button>
           );
         })}
       </div>
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={selected}
-          id={`${id}-panel`}
-          role="tabpanel"
-          aria-labelledby={`${id}-tab-${currentIndex}`}
-          tabIndex={0}
-          initial={{ opacity: 0, y: reduce ? 0 : 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: reduce ? 0 : -4 }}
-          transition={{ duration: 0.15 }}
-          className="rounded-[16px] outline-hidden focus-visible:outline-2 focus-visible:outline-brand"
-        >
-          {current?.content}
-        </motion.div>
-      </AnimatePresence>
+      <div className="relative overflow-hidden">
+        <AnimatePresence mode="popLayout" initial={false} custom={edges?.dir ?? 1}>
+          <motion.div
+            key={selected}
+            custom={edges?.dir ?? 1}
+            id={`${id}-panel`}
+            role="tabpanel"
+            aria-labelledby={`${id}-tab-${currentIndex}`}
+            tabIndex={0}
+            variants={{
+              enter: (dir: number) => ({ opacity: 0, x: reduce ? 0 : dir * 24, filter: reduce ? "none" : "blur(4px)" }),
+              center: { opacity: 1, x: 0, filter: "blur(0px)" },
+              exit: (dir: number) => ({ opacity: 0, x: reduce ? 0 : dir * -24, filter: reduce ? "none" : "blur(4px)" }),
+            }}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 36 }}
+            className="rounded-[16px] outline-hidden focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
+          >
+            {current?.content}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
