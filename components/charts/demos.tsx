@@ -5,6 +5,7 @@ import { formatCompact } from "@/lib/chart";
 import { AreaChart } from "@/components/ui/area-chart";
 import { BarChart } from "@/components/ui/bar-chart";
 import { LineChart } from "@/components/ui/line-chart";
+import { Sparkline } from "@/components/ui/sparkline";
 import { StackedBarChart } from "@/components/ui/stacked-bar-chart";
 
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -84,7 +85,30 @@ function StackedBarChartDemo() {
   );
 }
 
+const trends = [
+  { name: "Signups", value: "1,284", data: [42, 51, 48, 62, 58, 71, 69, 84, 92, 88, 104, 118] },
+  { name: "Active users", value: "8,920", data: [610, 640, 655, 630, 700, 720, 760, 745, 800, 830, 870, 892] },
+  { name: "Refunds", value: "37", data: [9, 7, 8, 6, 7, 5, 6, 4, 5, 4, 3, 4], color: "var(--chart-4)" },
+];
+
+function SparklineDemo() {
+  return (
+    <ul className="mx-auto flex w-full max-w-md flex-col divide-y divide-foreground/[0.06]">
+      {trends.map((trend) => (
+        <li key={trend.name} className="flex items-center gap-6 py-4">
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-muted-foreground">{trend.name}</p>
+            <p className="font-mono text-xl font-medium tabular-nums">{trend.value}</p>
+          </div>
+          <Sparkline className="w-36" label={`${trend.name} over twelve months`} labels={months} data={trend.data} color={trend.color} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
+  sparkline: SparklineDemo,
   "stacked-bar-chart": StackedBarChartDemo,
   "line-chart": LineChartDemo,
   "area-chart": AreaChartDemo,

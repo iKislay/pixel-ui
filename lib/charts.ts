@@ -213,4 +213,48 @@ export function Demo() {
   )
 }`,
   }),
+  chart("sparkline", {
+    name: "Sparkline",
+    category: "trends",
+    description: "A tiny line with no axes that shows a trend at a glance.",
+    interaction:
+      "The line draws in and a dot settles on the latest value. Hover or tab in to read any point; the arrow keys step through them. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: the line appears at once.",
+    props: [
+      {
+        name: "data",
+        type: "number[]",
+        required: true,
+        description: "The values, oldest first.",
+      },
+      {
+        name: "labels",
+        type: "string[]",
+        description: "A label for each value, shown in the tooltip. Without it the tooltip shows only the value.",
+      },
+      labelProp,
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for the line and its fill.",
+      },
+      {
+        name: "height",
+        type: "number",
+        default: "48",
+        description: "Height in pixels. The width fills the parent.",
+      },
+      formatProp,
+      classNameProp,
+    ],
+    usage: `import { Sparkline } from "@/components/ui/sparkline"
+
+export function Demo() {
+  return (
+    <div className="w-40">
+      <Sparkline label="Signups this week" data={[12, 18, 15, 22, 27, 24, 31]} />
+    </div>
+  )
+}`,
+  }),
 ];
