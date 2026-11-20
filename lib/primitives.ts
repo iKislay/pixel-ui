@@ -136,9 +136,9 @@ export function Demo() {
   primitive("checkbox", {
     name: "Checkbox",
     category: "inputs",
-    description: "A squircle checkbox whose tick draws itself in.",
+    description: "A squircle checkbox that squashes, fills and draws its tick.",
     interaction:
-      "Click or press Space and the box fills blue while the tick draws in stroke by stroke. A half-checked box shows a dash. Wrap it in a label to make the text clickable too. Honors prefers-reduced-motion: the tick appears at once.",
+      "Click or press Space and the box squashes like something soft being pressed. Blue blooms out from its centre, the tick draws itself in, and a faint ring pulses outward. Unchecking reverses it. A half-checked box shows a dash. Honors prefers-reduced-motion: the state changes at once.",
     props: [
       {
         name: "checked",

@@ -363,7 +363,7 @@
       "name": "checkbox",
       "type": "registry:ui",
       "title": "Checkbox",
-      "description": "A squircle checkbox whose tick draws itself in.",
+      "description": "A squircle checkbox that squashes, fills and draws its tick.",
       "dependencies": [
         "motion"
       ],
