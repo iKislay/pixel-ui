@@ -85,7 +85,8 @@ function Sheet({
     const root = document.documentElement;
     const overflow = root.style.overflow;
     root.style.overflow = "hidden";
-    ref.current?.showModal();
+    const dialog = ref.current;
+    dialog?.showModal();
 
     const el = panel.current;
     ref.current?.style.setProperty("opacity", "0");
@@ -103,6 +104,8 @@ function Sheet({
 
     return () => {
       root.style.overflow = overflow;
+      // the page stays inert while the modal is open, so it must close before focus can go back
+      dialog?.close();
       opener?.focus();
     };
   }, [reduce]);

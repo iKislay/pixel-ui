@@ -469,4 +469,73 @@ export function Demo() {
   )
 }`,
   }),
+  chart("stat-tile", {
+    name: "Stat Tile",
+    category: "trends",
+    description: "A soft card with one headline number, its change and a small trend line.",
+    interaction:
+      "The number counts up while the trend line draws in beside it. The change shows an arrow and a sign as well as a color, so it never relies on color alone. Screen readers hear the label, value and change as one sentence. Honors prefers-reduced-motion: everything appears at once.",
+    props: [
+      {
+        name: "label",
+        type: "string",
+        required: true,
+        description: "What the number measures.",
+      },
+      {
+        name: "value",
+        type: "number",
+        required: true,
+        description: "The headline number.",
+      },
+      {
+        name: "change",
+        type: "number",
+        description: "The change in percent, like 12.4 or -3. Hidden when unset.",
+      },
+      {
+        name: "caption",
+        type: "string",
+        description: "A short note after the change, like vs last month.",
+      },
+      {
+        name: "trend",
+        type: "number[]",
+        description: "Recent values, oldest first, drawn as a small line beside the number.",
+      },
+      {
+        name: "format",
+        type: "(value: number) => string",
+        default: "compact",
+        description: "Formats the headline number. Defaults to short numbers like 12.4K.",
+      },
+      {
+        name: "invert",
+        type: "boolean",
+        default: "false",
+        description: "Treats a fall as good news, for measures like churn or load time.",
+      },
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for the trend line.",
+      },
+      classNameProp,
+    ],
+    usage: `import { StatTile } from "@/components/ui/stat-tile"
+
+export function Demo() {
+  return (
+    <StatTile
+      label="Revenue"
+      value={48210}
+      change={12.4}
+      caption="vs last month"
+      trend={[31, 34, 33, 38, 41, 40, 46, 48]}
+      format={(n) => "$" + Math.round(n).toLocaleString()}
+    />
+  )
+}`,
+  }),
 ];

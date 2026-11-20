@@ -874,6 +874,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "stat-tile",
+      "type": "registry:ui",
+      "title": "Stat Tile",
+      "description": "A soft card with one headline number, its change and a small trend line.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/stat-tile.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

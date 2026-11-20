@@ -11,6 +11,7 @@ import { RadialProgress } from "@/components/ui/radial-progress";
 import { ScatterChart } from "@/components/ui/scatter-chart";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StackedBarChart } from "@/components/ui/stacked-bar-chart";
+import { StatTile } from "@/components/ui/stat-tile";
 
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const visitors = [1840, 2120, 1980, 2640, 3010, 2870, 3320, 3580, 3410, 3960, 4280, 4620];
@@ -169,7 +170,35 @@ function HeatmapDemo() {
   return <Heatmap label="Sessions by day and hour" rows={days} columns={hours} data={activity} />;
 }
 
+function StatTileDemo() {
+  return (
+    <div className="grid w-full gap-3 sm:grid-cols-2">
+      <StatTile
+        label="Revenue"
+        value={48210}
+        change={12.4}
+        caption="vs last month"
+        trend={[31, 34, 33, 38, 41, 40, 46, 48]}
+        format={(n) => "$" + Math.round(n).toLocaleString("en-US")}
+        className="bg-background"
+      />
+      <StatTile
+        label="Churn"
+        value={2.1}
+        change={-0.6}
+        caption="vs last month"
+        invert
+        trend={[3.1, 2.9, 3, 2.7, 2.5, 2.4, 2.2, 2.1]}
+        format={(n) => `${n.toFixed(1)}%`}
+        color="var(--chart-4)"
+        className="bg-background"
+      />
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType> = {
+  "stat-tile": StatTileDemo,
   heatmap: HeatmapDemo,
   "scatter-chart": ScatterChartDemo,
   "radial-progress": RadialProgressDemo,
