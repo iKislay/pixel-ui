@@ -1,6 +1,7 @@
 import { createElement, type ReactNode } from "react";
 import { MotionIcon } from "@/components/Description/icons";
 import { PRO_REGISTRY } from "@/lib/pro";
+import { charts } from "@/lib/charts";
 import { primitives } from "@/lib/primitives";
 
 export type Dependency = {
@@ -28,7 +29,10 @@ export type ComponentCategory =
   | "sections"
   | "text"
   | "buttons"
-  | "overlays";
+  | "overlays"
+  | "trends"
+  | "comparison"
+  | "composition";
 
 export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   ai: "AI kit",
@@ -40,6 +44,9 @@ export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   text: "Text",
   buttons: "Buttons",
   overlays: "Overlays",
+  trends: "Trends",
+  comparison: "Comparison",
+  composition: "Parts of a whole",
 };
 
 export const CATEGORY_ORDER: ComponentCategory[] = [
@@ -52,6 +59,9 @@ export const CATEGORY_ORDER: ComponentCategory[] = [
   "inputs",
   "overlays",
   "feedback",
+  "trends",
+  "comparison",
+  "composition",
 ];
 
 export type ComponentItem = {
@@ -1331,8 +1341,8 @@ export const gallerySections: ComponentSection[] = [
   })),
 ].filter((section) => section.items.length > 0);
 
-// every page that renders in the docs shell, components and primitives alike
-export const docsItems = [...components, ...primitives];
+// every page that renders in the docs shell: components, primitives and charts
+export const docsItems = [...components, ...primitives, ...charts];
 
 export function activeComponent(pathname: string): ComponentItem | undefined {
   return docsItems.find((c) => c.href === pathname);

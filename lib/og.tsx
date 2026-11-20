@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import { sectionFor } from "@/lib/sections";
 import { PIXEL_PETAL } from "@/components/logos";
 import { charAlpha, SKYLINE } from "@/lib/ascii";
 import {
@@ -253,7 +254,7 @@ export function componentOgImage(href: string) {
   const words = item.name.split(" ");
 
   return ogImage({
-    eyebrow: `${item.href.startsWith("/primitives") ? "Primitive" : "Component"} · ${CATEGORY_LABELS[item.category]}`,
+    eyebrow: `${(sectionFor(item.href)?.label ?? "Components").slice(0, -1)} · ${CATEGORY_LABELS[item.category]}`,
     title: words.slice(0, -1).join(" "),
     italic: words.at(-1),
     description: item.description ?? "",

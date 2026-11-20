@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { sectionFor } from "@/lib/sections";
 import { type ComponentItem, activeComponent, components } from "@/lib/components";
 import {
   SITE_ALT_NAMES,
@@ -121,7 +122,7 @@ export function componentJsonLd(href: string) {
   const item = activeComponent(href);
   if (!item) return null;
 
-  const section = item.href.startsWith("/primitives") ? "Primitives" : "Components";
+  const section = sectionFor(item.href)?.label ?? "Components";
   const url = `${SITE_URL}${item.href}`;
   const description = componentMetaDescription(item);
 

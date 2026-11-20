@@ -10,7 +10,9 @@ import {
   type ComponentCategory,
   type ComponentItem,
 } from "@/lib/components";
+import { charts } from "@/lib/charts";
 import { primitives } from "@/lib/primitives";
+import { sectionFor } from "@/lib/sections";
 import Tag from "@/components/Tag";
 import { cn } from "@/lib/utils";
 import { SCROLL_FADE, SCROLL_SELECTOR } from "./SidebarScroll";
@@ -38,7 +40,10 @@ const groupItems = (list: ComponentItem[]) => {
 };
 
 const componentGroups = groupItems(components);
-const primitiveGroups = groupItems(primitives);
+const sectionGroups: Record<string, ReturnType<typeof groupItems>> = {
+  primitives: groupItems(primitives),
+  charts: groupItems(charts),
+};
 
 const SidebarGroup = ({
   label,
@@ -116,12 +121,12 @@ const SidebarNav = ({
   className?: string;
 }) => {
   const pathname = usePathname();
-  const onPrimitives = pathname.startsWith("/primitives");
-  const groups = onPrimitives ? primitiveGroups : componentGroups;
+  const section = sectionFor(pathname);
+  const groups = (section && sectionGroups[section.id]) ?? componentGroups;
 
   return (
     <nav
-      aria-label={onPrimitives ? "Primitives" : "Components"}
+      aria-label={section?.label ?? "Components"}
       data-slot="sidebar-nav"
       className={cn("flex flex-col gap-6 p-0.5", className)}
     >

@@ -22,6 +22,9 @@ export const SECTIONS: Section[] = [
   { id: "studio", label: "Studio", href: "/studio", group: "studio", live: false },
 ];
 
+export const sectionFor = (href: string) =>
+  SECTIONS.find((section) => href.startsWith(`${section.href}/`));
+
 export const liveSections = SECTIONS.filter((section) => section.live);
 
 export const NAV_LINKS = [
