@@ -189,7 +189,7 @@ export function Select({
                     onClick={() => pick(option)}
                     className={cn(
                       "relative flex cursor-pointer items-center justify-between gap-3 rounded-[14px] px-3 py-2 text-sm [corner-shape:squircle]",
-                      option.disabled && "cursor-not-allowed opacity-40",
+                      option.disabled && "cursor-not-allowed text-foreground/35",
                     )}
                   >
                     {index === active && (
