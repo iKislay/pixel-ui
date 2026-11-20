@@ -491,7 +491,7 @@
       "name": "popover",
       "type": "registry:ui",
       "title": "Popover",
-      "description": "A panel that unfolds out of its trigger, for small forms and details.",
+      "description": "A floating panel anchored to a trigger, for small forms and details.",
       "dependencies": [
         "motion",
         "@radix-ui/react-slot"
