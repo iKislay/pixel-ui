@@ -25,7 +25,8 @@ export type ComponentCategory =
   | "feedback"
   | "display"
   | "sections"
-  | "text";
+  | "text"
+  | "buttons";
 
 export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   ai: "AI kit",
@@ -35,12 +36,14 @@ export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   display: "Display",
   sections: "Sections",
   text: "Text",
+  buttons: "Buttons",
 };
 
 export const CATEGORY_ORDER: ComponentCategory[] = [
   "display",
   "sections",
   "text",
+  "buttons",
   "ai",
   "navigation",
   "inputs",
@@ -73,7 +76,7 @@ export const components: ComponentItem[] = [
     name: "Metal Button",
     href: "/components/metal-button",
     released: "2026-11-20",
-    category: "display",
+    category: "buttons",
     registry: "metal-button",
     description:
       "A liquid metal ring with a wandering halo for buttons, icons, text and badges.",
