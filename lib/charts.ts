@@ -257,4 +257,45 @@ export function Demo() {
   )
 }`,
   }),
+  chart("donut-chart", {
+    name: "Donut Chart",
+    category: "composition",
+    description: "A ring split into slices that shows how a total breaks down.",
+    interaction:
+      "The ring sweeps in clockwise, slice by slice. Hover a slice or its legend row, or tab in and use the arrow keys, and the slice lifts while the center shows its value and share. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: the ring appears at once.",
+    props: [
+      {
+        name: "data",
+        type: "{ label: string; value: number; color?: string }[]",
+        required: true,
+        description: "One entry per slice. Colors follow the chart palette in order unless you set one.",
+      },
+      labelProp,
+      formatProp,
+      {
+        name: "thickness",
+        type: "number",
+        default: "26",
+        description: "Width of the ring, on a 200 unit wide chart.",
+      },
+      {
+        name: "totalLabel",
+        type: "string",
+        default: '"Total"',
+        description: "The caption under the total in the center.",
+      },
+      classNameProp,
+    ],
+    usage: `import { DonutChart } from "@/components/ui/donut-chart"
+
+const data = [
+  { label: "Direct", value: 4200 },
+  { label: "Search", value: 3100 },
+  { label: "Social", value: 1800 },
+]
+
+export function Demo() {
+  return <DonutChart label="Traffic by source" data={data} totalLabel="Visits" />
+}`,
+  }),
 ];

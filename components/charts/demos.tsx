@@ -4,6 +4,7 @@ import type { ComponentType } from "react";
 import { formatCompact } from "@/lib/chart";
 import { AreaChart } from "@/components/ui/area-chart";
 import { BarChart } from "@/components/ui/bar-chart";
+import { DonutChart } from "@/components/ui/donut-chart";
 import { LineChart } from "@/components/ui/line-chart";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StackedBarChart } from "@/components/ui/stacked-bar-chart";
@@ -107,7 +108,20 @@ function SparklineDemo() {
   );
 }
 
+const sources = [
+  { label: "Direct", value: 4200 },
+  { label: "Search", value: 3100 },
+  { label: "Social", value: 1800 },
+  { label: "Referral", value: 950 },
+  { label: "Email", value: 620 },
+];
+
+function DonutChartDemo() {
+  return <DonutChart label="Traffic by source" data={sources} totalLabel="Visits" />;
+}
+
 export const DEMOS: Record<string, ComponentType> = {
+  "donut-chart": DonutChartDemo,
   sparkline: SparklineDemo,
   "stacked-bar-chart": StackedBarChartDemo,
   "line-chart": LineChartDemo,
