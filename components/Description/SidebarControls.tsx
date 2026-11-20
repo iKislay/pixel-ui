@@ -15,6 +15,7 @@ import {
   useWaveStyle,
   type WaveSlider,
 } from "@/lib/distortion-wave-controls";
+import { VOICE_PICKERS, VOICE_SLIDERS, useVoiceStyle } from "@/lib/voice-glow-controls";
 
 type SidebarControlsProps = {
   item?: ComponentItem;
@@ -571,7 +572,7 @@ function PosterSphereControls() {
   );
 }
 
-function WavePicker({ name, title, options }: (typeof WAVE_PICKERS)[number]) {
+function WavePicker({ name, title, options }: { name: string; title: string; options: readonly string[] }) {
   const [value, setValue] = usePreviewControl(name, options[0]);
   return (
     <div className="flex flex-col gap-2">
@@ -697,6 +698,41 @@ function DistortionWaveControls() {
   );
 }
 
+function VoiceGlowControls() {
+  const [style, setStyle, resetStyle] = useVoiceStyle();
+
+  return (
+    <div className="flex flex-col gap-5">
+      {VOICE_PICKERS.map((picker) => (
+        <WavePicker key={picker.name} {...picker} />
+      ))}
+
+      {VOICE_SLIDERS.map(({ group, items }) => (
+        <div key={group} className="flex flex-col gap-3">
+          <SectionHeader title={group} />
+          {items.map(({ key, fallback, ...slider }) => (
+            <WaveRange
+              key={key}
+              {...slider}
+              value={style[key] ?? fallback}
+              changed={key in style}
+              onChange={(v) => setStyle(key, v)}
+            />
+          ))}
+        </div>
+      ))}
+
+      <button
+        type="button"
+        onClick={resetStyle}
+        className="rounded-xl bg-muted/40 px-3 py-2.5 text-xs font-semibold text-foreground transition-all hover:bg-muted/80"
+      >
+        Reset glow
+      </button>
+    </div>
+  );
+}
+
 export default function SidebarControls({
   item,
   onOpenCode,
@@ -730,6 +766,7 @@ export default function SidebarControls({
       {pathname === "/components/audio-chat-room" && <AudioChatControls />}
       {pathname === "/components/poster-sphere" && <PosterSphereControls />}
       {pathname === "/components/distortion-wave" && <DistortionWaveControls />}
+      {pathname === "/components/voice-glow" && <VoiceGlowControls />}
 
       <ColorSwatches showLabel />
 
