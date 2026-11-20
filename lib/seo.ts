@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { type ComponentItem, components } from "@/lib/components";
+import { type ComponentItem, activeComponent, components } from "@/lib/components";
 import {
   SITE_ALT_NAMES,
   SITE_DESCRIPTION,
@@ -80,7 +80,7 @@ export function componentMetaDescription(item: ComponentItem): string {
 }
 
 export function componentPageMetadata(href: string): Metadata {
-  const item = components.find((c) => c.href === href);
+  const item = activeComponent(href);
   if (!item) return {};
 
   const name = item.name.toLowerCase();
@@ -118,9 +118,10 @@ export function componentPageMetadata(href: string): Metadata {
 }
 
 export function componentJsonLd(href: string) {
-  const item = components.find((c) => c.href === href);
+  const item = activeComponent(href);
   if (!item) return null;
 
+  const section = item.href.startsWith("/primitives") ? "Primitives" : "Components";
   const url = `${SITE_URL}${item.href}`;
   const description = componentMetaDescription(item);
 
@@ -134,8 +135,8 @@ export function componentJsonLd(href: string) {
           {
             "@type": "ListItem",
             position: 2,
-            name: "Components",
-            item: `${SITE_URL}/components`,
+            name: section,
+            item: `${SITE_URL}/${section.toLowerCase()}`,
           },
           { "@type": "ListItem", position: 3, name: item.name, item: url },
         ],

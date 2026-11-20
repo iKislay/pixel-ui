@@ -1,6 +1,7 @@
 import { createElement, type ReactNode } from "react";
 import { MotionIcon } from "@/components/Description/icons";
 import { PRO_REGISTRY } from "@/lib/pro";
+import { primitives } from "@/lib/primitives";
 
 export type Dependency = {
   name: string;
@@ -26,7 +27,8 @@ export type ComponentCategory =
   | "display"
   | "sections"
   | "text"
-  | "buttons";
+  | "buttons"
+  | "overlays";
 
 export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   ai: "AI kit",
@@ -37,6 +39,7 @@ export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   sections: "Sections",
   text: "Text",
   buttons: "Buttons",
+  overlays: "Overlays",
 };
 
 export const CATEGORY_ORDER: ComponentCategory[] = [
@@ -47,6 +50,7 @@ export const CATEGORY_ORDER: ComponentCategory[] = [
   "ai",
   "navigation",
   "inputs",
+  "overlays",
   "feedback",
 ];
 
@@ -1327,12 +1331,15 @@ export const gallerySections: ComponentSection[] = [
   })),
 ].filter((section) => section.items.length > 0);
 
+// every page that renders in the docs shell, components and primitives alike
+export const docsItems = [...components, ...primitives];
+
 export function activeComponent(pathname: string): ComponentItem | undefined {
-  return components.find((c) => c.href === pathname);
+  return docsItems.find((c) => c.href === pathname);
 }
 
 export function registryComponent(name: string): ComponentItem | undefined {
-  return components.find((c) => c.registry === name);
+  return docsItems.find((c) => c.registry === name);
 }
 
 export function swatchProp(item?: ComponentItem): ComponentProp | undefined {

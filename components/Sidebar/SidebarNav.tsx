@@ -10,30 +10,35 @@ import {
   type ComponentCategory,
   type ComponentItem,
 } from "@/lib/components";
+import { primitives } from "@/lib/primitives";
 import Tag from "@/components/Tag";
 import { cn } from "@/lib/utils";
 import { SCROLL_FADE, SCROLL_SELECTOR } from "./SidebarScroll";
-
-// bucketing keeps a category that is missing from CATEGORY_ORDER in the nav
-const buckets = new Map<ComponentCategory, ComponentItem[]>();
-for (const component of components) {
-  const bucket = buckets.get(component.category);
-  if (bucket) bucket.push(component);
-  else buckets.set(component.category, [component]);
-}
 
 const rank = (category: ComponentCategory) => {
   const index = CATEGORY_ORDER.indexOf(category);
   return index === -1 ? CATEGORY_ORDER.length : index;
 };
 
-const groups = [...buckets.entries()]
-  .sort(([a], [b]) => rank(a) - rank(b))
-  .map(([category, items]) => ({
-    category,
-    label: CATEGORY_LABELS[category],
-    items,
-  }));
+// bucketing keeps a category that is missing from CATEGORY_ORDER in the nav
+const groupItems = (list: ComponentItem[]) => {
+  const buckets = new Map<ComponentCategory, ComponentItem[]>();
+  for (const item of list) {
+    const bucket = buckets.get(item.category);
+    if (bucket) bucket.push(item);
+    else buckets.set(item.category, [item]);
+  }
+  return [...buckets.entries()]
+    .sort(([a], [b]) => rank(a) - rank(b))
+    .map(([category, items]) => ({
+      category,
+      label: CATEGORY_LABELS[category],
+      items,
+    }));
+};
+
+const componentGroups = groupItems(components);
+const primitiveGroups = groupItems(primitives);
 
 const SidebarGroup = ({
   label,
@@ -111,10 +116,12 @@ const SidebarNav = ({
   className?: string;
 }) => {
   const pathname = usePathname();
+  const onPrimitives = pathname.startsWith("/primitives");
+  const groups = onPrimitives ? primitiveGroups : componentGroups;
 
   return (
     <nav
-      aria-label="Components"
+      aria-label={onPrimitives ? "Primitives" : "Components"}
       data-slot="sidebar-nav"
       className={cn("flex flex-col gap-6 p-0.5", className)}
     >

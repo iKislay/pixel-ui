@@ -4,8 +4,8 @@ import { ImageResponse } from "next/og";
 import { PIXEL_PETAL } from "@/components/logos";
 import { charAlpha, SKYLINE } from "@/lib/ascii";
 import {
+  activeComponent,
   CATEGORY_LABELS,
-  components,
   REGISTRY_REPO,
 } from "@/lib/components";
 
@@ -240,7 +240,7 @@ export async function ogImage({
 }
 
 const findComponent = (href: string) => {
-  const item = components.find((c) => c.href === href);
+  const item = activeComponent(href);
   if (!item) throw new Error(`no component at ${href}`);
   return item;
 };
@@ -253,7 +253,7 @@ export function componentOgImage(href: string) {
   const words = item.name.split(" ");
 
   return ogImage({
-    eyebrow: `Component · ${CATEGORY_LABELS[item.category]}`,
+    eyebrow: `${item.href.startsWith("/primitives") ? "Primitive" : "Component"} · ${CATEGORY_LABELS[item.category]}`,
     title: words.slice(0, -1).join(" "),
     italic: words.at(-1),
     description: item.description ?? "",
