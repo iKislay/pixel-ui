@@ -10,7 +10,7 @@ export type Section = {
 
 // a section stays out of the nav and sitemap until it has something to show
 export const SECTIONS: Section[] = [
-  { id: "primitives", label: "Primitives", href: "/primitives", group: "build", live: false },
+  { id: "primitives", label: "Primitives", href: "/primitives", group: "build", live: true },
   { id: "components", label: "Components", href: "/components", group: "build", live: true },
   { id: "blocks", label: "Blocks", href: "/blocks", group: "build", live: false },
   { id: "screens", label: "Screens", href: "/screens", group: "build", live: false },
