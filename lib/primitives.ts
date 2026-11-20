@@ -250,9 +250,9 @@ export function Demo() {
   primitive("slider", {
     name: "Slider",
     category: "inputs",
-    description: "A single-value slider with a soft round thumb.",
+    description: "A slider made of tick marks that swell under your pointer.",
     interaction:
-      "Drag the thumb or click anywhere on the track and the blue fill follows. The thumb swells a little while held. With focus, the arrow keys step it and Home and End jump to the ends. Honors prefers-reduced-motion: the thumb does not swell.",
+      "A soft capsule of tick marks, filled blue up to the value. Move the pointer across it and the ticks beneath swell like a magnifier, easing off to either side. Drag or click to set the value while a small tag above follows the thumb with the number. With focus, the arrow keys step it and Home and End jump to the ends. Honors prefers-reduced-motion: the ticks hold their height.",
     props: [
       {
         name: "value",
@@ -267,6 +267,12 @@ export function Demo() {
       { name: "min", type: "number", default: "0", description: "The lowest value." },
       { name: "max", type: "number", default: "100", description: "The highest value." },
       { name: "step", type: "number", default: "1", description: "The size of each step." },
+      { name: "ticks", type: "number", default: "40", description: "How many tick marks draw the track." },
+      {
+        name: "formatValue",
+        type: "(value: number) => string",
+        description: "Formats the number in the tag and for screen readers, for example as a percentage.",
+      },
       {
         name: "onValueChange",
         type: "(value: number) => void",
@@ -276,13 +282,13 @@ export function Demo() {
       {
         name: "className",
         type: "string",
-        description: "Merged onto the root. Other props, like aria-label, go to the inner range input.",
+        description: "Merged onto the capsule. Other props, like aria-label, go to the inner range input.",
       },
     ],
     usage: `import { Slider } from "@/components/ui/slider"
 
 export function Demo() {
-  return <Slider aria-label="Volume" defaultValue={40} />
+  return <Slider aria-label="Volume" defaultValue={40} formatValue={(v) => \`\${v}%\`} />
 }`,
   }),
   primitive("select", {

@@ -414,7 +414,10 @@
       "name": "slider",
       "type": "registry:ui",
       "title": "Slider",
-      "description": "A single-value slider with a soft round thumb.",
+      "description": "A slider made of tick marks that swell under your pointer.",
+      "dependencies": [
+        "motion"
+      ],
       "registryDependencies": [
         "utils"
       ],

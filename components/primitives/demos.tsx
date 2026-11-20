@@ -159,15 +159,18 @@ function RadioGroupDemo() {
 }
 
 function SliderDemo() {
-  const [volume, setVolume] = useState(64);
+  const [warmth, setWarmth] = useState(62);
 
   return (
-    <div className="flex w-full max-w-xs flex-col gap-3">
-      <div className="flex items-center justify-between text-sm font-medium">
-        <span>Volume</span>
-        <span className="font-mono text-xs text-foreground/50 tabular-nums">{volume}%</span>
+    <div className="flex w-full max-w-sm flex-col gap-10 pt-8">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between px-1 text-sm font-medium">
+          <span>Warmth</span>
+          <span className="font-mono text-xs text-foreground/50 tabular-nums">{warmth}%</span>
+        </div>
+        <Slider aria-label="Warmth" value={warmth} onValueChange={setWarmth} formatValue={(v) => `${v}%`} />
       </div>
-      <Slider aria-label="Volume" value={volume} onValueChange={setVolume} />
+      <Slider aria-label="Tempo" min={60} max={180} defaultValue={120} ticks={28} formatValue={(v) => `${v} bpm`} />
     </div>
   );
 }
