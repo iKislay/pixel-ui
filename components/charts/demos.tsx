@@ -17,6 +17,7 @@ import { ActivityRings } from "@/components/ui/activity-rings";
 import { SegmentedBar } from "@/components/ui/segmented-bar";
 import { WaffleChart } from "@/components/ui/waffle-chart";
 import { RadarChart } from "@/components/ui/radar-chart";
+import { FunnelChart } from "@/components/ui/funnel-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -406,7 +407,19 @@ function RadarChartDemo({ compact }: DemoProps) {
   );
 }
 
+const funnel = [
+  { label: "Visited", value: 12400 },
+  { label: "Signed up", value: 3100 },
+  { label: "Activated", value: 1820 },
+  { label: "Paid", value: 640 },
+];
+
+function FunnelChartDemo({ compact }: DemoProps) {
+  return <FunnelChart className="mx-auto max-w-md" label="Signup funnel" data={compact ? funnel.slice(0, 3) : funnel} />;
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "funnel-chart": FunnelChartDemo,
   "radar-chart": RadarChartDemo,
   "waffle-chart": WaffleChartDemo,
   "segmented-bar": SegmentedBarDemo,
