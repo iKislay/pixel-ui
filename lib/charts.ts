@@ -901,6 +901,20 @@ export function Demo() {
       },
       labelProp,
       formatProp,
+      {
+        name: "curve",
+        type: '"rounded" | "smooth"',
+        default: '"rounded"',
+        options: ["rounded", "smooth"],
+        description: "Rounded keeps straight edges with soft corners; smooth draws one flowing curve through every value.",
+      },
+      {
+        name: "grid",
+        type: '"circle" | "polygon"',
+        default: '"circle"',
+        options: ["circle", "polygon"],
+        description: "The shape of the rings behind the data.",
+      },
       classNameProp,
     ],
     usage: `import { RadarChart } from "@/components/ui/radar-chart"

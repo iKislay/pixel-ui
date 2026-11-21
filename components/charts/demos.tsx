@@ -402,6 +402,8 @@ const plansCompared = [
 function RadarChartDemo({ compact }: DemoProps) {
   return (
     <RadarChart
+      curve="smooth"
+      grid="polygon"
       className={compact ? "[&>div]:max-w-52" : undefined}
       label="Plans compared"
       data={plansCompared}

@@ -67,6 +67,20 @@ export function roundedPolygon(points: Point[], radius: number): string {
   return `${d}Z`;
 }
 
+// a closed catmull-rom curve through every point
+export function closedCurve(points: Point[]): string {
+  const n = points.length;
+  if (n < 3) return linePath(points);
+  let d = `M${round(points[0][0])},${round(points[0][1])}`;
+  for (let i = 0; i < n; i++) {
+    const [p0, p1, p2, p3] = [points[(i - 1 + n) % n], points[i], points[(i + 1) % n], points[(i + 2) % n]];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += `C${round(c1[0])},${round(c1[1])} ${round(c2[0])},${round(c2[1])} ${round(p2[0])},${round(p2[1])}`;
+  }
+  return `${d}Z`;
+}
+
 // monotone cubic (fritsch-carlson) so the curve never overshoots a data point
 export function smoothPath(points: Point[]): string {
   const n = points.length;

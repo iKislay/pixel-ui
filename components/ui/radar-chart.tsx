@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { formatCompact, niceTicks, roundedPolygon, seriesColor, type Point } from "@/lib/chart";
+import { closedCurve, formatCompact, niceTicks, roundedPolygon, seriesColor, type Point } from "@/lib/chart";
 import {
   ChartLegend,
   ChartTable,
@@ -20,13 +20,25 @@ export type RadarChartProps = Omit<ComponentProps<"figure">, "children"> & {
   series: ChartSeries[];
   label: string;
   format?: Format;
+  curve?: "rounded" | "smooth";
+  grid?: "circle" | "polygon";
 };
 
 const round = (n: number) => Math.round(n * 100) / 100;
 const C = 150;
 const R = 104;
 
-export function RadarChart({ data, index, series: input, label, format = formatCompact, className, ...props }: RadarChartProps) {
+export function RadarChart({
+  data,
+  index,
+  series: input,
+  label,
+  format = formatCompact,
+  curve = "rounded",
+  grid = "circle",
+  className,
+  ...props
+}: RadarChartProps) {
   const { active, setActive, handlers } = useChartNav(data.length);
   const progress = useDrawIn();
   const series = input.map((s, i) => ({ ...s, label: s.label ?? s.key, color: seriesColor(i, s.color) }));
@@ -49,9 +61,20 @@ export function RadarChart({ data, index, series: input, label, format = formatC
         {...handlers}
       >
         <svg viewBox="0 0 300 300" aria-hidden className="w-full overflow-visible">
-          {ticks.slice(1).map((tick) => (
-            <circle key={tick} cx={C} cy={C} r={(tick / top) * R} fill="none" stroke="currentColor" className="text-foreground/[0.07]" />
-          ))}
+          {ticks.slice(1).map((tick) =>
+            grid === "circle" ? (
+              <circle key={tick} cx={C} cy={C} r={(tick / top) * R} fill="none" stroke="currentColor" className="text-foreground/[0.07]" />
+            ) : (
+              <path
+                key={tick}
+                d={roundedPolygon(data.map((_, i) => at(i, (tick / top) * R)), 6)}
+                fill="currentColor"
+                fillOpacity={0.025}
+                stroke="currentColor"
+                className="text-foreground/[0.09]"
+              />
+            ),
+          )}
           {data.map((d, i) => {
             const [x, y] = at(i, R);
             const [lx, ly] = at(i, R + 22);
@@ -76,7 +99,7 @@ export function RadarChart({ data, index, series: input, label, format = formatC
             const points = data.map((d, i) => at(i, (value(d, s.key) / top) * R * progress));
             return (
               <g key={s.key}>
-                <path d={roundedPolygon(points, 8 * progress)} fill={s.color} fillOpacity={0.14} stroke={s.color} strokeWidth={2} strokeLinejoin="round" />
+                <path d={curve === "smooth" ? closedCurve(points) : roundedPolygon(points, 8 * progress)} fill={s.color} fillOpacity={0.14} stroke={s.color} strokeWidth={2} strokeLinejoin="round" />
                 {active !== null && (
                   <circle cx={points[active][0]} cy={points[active][1]} r={4.5} fill={s.color} stroke="var(--background)" strokeWidth={2} />
                 )}

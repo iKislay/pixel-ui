@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allocate, arcLine, arcPath, barPath, calendarCells, formatCompact, linePath, niceTicks, ribbonPath, roundedPolygon, sankeyLayout, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
+import { allocate, arcLine, arcPath, barPath, calendarCells, closedCurve, formatCompact, linePath, niceTicks, ribbonPath, roundedPolygon, sankeyLayout, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
 
 describe("niceTicks", () => {
   it("rounds the range out to round steps", () => {
@@ -169,6 +169,13 @@ describe("paths", () => {
     const ys = (d.match(/-?[\d.]+/g) ?? []).map(Number).filter((_, i) => i % 2 === 1);
     expect(Math.min(...ys)).toBe(0);
     expect(Math.max(...ys)).toBe(10);
+  });
+
+  it("closes a smooth curve through every point", () => {
+    const d = closedCurve([[0, -10], [10, 0], [0, 10], [-10, 0]]);
+    expect(d.startsWith("M0,-10C")).toBe(true);
+    expect(d.endsWith(" 0,-10Z")).toBe(true);
+    for (const p of ["10,0", "0,10", "-10,0"]) expect(d).toContain(` ${p}C`);
   });
 
   it("eases polygon corners into curves", () => {
