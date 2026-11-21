@@ -100,7 +100,10 @@ export function calendarCells(data: { date: string; value: number }[]) {
   const months: { week: number; label: string }[] = [];
   for (const cell of cells) {
     const month = MONTHS[Number(cell.date.slice(5, 7)) - 1];
-    if (months.at(-1)?.label !== month && (cell.date.slice(8) === "01" || months.length === 0)) months.push({ week: cell.week, label: month });
+    if (months.at(-1)?.label === month || (cell.date.slice(8) !== "01" && months.length > 0)) continue;
+    // a partial first month too close to the next label gives way to it
+    if (months.length === 1 && months[0].week > cell.week - 3) months.pop();
+    months.push({ week: cell.week, label: month });
   }
   return { weeks: cells.at(-1)!.week + 1, cells, months };
 }

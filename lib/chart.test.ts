@@ -78,11 +78,17 @@ describe("calendarCells", () => {
   });
 
   it("labels the first month and each month that begins in range", () => {
-    const data = ["2026-01-28", "2026-01-31", "2026-02-01", "2026-02-02"].map((date) => ({ date, value: 0 }));
-    expect(calendarCells(data).months).toEqual([
+    const dates = ["2026-01-05", "2026-02-01", "2026-03-01"];
+    expect(calendarCells(dates.map((date) => ({ date, value: 0 }))).months).toEqual([
       { week: 0, label: "Jan" },
-      { week: 0, label: "Feb" },
+      { week: 3, label: "Feb" },
+      { week: 7, label: "Mar" },
     ]);
+  });
+
+  it("drops a partial first month that would collide with the next", () => {
+    const dates = ["2026-01-28", "2026-02-01"];
+    expect(calendarCells(dates.map((date) => ({ date, value: 0 }))).months).toEqual([{ week: 0, label: "Feb" }]);
   });
 
   it("skips bad dates and handles no data", () => {
