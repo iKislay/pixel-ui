@@ -16,6 +16,9 @@ export type GaugeProps = Omit<ComponentProps<"div">, "children"> & {
   ticks?: number;
 };
 
+// server and browser can differ in the last digit of sin and cos, which breaks hydration
+const round = (n: number) => Math.round(n * 100) / 100;
+
 export function Gauge({
   value,
   min = 0,
@@ -56,10 +59,10 @@ export function Gauge({
             return (
               <line
                 key={i}
-                x1={100 + 72 * Math.sin(angle)}
-                y1={100 - 72 * Math.cos(angle)}
-                x2={100 + 92 * Math.sin(angle)}
-                y2={100 - 92 * Math.cos(angle)}
+                x1={round(100 + 72 * Math.sin(angle))}
+                y1={round(100 - 72 * Math.cos(angle))}
+                x2={round(100 + 92 * Math.sin(angle))}
+                y2={round(100 - 92 * Math.cos(angle))}
                 stroke={on ? color : "currentColor"}
                 strokeWidth={4}
                 strokeLinecap="round"

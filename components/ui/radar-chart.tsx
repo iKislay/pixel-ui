@@ -22,6 +22,7 @@ export type RadarChartProps = Omit<ComponentProps<"figure">, "children"> & {
   format?: Format;
 };
 
+const round = (n: number) => Math.round(n * 100) / 100;
 const C = 150;
 const R = 104;
 
@@ -33,7 +34,8 @@ export function RadarChart({ data, index, series: input, label, format = formatC
   const ticks = niceTicks(0, Math.max(...data.flatMap((row) => series.map((s) => value(row, s.key)))), 3);
   const top = ticks.at(-1) || 1;
   const angle = (i: number) => (Math.PI * 2 * i) / data.length;
-  const at = (i: number, r: number): Point => [C + r * Math.sin(angle(i)), C - r * Math.cos(angle(i))];
+  // rounded so server and browser trig agree during hydration
+  const at = (i: number, r: number): Point => [round(C + r * Math.sin(angle(i))), round(C - r * Math.cos(angle(i)))];
   const row = active === null ? null : data[active];
 
   return (
