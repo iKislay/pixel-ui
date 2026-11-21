@@ -1322,6 +1322,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "radial-bar-chart",
+      "type": "registry:ui",
+      "title": "Radial Bar Chart",
+      "description": "Rounded bars that radiate around a ring, made for cycles like hours or months.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/radial-bar-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

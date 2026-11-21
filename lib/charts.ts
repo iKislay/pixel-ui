@@ -1179,4 +1179,56 @@ export function Demo() {
   return <RoseChart label="How the release felt" data={data} />
 }`,
   }),
+  chart("radial-bar-chart", {
+    name: "Radial Bar Chart",
+    category: "trends",
+    description: "Rounded bars that radiate around a ring, made for cycles like hours or months.",
+    interaction:
+      "The bars grow outward one after another, clockwise from the top, over faint tracks; taller bars are brighter. Hover a bar, or tab in and use the arrow keys, and the center shows its label and value in place of the total. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: the bars appear at once.",
+    props: [
+      {
+        name: "data",
+        type: "Record<string, string | number>[]",
+        required: true,
+        description: "One object per bar, clockwise from the top.",
+      },
+      {
+        name: "index",
+        type: "string",
+        required: true,
+        description: "The key in each object that names the bar.",
+      },
+      {
+        name: "value",
+        type: "string",
+        required: true,
+        description: "The key in each object that holds the bar's value.",
+      },
+      labelProp,
+      formatProp,
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for the bars.",
+      },
+      {
+        name: "totalLabel",
+        type: "string",
+        default: '"Total"',
+        description: "The caption above the total in the center.",
+      },
+      classNameProp,
+    ],
+    usage: `import { RadialBarChart } from "@/components/ui/radial-bar-chart"
+
+const data = Array.from({ length: 24 }, (_, hour) => ({
+  hour: hour + ":00",
+  orders: Math.round(20 + 15 * Math.sin((hour - 6) / 3.8)),
+}))
+
+export function Demo() {
+  return <RadialBarChart label="Orders by hour" data={data} index="hour" value="orders" totalLabel="Orders" />
+}`,
+  }),
 ];

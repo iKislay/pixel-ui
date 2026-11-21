@@ -23,6 +23,7 @@ import { SankeyChart } from "@/components/ui/sankey-chart";
 import { FlowHub } from "@/components/ui/flow-hub";
 import { GanttChart } from "@/components/ui/gantt-chart";
 import { RoseChart } from "@/components/ui/rose-chart";
+import { RadialBarChart } from "@/components/ui/radial-bar-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -538,7 +539,26 @@ function RoseChartDemo({ compact }: DemoProps) {
   );
 }
 
+const byHour = Array.from({ length: 24 }, (_, hour) => ({
+  hour: `${hour}:00`,
+  orders: Math.round(Math.max(4, 26 + 22 * Math.sin((hour - 9) / 3.8) + 6 * Math.sin(hour * 1.3))),
+}));
+
+function RadialBarChartDemo({ compact }: DemoProps) {
+  return (
+    <RadialBarChart
+      className={compact ? "[&>div]:max-w-48" : undefined}
+      label="Orders by hour"
+      data={byHour}
+      index="hour"
+      value="orders"
+      totalLabel="Orders today"
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "radial-bar-chart": RadialBarChartDemo,
   "rose-chart": RoseChartDemo,
   "gantt-chart": GanttChartDemo,
   "flow-hub": FlowHubDemo,
