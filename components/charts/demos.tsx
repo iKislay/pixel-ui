@@ -9,6 +9,7 @@ import { BarChart } from "@/components/ui/bar-chart";
 import { DonutChart } from "@/components/ui/donut-chart";
 import { PillBarChart } from "@/components/ui/pill-bar-chart";
 import { HorizontalBarChart } from "@/components/ui/horizontal-bar-chart";
+import { LollipopChart } from "@/components/ui/lollipop-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -248,7 +249,31 @@ function HorizontalBarChartDemo({ compact }: DemoProps) {
   );
 }
 
+const teams = [
+  { team: "Design", now: 82, before: 70 },
+  { team: "Support", now: 91, before: 84 },
+  { team: "Sales", now: 74, before: 78 },
+  { team: "Product", now: 88, before: 72 },
+  { team: "Ops", now: 69, before: 61 },
+];
+
+function LollipopChartDemo({ compact }: DemoProps) {
+  return (
+    <LollipopChart
+      height={compact ? 170 : undefined}
+      label="Satisfaction by team"
+      data={teams}
+      index="team"
+      series={[
+        { key: "now", label: "This quarter" },
+        { key: "before", label: "Last quarter" },
+      ]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "lollipop-chart": LollipopChartDemo,
   "horizontal-bar-chart": HorizontalBarChartDemo,
   "pill-bar-chart": PillBarChartDemo,
   "stat-tile": StatTileDemo,

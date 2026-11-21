@@ -612,4 +612,29 @@ export function Demo() {
   return <HorizontalBarChart label="Visitors by country" data={data} />
 }`,
   }),
+  chart("lollipop-chart", {
+    name: "Lollipop Chart",
+    category: "comparison",
+    description: "Thin stems topped with dots, a lighter take on the bar chart.",
+    interaction: `Each dot rises on its stem from the baseline, one after another. ${cartesianInteraction("each stem")} The stem you are reading stays bright and its dot grows.`,
+    props: [...cartesianProps, classNameProp],
+    usage: `import { LollipopChart } from "@/components/ui/lollipop-chart"
+
+const data = [
+  { team: "Design", score: 82 },
+  { team: "Support", score: 91 },
+  { team: "Sales", score: 74 },
+]
+
+export function Demo() {
+  return (
+    <LollipopChart
+      label="Satisfaction by team"
+      data={data}
+      index="team"
+      series={[{ key: "score", label: "Score" }]}
+    />
+  )
+}`,
+  }),
 ];
