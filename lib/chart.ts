@@ -131,6 +131,63 @@ export function calendarCells(data: { date: string; value: number }[]) {
   return { weeks: cells.at(-1)!.week + 1, cells, months };
 }
 
+// a band of width w flowing from (x0, y0) to (x1, y1), both y at the band's top edge
+export function ribbonPath(x0: number, y0: number, x1: number, y1: number, w: number): string {
+  const xm = round((x0 + x1) / 2);
+  const [a, b, c, d] = [x0, y0, x1, y1].map(round);
+  const e = round(w);
+  return `M${a},${b}C${xm},${b} ${xm},${d} ${c},${d}L${c},${round(d + e)}C${xm},${round(d + e)} ${xm},${round(b + e)} ${a},${round(b + e)}Z`;
+}
+
+export type SankeyNodeInput = { id: string; label?: string; color?: string };
+export type SankeyLinkInput = { source: string; target: string; value: number };
+
+// columns by longest path from a source, nodes stacked and centred per column, links ordered to avoid crossings at each node
+export function sankeyLayout(
+  nodes: SankeyNodeInput[],
+  links: SankeyLinkInput[],
+  { width, height, nodeWidth = 10, gap = 14 }: { width: number; height: number; nodeWidth?: number; gap?: number },
+) {
+  const index = new Map(nodes.map((n, i) => [n.id, i]));
+  const valid = links.filter((l) => index.has(l.source) && index.has(l.target) && l.value > 0 && l.source !== l.target);
+  const depth = nodes.map(() => 0);
+  // relaxing n times settles any acyclic graph and stops a cycle from looping forever
+  for (let pass = 0; pass < nodes.length; pass++)
+    for (const l of valid) depth[index.get(l.target)!] = Math.max(depth[index.get(l.target)!], depth[index.get(l.source)!] + 1);
+  const columns = Math.max(...depth, 0) + 1;
+  const sum = (list: SankeyLinkInput[]) => list.reduce((a, l) => a + l.value, 0);
+  const values = nodes.map((n) => Math.max(sum(valid.filter((l) => l.source === n.id)), sum(valid.filter((l) => l.target === n.id))));
+  const layers = Array.from({ length: columns }, (_, c) => nodes.map((_, i) => i).filter((i) => depth[i] === c && values[i] > 0));
+  const k = Math.min(
+    ...layers.filter((l) => l.length).map((l) => (height - gap * (l.length - 1)) / (l.reduce((a, i) => a + values[i], 0) || 1)),
+  );
+  const placed = nodes.map((n, i) => ({ ...n, index: i, value: values[i], column: depth[i], x: 0, y: 0, h: values[i] * k }));
+  for (const layer of layers) {
+    const used = layer.reduce((a, i) => a + placed[i].h, 0) + gap * (layer.length - 1);
+    let y = (height - used) / 2;
+    for (const i of layer) {
+      placed[i].x = columns > 1 ? (depth[i] * (width - nodeWidth)) / (columns - 1) : 0;
+      placed[i].y = y;
+      y += placed[i].h + gap;
+    }
+  }
+  const out = nodes.map(() => 0);
+  const into = nodes.map(() => 0);
+  const placedLinks = valid.map((l) => ({ ...l, s: index.get(l.source)!, t: index.get(l.target)!, w: l.value * k, sy: 0, ty: 0 }));
+  for (const link of [...placedLinks].sort((a, b) => placed[a.t].y - placed[b.t].y)) {
+    link.sy = placed[link.s].y + out[link.s];
+    out[link.s] += link.w;
+  }
+  for (const link of [...placedLinks].sort((a, b) => placed[a.s].y - placed[b.s].y)) {
+    link.ty = placed[link.t].y + into[link.t];
+    into[link.t] += link.w;
+  }
+  return {
+    nodes: placed.filter((n) => n.value > 0),
+    links: placedLinks.map((l) => ({ ...l, x0: placed[l.s].x + nodeWidth, x1: placed[l.t].x })),
+  };
+}
+
 // a bar from the baseline to its value end, rounding only the value end
 export function barPath(x: number, base: number, width: number, end: number, radius: number): string {
   const height = Math.abs(base - end);

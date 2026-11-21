@@ -997,4 +997,60 @@ export function Demo() {
   return <CalendarHeatmap label="Contributions" data={data} />
 }`,
   }),
+  chart("sankey-chart", {
+    name: "Sankey Chart",
+    category: "flow",
+    description: "Soft ribbons that show how amounts flow from one stage to the next.",
+    interaction:
+      "The ribbons unfurl from left to right, each fading from its source's color to its target's. Hover a stage to light every ribbon through it, or hover a ribbon, or tab in and use the arrow keys, and a soft tooltip reads that flow. A hidden table carries every flow for screen readers. Honors prefers-reduced-motion: the ribbons appear at once.",
+    props: [
+      {
+        name: "nodes",
+        type: "{ id: string; label?: string; color?: string }[]",
+        required: true,
+        description: "The stages. Each one lands in the column of its longest path from a source, top to bottom in the order given.",
+      },
+      {
+        name: "links",
+        type: "{ source: string; target: string; value: number }[]",
+        required: true,
+        description: "The flows between stages, by id. Links to unknown ids, to themselves or with no value are skipped.",
+      },
+      labelProp,
+      formatProp,
+      {
+        name: "height",
+        type: "number",
+        default: "320",
+        description: "Height in pixels. The width fills the parent, with room for labels on both sides.",
+      },
+      {
+        name: "nodeWidth",
+        type: "number",
+        default: "10",
+        description: "Width of each stage's rounded bar in pixels.",
+      },
+      classNameProp,
+    ],
+    usage: `import { SankeyChart } from "@/components/ui/sankey-chart"
+
+const nodes = [
+  { id: "salary", label: "Salary" },
+  { id: "freelance", label: "Freelance" },
+  { id: "income", label: "Income" },
+  { id: "rent", label: "Rent" },
+  { id: "savings", label: "Savings" },
+]
+
+const links = [
+  { source: "salary", target: "income", value: 4200 },
+  { source: "freelance", target: "income", value: 1300 },
+  { source: "income", target: "rent", value: 1900 },
+  { source: "income", target: "savings", value: 3600 },
+]
+
+export function Demo() {
+  return <SankeyChart label="Monthly budget" nodes={nodes} links={links} />
+}`,
+  }),
 ];

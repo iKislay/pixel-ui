@@ -19,6 +19,7 @@ import { WaffleChart } from "@/components/ui/waffle-chart";
 import { RadarChart } from "@/components/ui/radar-chart";
 import { FunnelChart } from "@/components/ui/funnel-chart";
 import { CalendarHeatmap } from "@/components/ui/calendar-heatmap";
+import { SankeyChart } from "@/components/ui/sankey-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -431,7 +432,41 @@ function CalendarHeatmapDemo({ compact }: DemoProps) {
   return <CalendarHeatmap label="Contributions over six months" data={compact ? contributions.slice(-18 * 7) : contributions} />;
 }
 
+const budgetNodes = [
+  { id: "salary", label: "Salary" },
+  { id: "freelance", label: "Freelance" },
+  { id: "dividends", label: "Dividends" },
+  { id: "income", label: "Income" },
+  { id: "home", label: "Home" },
+  { id: "food", label: "Food" },
+  { id: "travel", label: "Travel" },
+  { id: "savings", label: "Savings" },
+];
+
+const budgetLinks = [
+  { source: "salary", target: "income", value: 4200 },
+  { source: "freelance", target: "income", value: 1300 },
+  { source: "dividends", target: "income", value: 500 },
+  { source: "income", target: "home", value: 1900 },
+  { source: "income", target: "food", value: 900 },
+  { source: "income", target: "travel", value: 700 },
+  { source: "income", target: "savings", value: 2500 },
+];
+
+function SankeyChartDemo({ compact }: DemoProps) {
+  return (
+    <SankeyChart
+      height={compact ? 190 : undefined}
+      label="Monthly budget"
+      nodes={budgetNodes}
+      links={budgetLinks}
+      format={(n) => "$" + formatCompact(n)}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "sankey-chart": SankeyChartDemo,
   "calendar-heatmap": CalendarHeatmapDemo,
   "funnel-chart": FunnelChartDemo,
   "radar-chart": RadarChartDemo,

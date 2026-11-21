@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allocate, arcLine, arcPath, barPath, calendarCells, formatCompact, linePath, niceTicks, roundedPolygon, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
+import { allocate, arcLine, arcPath, barPath, calendarCells, formatCompact, linePath, niceTicks, ribbonPath, roundedPolygon, sankeyLayout, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
 
 describe("niceTicks", () => {
   it("rounds the range out to round steps", () => {
@@ -96,7 +96,62 @@ describe("calendarCells", () => {
   });
 });
 
+describe("sankeyLayout", () => {
+  const nodes = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+  const links = [
+    { source: "a", target: "c", value: 30 },
+    { source: "b", target: "c", value: 10 },
+    { source: "c", target: "d", value: 40 },
+  ];
+
+  it("puts each node in the column of its longest path", () => {
+    const { nodes: placed } = sankeyLayout(nodes, links, { width: 210, height: 100, nodeWidth: 10, gap: 20 });
+    expect(placed.map((n) => [n.id, n.column, n.x])).toEqual([
+      ["a", 0, 0],
+      ["b", 0, 0],
+      ["c", 1, 100],
+      ["d", 2, 200],
+    ]);
+  });
+
+  it("scales the fullest column to the height and centres the rest", () => {
+    const { nodes: placed } = sankeyLayout(nodes, links, { width: 210, height: 100, nodeWidth: 10, gap: 20 });
+    expect(placed.map((n) => [n.id, n.y, n.h])).toEqual([
+      ["a", 0, 60],
+      ["b", 80, 20],
+      ["c", 10, 80],
+      ["d", 10, 80],
+    ]);
+  });
+
+  it("stacks links at each end without overlap", () => {
+    const { links: placed } = sankeyLayout(nodes, links, { width: 210, height: 100, nodeWidth: 10, gap: 20 });
+    expect(placed.map((l) => [l.source, l.target, l.sy, l.ty, l.w, l.x0, l.x1])).toEqual([
+      ["a", "c", 0, 10, 60, 10, 100],
+      ["b", "c", 80, 70, 20, 10, 100],
+      ["c", "d", 10, 10, 80, 110, 200],
+    ]);
+  });
+
+  it("drops bad links and survives a cycle", () => {
+    const cyclic = sankeyLayout(
+      [{ id: "x" }, { id: "y" }],
+      [
+        { source: "x", target: "y", value: 1 },
+        { source: "y", target: "x", value: 1 },
+        { source: "x", target: "zz", value: 1 },
+      ],
+      { width: 100, height: 50 },
+    );
+    expect(cyclic.links).toHaveLength(2);
+  });
+});
+
 describe("paths", () => {
+  it("draws a ribbon as two curves joined at each end", () => {
+    expect(ribbonPath(0, 0, 100, 40, 10)).toBe("M0,0C50,0 50,40 100,40L100,50C50,50 50,10 0,10Z");
+  });
+
   it("draws straight segments", () => {
     expect(linePath([[0, 0], [10, 5.556]])).toBe("M0,0L10,5.56");
   });
