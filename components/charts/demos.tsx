@@ -16,6 +16,7 @@ import { Gauge } from "@/components/ui/gauge";
 import { ActivityRings } from "@/components/ui/activity-rings";
 import { SegmentedBar } from "@/components/ui/segmented-bar";
 import { WaffleChart } from "@/components/ui/waffle-chart";
+import { RadarChart } from "@/components/ui/radar-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -381,7 +382,32 @@ function WaffleChartDemo({ compact }: DemoProps) {
   );
 }
 
+const plansCompared = [
+  { skill: "Speed", pro: 82, free: 60 },
+  { skill: "Storage", pro: 90, free: 40 },
+  { skill: "Support", pro: 75, free: 35 },
+  { skill: "Sharing", pro: 88, free: 70 },
+  { skill: "Search", pro: 70, free: 55 },
+  { skill: "Privacy", pro: 84, free: 62 },
+];
+
+function RadarChartDemo({ compact }: DemoProps) {
+  return (
+    <RadarChart
+      className={compact ? "[&>div]:max-w-52" : undefined}
+      label="Plans compared"
+      data={plansCompared}
+      index="skill"
+      series={[
+        { key: "pro", label: "Pro" },
+        { key: "free", label: "Free" },
+      ]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "radar-chart": RadarChartDemo,
   "waffle-chart": WaffleChartDemo,
   "segmented-bar": SegmentedBarDemo,
   "activity-rings": ActivityRingsDemo,

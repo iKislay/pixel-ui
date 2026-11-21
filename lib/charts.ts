@@ -874,4 +874,57 @@ export function Demo() {
   return <WaffleChart label="Subscriptions this year" data={data} total={100} />
 }`,
   }),
+  chart("radar-chart", {
+    name: "Radar Chart",
+    category: "comparison",
+    description: "Soft filled shapes on a round web that compare several measures at once.",
+    interaction:
+      "The shapes grow out from the center. Hover an axis, or tab in and use the arrow keys, and the axis lights up while a card in the middle reads each series on it. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: the shapes appear at full size.",
+    props: [
+      {
+        name: "data",
+        type: "Record<string, string | number>[]",
+        required: true,
+        description: "One object per axis, clockwise from the top.",
+      },
+      {
+        name: "index",
+        type: "string",
+        required: true,
+        description: "The key in each object that names the axis.",
+      },
+      {
+        name: "series",
+        type: "{ key: string; label?: string; color?: string }[]",
+        required: true,
+        description: "The keys to draw as shapes. Colors follow the chart palette in order unless you set one.",
+      },
+      labelProp,
+      formatProp,
+      classNameProp,
+    ],
+    usage: `import { RadarChart } from "@/components/ui/radar-chart"
+
+const data = [
+  { skill: "Speed", pro: 82, free: 60 },
+  { skill: "Storage", pro: 90, free: 40 },
+  { skill: "Support", pro: 75, free: 35 },
+  { skill: "Sharing", pro: 88, free: 70 },
+  { skill: "Search", pro: 70, free: 55 },
+]
+
+export function Demo() {
+  return (
+    <RadarChart
+      label="Plans compared"
+      data={data}
+      index="skill"
+      series={[
+        { key: "pro", label: "Pro" },
+        { key: "free", label: "Free" },
+      ]}
+    />
+  )
+}`,
+  }),
 ];
