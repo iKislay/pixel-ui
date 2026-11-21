@@ -1192,6 +1192,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "calendar-heatmap",
+      "type": "registry:ui",
+      "title": "Calendar Heatmap",
+      "description": "Days laid out in week columns, shaded by how much happened on each.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/calendar-heatmap.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

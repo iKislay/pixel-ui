@@ -18,6 +18,7 @@ import { SegmentedBar } from "@/components/ui/segmented-bar";
 import { WaffleChart } from "@/components/ui/waffle-chart";
 import { RadarChart } from "@/components/ui/radar-chart";
 import { FunnelChart } from "@/components/ui/funnel-chart";
+import { CalendarHeatmap } from "@/components/ui/calendar-heatmap";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -418,7 +419,20 @@ function FunnelChartDemo({ compact }: DemoProps) {
   return <FunnelChart className="mx-auto max-w-md" label="Signup funnel" data={compact ? funnel.slice(0, 3) : funnel} />;
 }
 
+const contributions = Array.from({ length: 26 * 7 - 3 }, (_, i) => {
+  const date = new Date(Date.UTC(2026, 4, 4) + i * 86_400_000).toISOString().slice(0, 10);
+  const weekday = i % 7;
+  const wave = Math.sin(i * 0.11) * 0.5 + 0.5;
+  const noise = Math.sin(i * 12.9898) * 0.5 + 0.5;
+  return { date, value: weekday >= 5 ? Math.round(noise * 3) : Math.round(wave * 8 + noise * 6) };
+});
+
+function CalendarHeatmapDemo({ compact }: DemoProps) {
+  return <CalendarHeatmap label="Contributions over six months" data={compact ? contributions.slice(-18 * 7) : contributions} />;
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "calendar-heatmap": CalendarHeatmapDemo,
   "funnel-chart": FunnelChartDemo,
   "radar-chart": RadarChartDemo,
   "waffle-chart": WaffleChartDemo,

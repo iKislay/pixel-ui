@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allocate, arcLine, arcPath, barPath, formatCompact, linePath, niceTicks, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
+import { allocate, arcLine, arcPath, barPath, calendarCells, formatCompact, linePath, niceTicks, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
 
 describe("niceTicks", () => {
   it("rounds the range out to round steps", () => {
@@ -60,6 +60,33 @@ describe("allocate", () => {
   it("ignores negatives and an empty total", () => {
     expect(allocate([-5, 10], 10)).toEqual([0, 10]);
     expect(allocate([0, 0], 10)).toEqual([0, 0]);
+  });
+});
+
+describe("calendarCells", () => {
+  it("starts weeks on monday and places each day in its row", () => {
+    // 2026-03-04 is a wednesday
+    const { weeks, cells } = calendarCells([
+      { date: "2026-03-09", value: 2 },
+      { date: "2026-03-04", value: 1 },
+    ]);
+    expect(weeks).toBe(2);
+    expect(cells).toEqual([
+      { date: "2026-03-04", value: 1, week: 0, day: 2 },
+      { date: "2026-03-09", value: 2, week: 1, day: 0 },
+    ]);
+  });
+
+  it("labels the first month and each month that begins in range", () => {
+    const data = ["2026-01-28", "2026-01-31", "2026-02-01", "2026-02-02"].map((date) => ({ date, value: 0 }));
+    expect(calendarCells(data).months).toEqual([
+      { week: 0, label: "Jan" },
+      { week: 0, label: "Feb" },
+    ]);
+  });
+
+  it("skips bad dates and handles no data", () => {
+    expect(calendarCells([{ date: "nope", value: 1 }])).toEqual({ weeks: 0, cells: [], months: [] });
   });
 });
 

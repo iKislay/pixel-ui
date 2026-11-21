@@ -962,4 +962,39 @@ export function Demo() {
   return <FunnelChart label="Signup funnel" data={data} />
 }`,
   }),
+  chart("calendar-heatmap", {
+    name: "Calendar Heatmap",
+    category: "trends",
+    description: "Days laid out in week columns, shaded by how much happened on each.",
+    interaction:
+      "The weeks fade in from left to right. Hover a day, or tab in and use the arrow keys to walk day by day, and a soft tooltip reads its date and value. A hidden table carries every day for screen readers. Honors prefers-reduced-motion: the calendar appears at once.",
+    props: [
+      {
+        name: "data",
+        type: "{ date: string; value: number }[]",
+        required: true,
+        description: "One entry per day, with an ISO date like 2026-03-04. Weeks start on Monday and missing days stay blank.",
+      },
+      labelProp,
+      formatProp,
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color. Days are shaded in five steps of it, from a faint tint to full.",
+      },
+      classNameProp,
+    ],
+    usage: `import { CalendarHeatmap } from "@/components/ui/calendar-heatmap"
+
+const data = [
+  { date: "2026-03-02", value: 4 },
+  { date: "2026-03-03", value: 9 },
+  { date: "2026-03-04", value: 0 },
+]
+
+export function Demo() {
+  return <CalendarHeatmap label="Contributions" data={data} />
+}`,
+  }),
 ];

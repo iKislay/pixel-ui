@@ -79,6 +79,32 @@ export function allocate(values: number[], cells: number): number[] {
   return counts;
 }
 
+export type CalendarCell = { date: string; value: number; week: number; day: number };
+
+const DAY = 86_400_000;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// lays iso dates out in week columns starting on monday, with a month label where each month begins
+export function calendarCells(data: { date: string; value: number }[]) {
+  const days = data
+    .map((d) => ({ ...d, time: Date.parse(`${d.date.slice(0, 10)}T00:00:00Z`) }))
+    .filter((d) => Number.isFinite(d.time))
+    .sort((a, b) => a.time - b.time);
+  if (days.length === 0) return { weeks: 0, cells: [] as CalendarCell[], months: [] as { week: number; label: string }[] };
+  const first = days[0].time;
+  const monday = first - ((new Date(first).getUTCDay() + 6) % 7) * DAY;
+  const cells = days.map((d) => {
+    const offset = Math.round((d.time - monday) / DAY);
+    return { date: d.date.slice(0, 10), value: d.value, week: Math.floor(offset / 7), day: offset % 7 };
+  });
+  const months: { week: number; label: string }[] = [];
+  for (const cell of cells) {
+    const month = MONTHS[Number(cell.date.slice(5, 7)) - 1];
+    if (months.at(-1)?.label !== month && (cell.date.slice(8) === "01" || months.length === 0)) months.push({ week: cell.week, label: month });
+  }
+  return { weeks: cells.at(-1)!.week + 1, cells, months };
+}
+
 // a bar from the baseline to its value end, rounding only the value end
 export function barPath(x: number, base: number, width: number, end: number, radius: number): string {
   const height = Math.abs(base - end);
