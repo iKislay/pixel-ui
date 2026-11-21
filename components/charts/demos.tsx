@@ -12,6 +12,7 @@ import { HorizontalBarChart } from "@/components/ui/horizontal-bar-chart";
 import { LollipopChart } from "@/components/ui/lollipop-chart";
 import { DotMatrixChart } from "@/components/ui/dot-matrix-chart";
 import { CombChart } from "@/components/ui/comb-chart";
+import { Gauge } from "@/components/ui/gauge";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -313,7 +314,26 @@ function CombChartDemo({ compact }: DemoProps) {
   );
 }
 
+function GaugeDemo({ compact }: DemoProps) {
+  return (
+    <div className="flex items-center justify-center gap-8">
+      <Gauge label="Server load" value={68} caption="CPU load" format={(n) => `${Math.round(n)}%`} />
+      {!compact && (
+        <Gauge
+          label="Response time"
+          value={182}
+          max={400}
+          caption="Response, ms"
+          color="var(--chart-2)"
+          format={(n) => `${Math.round(n)}`}
+        />
+      )}
+    </div>
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "gauge": GaugeDemo,
   "comb-chart": CombChartDemo,
   "dot-matrix-chart": DotMatrixChartDemo,
   "lollipop-chart": LollipopChartDemo,

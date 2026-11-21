@@ -32,7 +32,8 @@ export type ComponentCategory =
   | "overlays"
   | "trends"
   | "comparison"
-  | "composition";
+  | "composition"
+  | "progress";
 
 export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   ai: "AI kit",
@@ -47,6 +48,7 @@ export const CATEGORY_LABELS: Record<ComponentCategory, string> = {
   trends: "Trends",
   comparison: "Comparison",
   composition: "Parts of a whole",
+  progress: "Progress",
 };
 
 export const CATEGORY_ORDER: ComponentCategory[] = [
@@ -62,6 +64,7 @@ export const CATEGORY_ORDER: ComponentCategory[] = [
   "trends",
   "comparison",
   "composition",
+  "progress",
 ];
 
 export type ComponentItem = {

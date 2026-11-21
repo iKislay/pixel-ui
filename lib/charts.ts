@@ -300,7 +300,7 @@ export function Demo() {
   }),
   chart("radial-progress", {
     name: "Radial Progress",
-    category: "composition",
+    category: "progress",
     description: "A ring that fills toward a goal, with the value in its center.",
     interaction:
       "The ring sweeps round to its value as the number counts up beside it. Screen readers hear it as a meter with its value. Honors prefers-reduced-motion: the ring and number appear at once.",
@@ -701,6 +701,63 @@ export function Demo() {
       series={[{ key: "commits", label: "Commits" }]}
     />
   )
+}`,
+  }),
+  chart("gauge", {
+    name: "Gauge",
+    category: "progress",
+    description: "A half dial of tick marks that light up to show a value within a range.",
+    interaction:
+      "The ticks light up one by one from the left as the number counts up beneath them. Screen readers hear it as a meter with its value. Honors prefers-reduced-motion: the dial and number appear at once.",
+    props: [
+      {
+        name: "value",
+        type: "number",
+        required: true,
+        description: "The current value. It is clamped between min and max.",
+      },
+      {
+        name: "min",
+        type: "number",
+        default: "0",
+        description: "The value at the left end of the dial.",
+      },
+      {
+        name: "max",
+        type: "number",
+        default: "100",
+        description: "The value at the right end of the dial.",
+      },
+      {
+        name: "label",
+        type: "string",
+        required: true,
+        description: "Names the meter for screen readers.",
+      },
+      {
+        name: "caption",
+        type: "string",
+        description: "A short line under the value.",
+      },
+      formatProp,
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for the lit ticks.",
+      },
+      {
+        name: "ticks",
+        type: "number",
+        default: "41",
+        description: "How many tick marks make up the dial.",
+      },
+      classNameProp,
+    ],
+    usage: `import { Gauge } from "@/components/ui/gauge"
+
+export function Demo() {
+  return <Gauge label="Server load" value={68} caption="CPU load" format={(n) => Math.round(n) + "%"} />
 }`,
   }),
 ];
