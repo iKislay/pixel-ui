@@ -538,4 +538,38 @@ export function Demo() {
   )
 }`,
   }),
+  chart("pill-bar-chart", {
+    name: "Pill Bar Chart",
+    category: "comparison",
+    description: "Rounded pill bars with one bar lit and the rest softly hatched.",
+    interaction: `The pills rise one after another and the lit bar wears its value in a small tag. ${cartesianInteraction("each bar")} The bar you are reading lights up and the others fall back to hatching.`,
+    props: [
+      ...cartesianProps,
+      {
+        name: "highlight",
+        type: "number",
+        description: "Index of the bar to light when nothing is hovered. Defaults to the last one.",
+      },
+      classNameProp,
+    ],
+    usage: `import { PillBarChart } from "@/components/ui/pill-bar-chart"
+
+const data = [
+  { day: "Mon", hours: 5.2 },
+  { day: "Tue", hours: 6.8 },
+  { day: "Wed", hours: 4.9 },
+]
+
+export function Demo() {
+  return (
+    <PillBarChart
+      label="Focus hours by day"
+      data={data}
+      index="day"
+      series={[{ key: "hours", label: "Hours" }]}
+      highlight={1}
+    />
+  )
+}`,
+  }),
 ];

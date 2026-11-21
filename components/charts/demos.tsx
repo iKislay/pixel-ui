@@ -7,6 +7,7 @@ import { formatCompact } from "@/lib/chart";
 import { AreaChart } from "@/components/ui/area-chart";
 import { BarChart } from "@/components/ui/bar-chart";
 import { DonutChart } from "@/components/ui/donut-chart";
+import { PillBarChart } from "@/components/ui/pill-bar-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -212,7 +213,24 @@ function StatTileDemo({ compact }: DemoProps) {
   );
 }
 
+const focus = days.map((day, i) => ({ day, hours: [5.2, 6.8, 4.9, 7.6, 6.1, 2.4, 1.8][i] }));
+
+function PillBarChartDemo({ compact }: DemoProps) {
+  return (
+    <PillBarChart
+      height={compact ? 170 : undefined}
+      label="Focus hours by day"
+      data={focus}
+      index="day"
+      series={[{ key: "hours", label: "Hours" }]}
+      format={(n) => `${n}h`}
+      highlight={3}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "pill-bar-chart": PillBarChartDemo,
   "stat-tile": StatTileDemo,
   heatmap: HeatmapDemo,
   "scatter-chart": ScatterChartDemo,

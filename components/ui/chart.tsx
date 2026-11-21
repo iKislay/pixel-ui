@@ -189,6 +189,7 @@ export type CartesianChartProps = Omit<ComponentProps<"figure">, "children"> & {
   zero?: boolean;
   bars?: boolean;
   bare?: boolean;
+  grid?: boolean;
   slot: string;
   children: (context: CartesianContext) => ReactNode;
 };
@@ -207,6 +208,7 @@ export function CartesianChart({
   zero = false,
   bars = false,
   bare = false,
+  grid = true,
   slot,
   children,
   className,
@@ -215,7 +217,7 @@ export function CartesianChart({
   const [ref, width] = useChartWidth<HTMLDivElement>();
   const { active, setActive, handlers } = useChartNav(data.length);
   const progress = useDrawIn();
-  const margin = bare ? BARE : MARGIN;
+  const margin = bare ? BARE : grid ? MARGIN : { ...MARGIN, left: 8 };
   const series = input.map((s, i) => ({ ...s, label: s.label ?? s.key, color: seriesColor(i, s.color) }));
 
   const value = (row: ChartDatum, key: string) => Number(row[key]) || 0;
@@ -262,6 +264,7 @@ export function CartesianChart({
         {width > 0 && (
           <svg width={width} height={height} aria-hidden className="block overflow-visible">
             {!bare &&
+              grid &&
               ticks.map((tick) => (
                 <g key={tick}>
                   <line

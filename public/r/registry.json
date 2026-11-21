@@ -906,6 +906,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "pill-bar-chart",
+      "type": "registry:ui",
+      "title": "Pill Bar Chart",
+      "description": "Rounded pill bars with one bar lit and the rest softly hatched.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/pill-bar-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }
