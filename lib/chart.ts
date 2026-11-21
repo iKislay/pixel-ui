@@ -131,12 +131,11 @@ export function calendarCells(data: { date: string; value: number }[]) {
   return { weeks: cells.at(-1)!.week + 1, cells, months };
 }
 
-// a band of width w flowing from (x0, y0) to (x1, y1), both y at the band's top edge
-export function ribbonPath(x0: number, y0: number, x1: number, y1: number, w: number): string {
+// a band flowing from (x0, y0) to (x1, y1), y at its top edge, w wide at the start and w1 at the end
+export function ribbonPath(x0: number, y0: number, x1: number, y1: number, w: number, w1 = w): string {
   const xm = round((x0 + x1) / 2);
   const [a, b, c, d] = [x0, y0, x1, y1].map(round);
-  const e = round(w);
-  return `M${a},${b}C${xm},${b} ${xm},${d} ${c},${d}L${c},${round(d + e)}C${xm},${round(d + e)} ${xm},${round(b + e)} ${a},${round(b + e)}Z`;
+  return `M${a},${b}C${xm},${b} ${xm},${d} ${c},${d}L${c},${round(y1 + w1)}C${xm},${round(y1 + w1)} ${xm},${round(y0 + w)} ${a},${round(y0 + w)}Z`;
 }
 
 export type SankeyNodeInput = { id: string; label?: string; color?: string };

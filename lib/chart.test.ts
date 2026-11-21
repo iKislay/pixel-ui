@@ -152,6 +152,10 @@ describe("paths", () => {
     expect(ribbonPath(0, 0, 100, 40, 10)).toBe("M0,0C50,0 50,40 100,40L100,50C50,50 50,10 0,10Z");
   });
 
+  it("tapers a ribbon to a different width at its end", () => {
+    expect(ribbonPath(0, 0, 100, 40, 10, 4)).toBe("M0,0C50,0 50,40 100,40L100,44C50,44 50,10 0,10Z");
+  });
+
   it("draws straight segments", () => {
     expect(linePath([[0, 0], [10, 5.556]])).toBe("M0,0L10,5.56");
   });

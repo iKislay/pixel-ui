@@ -1244,6 +1244,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "flow-hub",
+      "type": "registry:ui",
+      "title": "Flow Hub",
+      "description": "Ribbons that gather into a central total and fan back out to where it went.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/flow-hub.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

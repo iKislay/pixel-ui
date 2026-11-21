@@ -1053,4 +1053,58 @@ export function Demo() {
   return <SankeyChart label="Monthly budget" nodes={nodes} links={links} />
 }`,
   }),
+  chart("flow-hub", {
+    name: "Flow Hub",
+    category: "flow",
+    description: "Ribbons that gather into a central total and fan back out to where it went.",
+    interaction:
+      "The ribbons reach in from both edges and meet behind a soft disc that counts up the total. Hover a ribbon, or tab in and use the arrow keys, and it stays bright while the disc shows its value and share. A hidden table carries every flow for screen readers. Honors prefers-reduced-motion: the ribbons and total appear at once.",
+    props: [
+      {
+        name: "inputs",
+        type: "{ label: string; value: number; color?: string }[]",
+        required: true,
+        description: "What flows in on the left. Their sum is the total in the center.",
+      },
+      {
+        name: "outputs",
+        type: "{ label: string; value: number; color?: string }[]",
+        required: true,
+        description: "Where it goes on the right. Colors carry on through the palette after the inputs.",
+      },
+      labelProp,
+      {
+        name: "totalLabel",
+        type: "string",
+        default: '"Total"',
+        description: "The caption above the total in the center.",
+      },
+      formatProp,
+      {
+        name: "height",
+        type: "number",
+        default: "300",
+        description: "Height in pixels. The width fills the parent, with room for labels on both sides.",
+      },
+      classNameProp,
+    ],
+    usage: `import { FlowHub } from "@/components/ui/flow-hub"
+
+export function Demo() {
+  return (
+    <FlowHub
+      label="Sales by source and destination"
+      totalLabel="Total sales"
+      inputs={[
+        { label: "Business", value: 22987 },
+        { label: "Finance", value: 12657 },
+      ]}
+      outputs={[
+        { label: "Investments", value: 26644 },
+        { label: "Startups", value: 9000 },
+      ]}
+    />
+  )
+}`,
+  }),
 ];

@@ -20,6 +20,7 @@ import { RadarChart } from "@/components/ui/radar-chart";
 import { FunnelChart } from "@/components/ui/funnel-chart";
 import { CalendarHeatmap } from "@/components/ui/calendar-heatmap";
 import { SankeyChart } from "@/components/ui/sankey-chart";
+import { FlowHub } from "@/components/ui/flow-hub";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -465,7 +466,35 @@ function SankeyChartDemo({ compact }: DemoProps) {
   );
 }
 
+const hubInputs = [
+  { label: "Business", value: 22987 },
+  { label: "Presentation", value: 14641 },
+  { label: "Finance", value: 12657 },
+  { label: "Development", value: 23054 },
+];
+
+const hubOutputs = [
+  { label: "Investments", value: 28644 },
+  { label: "Startups", value: 15752 },
+  { label: "Operations", value: 9101 },
+  { label: "Reserves", value: 19842 },
+];
+
+function FlowHubDemo({ compact }: DemoProps) {
+  return (
+    <FlowHub
+      height={compact ? 200 : undefined}
+      label="Sales by source and destination"
+      totalLabel="Total sales"
+      inputs={hubInputs}
+      outputs={hubOutputs}
+      format={(n) => "$" + formatCompact(n)}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "flow-hub": FlowHubDemo,
   "sankey-chart": SankeyChartDemo,
   "calendar-heatmap": CalendarHeatmapDemo,
   "funnel-chart": FunnelChartDemo,
