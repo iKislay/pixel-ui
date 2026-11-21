@@ -781,7 +781,7 @@
       "name": "donut-chart",
       "type": "registry:ui",
       "title": "Donut Chart",
-      "description": "A ring split into slices that shows how a total breaks down.",
+      "description": "A ring of soft rounded slices that shows how a total breaks down.",
       "dependencies": [
         "motion"
       ],

@@ -260,9 +260,9 @@ export function Demo() {
   chart("donut-chart", {
     name: "Donut Chart",
     category: "composition",
-    description: "A ring split into slices that shows how a total breaks down.",
+    description: "A ring of soft rounded slices that shows how a total breaks down.",
     interaction:
-      "The ring sweeps in clockwise, slice by slice. Hover a slice or its legend row, or tab in and use the arrow keys, and the slice lifts while the center shows its value and share. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: the ring appears at once.",
+      "The ring sweeps in clockwise as soft, round-ended slices. Hover a slice or its legend row, or tab in and use the arrow keys, and the slice thickens while the center shows its value and share. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: the ring appears at once.",
     props: [
       {
         name: "data",
@@ -275,7 +275,7 @@ export function Demo() {
       {
         name: "thickness",
         type: "number",
-        default: "26",
+        default: "24",
         description: "Width of the ring, on a 200 unit wide chart.",
       },
       {

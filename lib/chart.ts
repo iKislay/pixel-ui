@@ -89,6 +89,15 @@ const polar =(cx: number, cy: number, r: number, angle: number): Point => [
   cy - r * Math.cos(angle),
 ];
 
+// an open arc along one radius, for stroking with round caps
+export function arcLine(cx: number, cy: number, r: number, start: number, end: number): string {
+  const sweep = Math.min(end - start, Math.PI * 2 - 1e-4);
+  if (sweep <= 0) return "";
+  const [x0, y0] = polar(cx, cy, r, start);
+  const [x1, y1] = polar(cx, cy, r, start + sweep);
+  return `M${round(x0)},${round(y0)}A${r},${r} 0 ${sweep > Math.PI ? 1 : 0} 1 ${round(x1)},${round(y1)}`;
+}
+
 // angles in radians, clockwise from twelve o'clock
 export function arcPath(cx: number, cy: number, outer: number, inner: number, start: number, end: number): string {
   const sweep = Math.min(end - start, Math.PI * 2 - 1e-4);

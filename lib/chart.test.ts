@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { arcPath, barPath, formatCompact, linePath, niceTicks, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
+import { arcLine, arcPath, barPath, formatCompact, linePath, niceTicks, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
 
 describe("niceTicks", () => {
   it("rounds the range out to round steps", () => {
@@ -79,6 +79,11 @@ describe("paths", () => {
 
   it("closes a donut slice through the inner radius", () => {
     expect(arcPath(50, 50, 40, 30, 0, Math.PI / 2)).toBe("M50,10A40,40 0 0 1 90,50L80,50A30,30 0 0 0 50,20Z");
+  });
+
+  it("draws an open arc and skips an empty one", () => {
+    expect(arcLine(50, 50, 40, 0, Math.PI / 2)).toBe("M50,10A40,40 0 0 1 90,50");
+    expect(arcLine(50, 50, 40, 1, 1)).toBe("");
   });
 
   it("keeps a full circle drawable", () => {

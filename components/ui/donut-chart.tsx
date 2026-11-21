@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { arcPath, formatCompact, seriesColor } from "@/lib/chart";
+import { arcLine, formatCompact, seriesColor } from "@/lib/chart";
 import { ChartTable, chartFocus, useChartNav, useDrawIn, type Format } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
@@ -16,13 +16,14 @@ export type DonutChartProps = Omit<ComponentProps<"figure">, "children"> & {
 };
 
 const SIZE = 200;
-const GAP = 0.025;
+// space between the round ends of neighbouring slices, in chart units
+const GAP = 3;
 
 export function DonutChart({
   data,
   label,
   format = formatCompact,
-  thickness = 26,
+  thickness = 24,
   totalLabel = "Total",
   className,
   ...props
@@ -30,7 +31,9 @@ export function DonutChart({
   const { active, setActive, handlers } = useChartNav(data.length);
   const progress = useDrawIn();
   const total = data.reduce((sum, d) => sum + Math.max(d.value, 0), 0) || 1;
-  const outer = SIZE / 2 - 6;
+  const r = SIZE / 2 - 8 - thickness / 2;
+  // a round cap reaches past its arc by half the stroke, so each slice gives that back
+  const trim = (thickness / 2 + GAP / 2) / r;
   const share = (value: number) => `${Math.round((Math.max(value, 0) / total) * 100)}%`;
 
   const turn = (value: number) => (Math.max(value, 0) / total) * Math.PI * 2 * progress;
@@ -52,16 +55,24 @@ export function DonutChart({
       >
         <svg viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden className="size-full overflow-visible">
           {slices.map((slice, i) => {
+            if (slice.end <= slice.start) return null;
             const lifted = active === i;
-            const gap = slice.end - slice.start > GAP * 2 ? GAP / 2 : 0;
+            const whole = slices.filter((s) => s.end > s.start).length === 1;
+            const start = whole ? slice.start : slice.start + trim;
+            // a slice too thin for two caps shrinks to a dot at its middle
+            const end = whole ? slice.end : Math.max(slice.end - trim, start + 1e-3);
+            const middle = (slice.start + slice.end) / 2;
             return (
               <path
                 key={slice.label}
-                d={arcPath(SIZE / 2, SIZE / 2, outer + (lifted ? 4 : 0), outer - thickness, slice.start + gap, slice.end - gap)}
-                fill={slice.color}
-                opacity={active === null || lifted ? 1 : 0.4}
+                d={end - start < 2e-3 ? arcLine(SIZE / 2, SIZE / 2, r, middle, middle + 1e-3) : arcLine(SIZE / 2, SIZE / 2, r, start, end)}
+                fill="none"
+                stroke={slice.color}
+                strokeWidth={thickness + (lifted ? 6 : 0)}
+                strokeLinecap="round"
+                opacity={active === null || lifted ? 1 : 0.35}
                 onPointerEnter={() => setActive(i)}
-                className="transition-opacity duration-200 motion-reduce:transition-none"
+                className="transition-[opacity,stroke-width] duration-200 motion-reduce:transition-none"
               />
             );
           })}
