@@ -932,6 +932,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "horizontal-bar-chart",
+      "type": "registry:ui",
+      "title": "Horizontal Bar Chart",
+      "description": "A ranked list of labelled bars that fill along soft rounded tracks.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/horizontal-bar-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

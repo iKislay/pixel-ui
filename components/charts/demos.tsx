@@ -8,6 +8,7 @@ import { AreaChart } from "@/components/ui/area-chart";
 import { BarChart } from "@/components/ui/bar-chart";
 import { DonutChart } from "@/components/ui/donut-chart";
 import { PillBarChart } from "@/components/ui/pill-bar-chart";
+import { HorizontalBarChart } from "@/components/ui/horizontal-bar-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -229,7 +230,26 @@ function PillBarChartDemo({ compact }: DemoProps) {
   );
 }
 
+const countries = [
+  { label: "United States", value: 4120 },
+  { label: "Germany", value: 2380 },
+  { label: "India", value: 1960 },
+  { label: "Brazil", value: 1240 },
+  { label: "Japan", value: 860 },
+];
+
+function HorizontalBarChartDemo({ compact }: DemoProps) {
+  return (
+    <HorizontalBarChart
+      className="mx-auto max-w-md"
+      label="Visitors by country"
+      data={compact ? countries.slice(0, 4) : countries}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "horizontal-bar-chart": HorizontalBarChartDemo,
   "pill-bar-chart": PillBarChartDemo,
   "stat-tile": StatTileDemo,
   heatmap: HeatmapDemo,

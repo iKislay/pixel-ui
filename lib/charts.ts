@@ -572,4 +572,44 @@ export function Demo() {
   )
 }`,
   }),
+  chart("horizontal-bar-chart", {
+    name: "Horizontal Bar Chart",
+    category: "comparison",
+    description: "A ranked list of labelled bars that fill along soft rounded tracks.",
+    interaction:
+      "The bars fill from the left one after another. Hover a row and the others fade back. Every label and value is plain text, so screen readers read it as a list. Honors prefers-reduced-motion: the bars appear filled.",
+    props: [
+      {
+        name: "data",
+        type: "{ label: string; value: number; color?: string }[]",
+        required: true,
+        description: "One row per entry, drawn in the order given.",
+      },
+      labelProp,
+      formatProp,
+      {
+        name: "max",
+        type: "number",
+        description: "The value that fills a track. Defaults to the largest value.",
+      },
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for the bars. A row's own color wins.",
+      },
+      classNameProp,
+    ],
+    usage: `import { HorizontalBarChart } from "@/components/ui/horizontal-bar-chart"
+
+const data = [
+  { label: "United States", value: 4120 },
+  { label: "Germany", value: 2380 },
+  { label: "India", value: 1960 },
+]
+
+export function Demo() {
+  return <HorizontalBarChart label="Visitors by country" data={data} />
+}`,
+  }),
 ];
