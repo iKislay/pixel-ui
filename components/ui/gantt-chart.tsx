@@ -107,7 +107,7 @@ export function GanttChart({ tasks, label, formatTime = formatCompact, rowHeight
           rows={
             task
               ? [
-                  { label: "Time", value: `${formatTime(task.start)} – ${formatTime(task.end)}` },
+                  { label: "Time", value: `${formatTime(task.start)} to ${formatTime(task.end)}` },
                   { label: "Progress", value: done(task) ? "Done" : percent(task), color: seriesColor(rows.indexOf(task.label) % 5, task.color) },
                 ]
               : null
