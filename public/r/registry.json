@@ -1296,6 +1296,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "rose-chart",
+      "type": "registry:ui",
+      "title": "Rose Chart",
+      "description": "Soft rounded petals around a center, each grown to the size of its value.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/rose-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

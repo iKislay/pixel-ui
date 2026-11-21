@@ -1149,4 +1149,34 @@ export function Demo() {
   return <GanttChart label="Today's plan" tasks={tasks} formatTime={hour} />
 }`,
   }),
+  chart("rose-chart", {
+    name: "Rose Chart",
+    category: "composition",
+    description: "Soft rounded petals around a center, each grown to the size of its value.",
+    interaction:
+      "The petals bloom outward one after another over faintly hatched outlines of their full size. Hover a petal or its row, or tab in and use the arrow keys, and the others fade back. A petal's area, not its length, matches its value. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: the petals appear at once.",
+    props: [
+      {
+        name: "data",
+        type: "{ label: string; value: number; color?: string }[]",
+        required: true,
+        description: "One petal per entry, clockwise from the top. Colors follow the chart palette and repeat after five.",
+      },
+      labelProp,
+      formatProp,
+      classNameProp,
+    ],
+    usage: `import { RoseChart } from "@/components/ui/rose-chart"
+
+const data = [
+  { label: "Happy", value: 12 },
+  { label: "Calm", value: 7 },
+  { label: "Excited", value: 10 },
+  { label: "Tired", value: 4 },
+]
+
+export function Demo() {
+  return <RoseChart label="How the release felt" data={data} />
+}`,
+  }),
 ];

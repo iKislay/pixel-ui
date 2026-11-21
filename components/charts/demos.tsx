@@ -22,6 +22,7 @@ import { CalendarHeatmap } from "@/components/ui/calendar-heatmap";
 import { SankeyChart } from "@/components/ui/sankey-chart";
 import { FlowHub } from "@/components/ui/flow-hub";
 import { GanttChart } from "@/components/ui/gantt-chart";
+import { RoseChart } from "@/components/ui/rose-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -517,7 +518,28 @@ function GanttChartDemo({ compact }: DemoProps) {
   );
 }
 
+const moods = [
+  { label: "Happy", value: 12 },
+  { label: "Calm", value: 7 },
+  { label: "Excited", value: 10 },
+  { label: "Curious", value: 5 },
+  { label: "Tired", value: 4 },
+  { label: "Proud", value: 9 },
+];
+
+function RoseChartDemo({ compact }: DemoProps) {
+  return (
+    <RoseChart
+      label="How the release felt"
+      data={moods}
+      format={(n) => `${n}`}
+      className={compact ? "flex-nowrap gap-x-6 [&>div]:max-w-40 [&_ul]:min-w-0 [&_ul]:text-xs" : undefined}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "rose-chart": RoseChartDemo,
   "gantt-chart": GanttChartDemo,
   "flow-hub": FlowHubDemo,
   "sankey-chart": SankeyChartDemo,
