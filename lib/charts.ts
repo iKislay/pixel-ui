@@ -1107,4 +1107,46 @@ export function Demo() {
   )
 }`,
   }),
+  chart("gantt-chart", {
+    name: "Gantt Chart",
+    category: "progress",
+    description: "Rounded timeline bars that fill with each task's progress and tick when done.",
+    interaction:
+      "The bars stretch out along the timeline one after another. Each one fills from inside as far as its task has got; a finished task turns solid with a tick. Hover a bar, or tab in and use the arrow keys, and a soft tooltip reads its time and progress. A hidden table carries every task for screen readers. Honors prefers-reduced-motion: the bars appear at once.",
+    props: [
+      {
+        name: "tasks",
+        type: "{ label: string; start: number; end: number; progress?: number; color?: string }[]",
+        required: true,
+        description: "Bars on the timeline. Progress runs from 0 to 1. Tasks with the same label share a row and a color.",
+      },
+      labelProp,
+      {
+        name: "formatTime",
+        type: "(value: number) => string",
+        default: "compact",
+        description: "Formats the times along the top and in the tooltip, such as hours into 2 PM.",
+      },
+      {
+        name: "rowHeight",
+        type: "number",
+        default: "40",
+        description: "Height of each row in pixels.",
+      },
+      classNameProp,
+    ],
+    usage: `import { GanttChart } from "@/components/ui/gantt-chart"
+
+const tasks = [
+  { label: "Research", start: 8, end: 10.5, progress: 1 },
+  { label: "Design", start: 9.5, end: 13, progress: 0.6 },
+  { label: "Build", start: 12, end: 17, progress: 0.25 },
+]
+
+const hour = (h: number) => (h % 12 || 12) + (h < 12 ? " AM" : " PM")
+
+export function Demo() {
+  return <GanttChart label="Today's plan" tasks={tasks} formatTime={hour} />
+}`,
+  }),
 ];

@@ -21,6 +21,7 @@ import { FunnelChart } from "@/components/ui/funnel-chart";
 import { CalendarHeatmap } from "@/components/ui/calendar-heatmap";
 import { SankeyChart } from "@/components/ui/sankey-chart";
 import { FlowHub } from "@/components/ui/flow-hub";
+import { GanttChart } from "@/components/ui/gantt-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -493,7 +494,31 @@ function FlowHubDemo({ compact }: DemoProps) {
   );
 }
 
+const plan = [
+  { label: "Research", start: 8, end: 9.5, progress: 1 },
+  { label: "Design", start: 8.5, end: 10.5, progress: 1 },
+  { label: "Design", start: 12, end: 14, progress: 0.3 },
+  { label: "Build", start: 10, end: 12.5, progress: 0.77 },
+  { label: "Build", start: 14, end: 16.5, progress: 0.76 },
+  { label: "Review", start: 13, end: 14.5, progress: 1 },
+  { label: "Launch", start: 15.5, end: 19, progress: 0.81 },
+];
+
+const hour = (h: number) => `${Math.floor(h) % 12 || 12}${h < 12 ? "am" : "pm"}`;
+
+function GanttChartDemo({ compact }: DemoProps) {
+  return (
+    <GanttChart
+      label="Today's plan"
+      tasks={compact ? plan.slice(0, 5) : plan}
+      formatTime={hour}
+      rowHeight={compact ? 32 : undefined}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "gantt-chart": GanttChartDemo,
   "flow-hub": FlowHubDemo,
   "sankey-chart": SankeyChartDemo,
   "calendar-heatmap": CalendarHeatmapDemo,
