@@ -1088,6 +1088,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "segmented-bar",
+      "type": "registry:ui",
+      "title": "Segmented Bar",
+      "description": "One rounded bar split into parts, with each part's value and share below.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/segmented-bar.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

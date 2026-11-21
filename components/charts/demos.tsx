@@ -14,6 +14,7 @@ import { DotMatrixChart } from "@/components/ui/dot-matrix-chart";
 import { CombChart } from "@/components/ui/comb-chart";
 import { Gauge } from "@/components/ui/gauge";
 import { ActivityRings } from "@/components/ui/activity-rings";
+import { SegmentedBar } from "@/components/ui/segmented-bar";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -349,7 +350,20 @@ function ActivityRingsDemo({ compact }: DemoProps) {
   );
 }
 
+const storage = [
+  { label: "Photos", value: 48 },
+  { label: "Apps", value: 31 },
+  { label: "Music", value: 12 },
+  { label: "Mail", value: 6 },
+  { label: "Other", value: 9 },
+];
+
+function SegmentedBarDemo() {
+  return <SegmentedBar className="mx-auto max-w-md" label="Storage by type" data={storage} format={(n) => `${n} GB`} />;
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "segmented-bar": SegmentedBarDemo,
   "activity-rings": ActivityRingsDemo,
   "gauge": GaugeDemo,
   "comb-chart": CombChartDemo,

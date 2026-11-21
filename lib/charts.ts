@@ -800,4 +800,33 @@ export function Demo() {
   return <ActivityRings label="Today's goals" data={data} />
 }`,
   }),
+  chart("segmented-bar", {
+    name: "Segmented Bar",
+    category: "composition",
+    description: "One rounded bar split into parts, with each part's value and share below.",
+    interaction:
+      "The bar stretches out from the left with every part in place. Hover a part or its row and the others fade back. Each label, value and share is plain text, so screen readers read it as a list. Honors prefers-reduced-motion: the bar appears at full width.",
+    props: [
+      {
+        name: "data",
+        type: "{ label: string; value: number; color?: string }[]",
+        required: true,
+        description: "One part per entry, left to right. Colors follow the chart palette in order unless you set one.",
+      },
+      labelProp,
+      formatProp,
+      classNameProp,
+    ],
+    usage: `import { SegmentedBar } from "@/components/ui/segmented-bar"
+
+const data = [
+  { label: "Photos", value: 48 },
+  { label: "Apps", value: 31 },
+  { label: "Music", value: 12 },
+]
+
+export function Demo() {
+  return <SegmentedBar label="Storage by type" data={data} format={(n) => n + " GB"} />
+}`,
+  }),
 ];
