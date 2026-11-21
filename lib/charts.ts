@@ -930,7 +930,7 @@ export function Demo() {
   chart("funnel-chart", {
     name: "Funnel Chart",
     category: "composition",
-    description: "Centered rounded bars that narrow step by step, with the rate kept between each.",
+    description: "Centered rounded bars that narrow step by step, with the rate between each step.",
     interaction:
       "The bars widen out from the center. Between each pair of steps a small line shows how many carried on. Hover a step and the others fade back. Every label and value is plain text, so screen readers read it as an ordered list. Honors prefers-reduced-motion: the bars appear at full width.",
     props: [

@@ -1171,7 +1171,7 @@
       "name": "funnel-chart",
       "type": "registry:ui",
       "title": "Funnel Chart",
-      "description": "Centered rounded bars that narrow step by step, with the rate kept between each.",
+      "description": "Centered rounded bars that narrow step by step, with the rate between each step.",
       "dependencies": [
         "motion"
       ],
