@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { arcLine, arcPath, barPath, formatCompact, linePath, niceTicks, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
+import { allocate, arcLine, arcPath, barPath, formatCompact, linePath, niceTicks, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
 
 describe("niceTicks", () => {
   it("rounds the range out to round steps", () => {
@@ -48,6 +48,18 @@ describe("seriesColor", () => {
     expect(seriesColor(0, "red")).toBe("red");
     expect(seriesColor(1)).toContain("--chart-2");
     expect(seriesColor(9)).toBe("var(--muted-foreground)");
+  });
+});
+
+describe("allocate", () => {
+  it("rounds shares so they fill every cell", () => {
+    expect(allocate([1, 1, 1], 100)).toEqual([34, 33, 33]);
+    expect(allocate([48, 31, 12, 6, 9], 100).reduce((a, b) => a + b)).toBe(100);
+  });
+
+  it("ignores negatives and an empty total", () => {
+    expect(allocate([-5, 10], 10)).toEqual([0, 10]);
+    expect(allocate([0, 0], 10)).toEqual([0, 0]);
   });
 });
 

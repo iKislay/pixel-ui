@@ -67,6 +67,18 @@ export function smoothPath(points: Point[]): string {
   return d;
 }
 
+// splits whole cells by share so the counts always add up to the total (largest remainder)
+export function allocate(values: number[], cells: number): number[] {
+  const sum = values.reduce((a, v) => a + Math.max(v, 0), 0);
+  if (sum === 0) return values.map(() => 0);
+  const exact = values.map((v) => (Math.max(v, 0) / sum) * cells);
+  const counts = exact.map(Math.floor);
+  const order = exact.map((e, i) => [e - counts[i], i]).sort((a, b) => b[0] - a[0]);
+  const left = cells - counts.reduce((a, c) => a + c, 0);
+  for (let k = 0; k < left; k++) counts[order[k][1]]++;
+  return counts;
+}
+
 // a bar from the baseline to its value end, rounding only the value end
 export function barPath(x: number, base: number, width: number, end: number, radius: number): string {
   const height = Math.abs(base - end);

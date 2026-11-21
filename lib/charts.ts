@@ -829,4 +829,49 @@ export function Demo() {
   return <SegmentedBar label="Storage by type" data={data} format={(n) => n + " GB"} />
 }`,
   }),
+  chart("waffle-chart", {
+    name: "Waffle Chart",
+    category: "composition",
+    description: "A grid of soft squares where each square stands for an equal share.",
+    interaction:
+      "The squares fill in row by row. Hover a square or a row of the list and the other parts fade back. Each label, value and share is plain text beside the grid, so screen readers read it as a list. Honors prefers-reduced-motion: the grid appears filled.",
+    props: [
+      {
+        name: "data",
+        type: "{ label: string; value: number; color?: string }[]",
+        required: true,
+        description: "One part per entry, filled in order. Squares are rounded so the parts always fill the grid exactly.",
+      },
+      labelProp,
+      {
+        name: "total",
+        type: "number",
+        description: "The amount the whole grid stands for. Above the sum of the parts, the rest of the grid stays empty.",
+      },
+      {
+        name: "columns",
+        type: "number",
+        default: "10",
+        description: "Squares per row.",
+      },
+      {
+        name: "rows",
+        type: "number",
+        default: "10",
+        description: "Rows of squares.",
+      },
+      formatProp,
+      classNameProp,
+    ],
+    usage: `import { WaffleChart } from "@/components/ui/waffle-chart"
+
+const data = [
+  { label: "Renewed", value: 62 },
+  { label: "Upgraded", value: 14 },
+]
+
+export function Demo() {
+  return <WaffleChart label="Subscriptions this year" data={data} total={100} />
+}`,
+  }),
 ];

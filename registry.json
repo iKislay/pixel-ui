@@ -1114,6 +1114,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "waffle-chart",
+      "type": "registry:ui",
+      "title": "Waffle Chart",
+      "description": "A grid of soft squares where each square stands for an equal share.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/waffle-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

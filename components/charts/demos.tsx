@@ -15,6 +15,7 @@ import { CombChart } from "@/components/ui/comb-chart";
 import { Gauge } from "@/components/ui/gauge";
 import { ActivityRings } from "@/components/ui/activity-rings";
 import { SegmentedBar } from "@/components/ui/segmented-bar";
+import { WaffleChart } from "@/components/ui/waffle-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -362,7 +363,26 @@ function SegmentedBarDemo() {
   return <SegmentedBar className="mx-auto max-w-md" label="Storage by type" data={storage} format={(n) => `${n} GB`} />;
 }
 
+const renewals = [
+  { label: "Renewed", value: 62 },
+  { label: "Upgraded", value: 14 },
+  { label: "Paused", value: 7 },
+];
+
+function WaffleChartDemo({ compact }: DemoProps) {
+  return (
+    <WaffleChart
+      label="Subscriptions this year"
+      data={renewals}
+      total={100}
+      format={(n) => `${n}`}
+      className={compact ? "flex-nowrap gap-x-6 [&>div]:max-w-36 [&_ul]:min-w-0 [&_ul]:text-xs" : undefined}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "waffle-chart": WaffleChartDemo,
   "segmented-bar": SegmentedBarDemo,
   "activity-rings": ActivityRingsDemo,
   "gauge": GaugeDemo,
