@@ -44,6 +44,29 @@ export function linePath(points: Point[]): string {
   return points.map(([x, y], i) => `${i ? "L" : "M"}${round(x)},${round(y)}`).join("");
 }
 
+// a closed polygon whose corners are eased into curves, the corner cut never past half an edge
+export function roundedPolygon(points: Point[], radius: number): string {
+  const n = points.length;
+  if (n < 3) return linePath(points);
+  const toward = ([x0, y0]: Point, [x1, y1]: Point, distance: number): Point => {
+    const length = Math.hypot(x1 - x0, y1 - y0) || 1;
+    const t = Math.min(distance / length, 0.5);
+    return [x0 + (x1 - x0) * t, y0 + (y1 - y0) * t];
+  };
+  const corners = points.map((p, i) => {
+    const before = toward(p, points[(i - 1 + n) % n], radius);
+    const after = toward(p, points[(i + 1) % n], radius);
+    return { before, p, after };
+  });
+  const [sx, sy] = corners[0].after;
+  let d = `M${round(sx)},${round(sy)}`;
+  for (let i = 1; i <= n; i++) {
+    const { before, p, after } = corners[i % n];
+    d += `L${round(before[0])},${round(before[1])}Q${round(p[0])},${round(p[1])} ${round(after[0])},${round(after[1])}`;
+  }
+  return `${d}Z`;
+}
+
 // monotone cubic (fritsch-carlson) so the curve never overshoots a data point
 export function smoothPath(points: Point[]): string {
   const n = points.length;

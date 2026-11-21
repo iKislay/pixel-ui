@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allocate, arcLine, arcPath, barPath, calendarCells, formatCompact, linePath, niceTicks, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
+import { allocate, arcLine, arcPath, barPath, calendarCells, formatCompact, linePath, niceTicks, roundedPolygon, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
 
 describe("niceTicks", () => {
   it("rounds the range out to round steps", () => {
@@ -110,6 +110,16 @@ describe("paths", () => {
     const ys = (d.match(/-?[\d.]+/g) ?? []).map(Number).filter((_, i) => i % 2 === 1);
     expect(Math.min(...ys)).toBe(0);
     expect(Math.max(...ys)).toBe(10);
+  });
+
+  it("eases polygon corners into curves", () => {
+    expect(roundedPolygon([[0, 0], [10, 0], [10, 10]], 2)).toBe(
+      "M2,0L8,0Q10,0 10,2L10,8Q10,10 8.59,8.59L1.41,1.41Q0,0 2,0Z",
+    );
+  });
+
+  it("never cuts a corner past half an edge", () => {
+    expect(roundedPolygon([[0, 0], [4, 0], [4, 4]], 10)).toContain("M2,0L2,0Q4,0 4,2");
   });
 
   it("rounds only the value end of a bar", () => {

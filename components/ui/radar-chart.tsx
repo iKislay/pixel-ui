@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { formatCompact, linePath, niceTicks, seriesColor, type Point } from "@/lib/chart";
+import { formatCompact, niceTicks, roundedPolygon, seriesColor, type Point } from "@/lib/chart";
 import {
   ChartLegend,
   ChartTable,
@@ -45,7 +45,7 @@ export function RadarChart({ data, index, series: input, label, format = formatC
         role="group"
         aria-roledescription="chart"
         aria-label={`${label}. Use the arrow keys to read each axis.`}
-        className={cn("relative w-full max-w-80 rounded-full", chartFocus)}
+        className={cn("relative w-full max-w-96 rounded-full", chartFocus)}
         {...handlers}
       >
         <svg viewBox="0 0 300 300" aria-hidden className="w-full overflow-visible">
@@ -76,7 +76,7 @@ export function RadarChart({ data, index, series: input, label, format = formatC
             const points = data.map((d, i) => at(i, (value(d, s.key) / top) * R * progress));
             return (
               <g key={s.key}>
-                <path d={`${linePath(points)}Z`} fill={s.color} fillOpacity={0.14} stroke={s.color} strokeWidth={2} strokeLinejoin="round" />
+                <path d={roundedPolygon(points, 8 * progress)} fill={s.color} fillOpacity={0.14} stroke={s.color} strokeWidth={2} strokeLinejoin="round" />
                 {active !== null && (
                   <circle cx={points[active][0]} cy={points[active][1]} r={4.5} fill={s.color} stroke="var(--background)" strokeWidth={2} />
                 )}
