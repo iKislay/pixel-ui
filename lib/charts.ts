@@ -760,4 +760,44 @@ export function Demo() {
   return <Gauge label="Server load" value={68} caption="CPU load" format={(n) => Math.round(n) + "%"} />
 }`,
   }),
+  chart("activity-rings", {
+    name: "Activity Rings",
+    category: "progress",
+    description: "Nested rings that each close toward their own goal.",
+    interaction:
+      "The rings sweep round one after another, outermost first. Hover a ring's row and the other rings fade back. Each goal and value is plain text beside the rings, so screen readers read it as a list. Honors prefers-reduced-motion: the rings appear filled.",
+    props: [
+      {
+        name: "data",
+        type: "{ label: string; value: number; max?: number; color?: string }[]",
+        required: true,
+        description: "One ring per entry, outermost first. Max defaults to 100.",
+      },
+      labelProp,
+      {
+        name: "format",
+        type: "(value: number) => string",
+        default: "rounded",
+        description: "Formats each value and goal in the list. Defaults to whole numbers.",
+      },
+      {
+        name: "thickness",
+        type: "number",
+        default: "14",
+        description: "Width of each ring, on a 200 unit wide chart.",
+      },
+      classNameProp,
+    ],
+    usage: `import { ActivityRings } from "@/components/ui/activity-rings"
+
+const data = [
+  { label: "Move", value: 420, max: 600 },
+  { label: "Exercise", value: 24, max: 30 },
+  { label: "Stand", value: 9, max: 12 },
+]
+
+export function Demo() {
+  return <ActivityRings label="Today's goals" data={data} />
+}`,
+  }),
 ];

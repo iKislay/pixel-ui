@@ -13,6 +13,7 @@ import { LollipopChart } from "@/components/ui/lollipop-chart";
 import { DotMatrixChart } from "@/components/ui/dot-matrix-chart";
 import { CombChart } from "@/components/ui/comb-chart";
 import { Gauge } from "@/components/ui/gauge";
+import { ActivityRings } from "@/components/ui/activity-rings";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -332,7 +333,24 @@ function GaugeDemo({ compact }: DemoProps) {
   );
 }
 
+const goals = [
+  { label: "Move", value: 420, max: 600 },
+  { label: "Exercise", value: 24, max: 30 },
+  { label: "Stand", value: 9, max: 12 },
+];
+
+function ActivityRingsDemo({ compact }: DemoProps) {
+  return (
+    <ActivityRings
+      label="Today's goals"
+      data={goals}
+      className={compact ? "flex-nowrap gap-x-6 [&_svg]:max-w-36 [&_ul]:min-w-0 [&_ul]:text-xs" : undefined}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "activity-rings": ActivityRingsDemo,
   "gauge": GaugeDemo,
   "comb-chart": CombChartDemo,
   "dot-matrix-chart": DotMatrixChartDemo,
