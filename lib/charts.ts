@@ -674,4 +674,33 @@ export function Demo() {
   )
 }`,
   }),
+  chart("comb-chart", {
+    name: "Comb Chart",
+    category: "trends",
+    description: "A dense row of thin rounded teeth for long runs of values.",
+    interaction: `The teeth rise from left to right, older ones fainter so the latest values stand out. ${cartesianInteraction("each tooth")} The tooth you are reading lights up while the rest dim.`,
+    props: [
+      ...cartesianProps.map((prop) =>
+        prop.name === "series" ? { ...prop, description: "The key to plot. Only the first series is drawn." } : prop,
+      ),
+      classNameProp,
+    ],
+    usage: `import { CombChart } from "@/components/ui/comb-chart"
+
+const data = Array.from({ length: 30 }, (_, i) => ({
+  day: String(i + 1),
+  commits: Math.round(4 + Math.random() * 10),
+}))
+
+export function Demo() {
+  return (
+    <CombChart
+      label="Commits per day"
+      data={data}
+      index="day"
+      series={[{ key: "commits", label: "Commits" }]}
+    />
+  )
+}`,
+  }),
 ];

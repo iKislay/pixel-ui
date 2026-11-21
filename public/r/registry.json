@@ -1010,6 +1010,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "comb-chart",
+      "type": "registry:ui",
+      "title": "Comb Chart",
+      "description": "A dense row of thin rounded teeth for long runs of values.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/comb-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

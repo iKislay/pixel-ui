@@ -11,6 +11,7 @@ import { PillBarChart } from "@/components/ui/pill-bar-chart";
 import { HorizontalBarChart } from "@/components/ui/horizontal-bar-chart";
 import { LollipopChart } from "@/components/ui/lollipop-chart";
 import { DotMatrixChart } from "@/components/ui/dot-matrix-chart";
+import { CombChart } from "@/components/ui/comb-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -295,7 +296,25 @@ function DotMatrixChartDemo({ compact }: DemoProps) {
   );
 }
 
+const commits = Array.from({ length: 36 }, (_, i) => ({
+  day: `Day ${i + 1}`,
+  commits: Math.round(6 + Math.sin(i * 0.55) * 3 + Math.sin(i * 1.7) * 2 + i * 0.18),
+}));
+
+function CombChartDemo({ compact }: DemoProps) {
+  return (
+    <CombChart
+      height={compact ? 170 : undefined}
+      label="Commits per day"
+      data={commits}
+      index="day"
+      series={[{ key: "commits", label: "Commits" }]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "comb-chart": CombChartDemo,
   "dot-matrix-chart": DotMatrixChartDemo,
   "lollipop-chart": LollipopChartDemo,
   "horizontal-bar-chart": HorizontalBarChartDemo,
