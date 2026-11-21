@@ -984,6 +984,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "dot-matrix-chart",
+      "type": "registry:ui",
+      "title": "Dot Matrix Chart",
+      "description": "Columns of small dots that light up from the bottom, stacked by series.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/dot-matrix-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

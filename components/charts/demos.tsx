@@ -10,6 +10,7 @@ import { DonutChart } from "@/components/ui/donut-chart";
 import { PillBarChart } from "@/components/ui/pill-bar-chart";
 import { HorizontalBarChart } from "@/components/ui/horizontal-bar-chart";
 import { LollipopChart } from "@/components/ui/lollipop-chart";
+import { DotMatrixChart } from "@/components/ui/dot-matrix-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -272,7 +273,30 @@ function LollipopChartDemo({ compact }: DemoProps) {
   );
 }
 
+const requests = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"].map((hour, i) => ({
+  hour,
+  reads: [8, 18, 26, 22, 30, 24, 34, 38, 29, 21, 14, 9][i],
+  writes: [3, 6, 9, 12, 8, 10, 14, 11, 12, 8, 5, 4][i],
+}));
+
+function DotMatrixChartDemo({ compact }: DemoProps) {
+  return (
+    <DotMatrixChart
+      height={compact ? 170 : undefined}
+      rows={compact ? 10 : 14}
+      label="Requests by hour"
+      data={requests}
+      index="hour"
+      series={[
+        { key: "reads", label: "Reads" },
+        { key: "writes", label: "Writes" },
+      ]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "dot-matrix-chart": DotMatrixChartDemo,
   "lollipop-chart": LollipopChartDemo,
   "horizontal-bar-chart": HorizontalBarChartDemo,
   "pill-bar-chart": PillBarChartDemo,

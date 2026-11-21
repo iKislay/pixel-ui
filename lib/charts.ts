@@ -637,4 +637,41 @@ export function Demo() {
   )
 }`,
   }),
+  chart("dot-matrix-chart", {
+    name: "Dot Matrix Chart",
+    category: "comparison",
+    description: "Columns of small dots that light up from the bottom, stacked by series.",
+    interaction: `The dots light up from the bottom, column by column, like a pixel display. ${cartesianInteraction("each column and its total")}`,
+    props: [
+      ...cartesianProps,
+      {
+        name: "rows",
+        type: "number",
+        default: "12",
+        description: "Dots per column. Each dot stands for the same amount, so fewer rows means coarser steps.",
+      },
+      classNameProp,
+    ],
+    usage: `import { DotMatrixChart } from "@/components/ui/dot-matrix-chart"
+
+const data = [
+  { hour: "09", reads: 18, writes: 6 },
+  { hour: "10", reads: 26, writes: 9 },
+  { hour: "11", reads: 22, writes: 12 },
+]
+
+export function Demo() {
+  return (
+    <DotMatrixChart
+      label="Requests by hour"
+      data={data}
+      index="hour"
+      series={[
+        { key: "reads", label: "Reads" },
+        { key: "writes", label: "Writes" },
+      ]}
+    />
+  )
+}`,
+  }),
 ];
