@@ -35,7 +35,7 @@ export function SegmentedBar({ data, label, format = formatCompact, className, .
           ) : null,
         )}
       </div>
-      <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+      <ul className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-x-6 gap-y-2 text-sm">
         {segments.map((segment, i) => (
           <li
             key={segment.label}

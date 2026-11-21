@@ -29,7 +29,7 @@ export function FunnelChart({ data, label, format = formatCompact, color = "var(
           return (
             <Fragment key={step.label}>
               {i > 0 && (
-                <li aria-hidden className="py-1 font-mono text-[11px] text-muted-foreground tabular-nums">
+                <li aria-hidden className="py-0.5 font-mono text-[11px] text-muted-foreground tabular-nums">
                   ↓ {previous > 0 ? Math.round((Math.max(step.value, 0) / previous) * 100) : 0}%
                 </li>
               )}
@@ -46,7 +46,7 @@ export function FunnelChart({ data, label, format = formatCompact, color = "var(
                 </div>
                 <div
                   aria-hidden
-                  className="h-7 rounded-full"
+                  className="h-6 rounded-full"
                   style={{
                     width: `${Math.max(share * 100, 4) * progress}%`,
                     background: color,
