@@ -4,7 +4,7 @@ import { useId } from "react";
 import { linePath, smoothPath, type Point } from "@/lib/chart";
 import { CartesianChart, type CartesianChartProps } from "@/components/ui/chart";
 
-export type AreaChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero"> & {
+export type AreaChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero" | "floating" | "legend"> & {
   curve?: "smooth" | "linear";
 };
 

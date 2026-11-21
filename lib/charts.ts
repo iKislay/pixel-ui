@@ -1231,4 +1231,74 @@ export function Demo() {
   return <RadialBarChart label="Orders by hour" data={data} index="hour" value="orders" totalLabel="Orders" />
 }`,
   }),
+  chart("range-chart", {
+    name: "Range Chart",
+    category: "trends",
+    description: "Floating capsules that span each period's low to its high.",
+    interaction: `Each capsule opens out from its middle to its full span, one after another. ${cartesianInteraction("each low and high")}`,
+    props: [
+      {
+        name: "data",
+        type: "Record<string, string | number>[]",
+        required: true,
+        description: "One object per period along the x axis.",
+      },
+      {
+        name: "index",
+        type: "string",
+        required: true,
+        description: "The key in each object that labels the x axis.",
+      },
+      {
+        name: "low",
+        type: "string",
+        required: true,
+        description: "The key that holds the bottom of each span.",
+      },
+      {
+        name: "high",
+        type: "string",
+        required: true,
+        description: "The key that holds the top of each span.",
+      },
+      {
+        name: "lowLabel",
+        type: "string",
+        default: '"Low"',
+        description: "Names the bottom value in the tooltip.",
+      },
+      {
+        name: "highLabel",
+        type: "string",
+        default: '"High"',
+        description: "Names the top value in the tooltip.",
+      },
+      labelProp,
+      {
+        name: "height",
+        type: "number",
+        default: "240",
+        description: "Height in pixels. The width fills the parent.",
+      },
+      formatProp,
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for the capsules.",
+      },
+      classNameProp,
+    ],
+    usage: `import { RangeChart } from "@/components/ui/range-chart"
+
+const data = [
+  { day: "Mon", min: 120, max: 210 },
+  { day: "Tue", min: 140, max: 260 },
+  { day: "Wed", min: 90, max: 180 },
+]
+
+export function Demo() {
+  return <RangeChart label="Daily active range" data={data} index="day" low="min" high="max" />
+}`,
+  }),
 ];

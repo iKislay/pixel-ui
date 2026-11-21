@@ -24,6 +24,7 @@ import { FlowHub } from "@/components/ui/flow-hub";
 import { GanttChart } from "@/components/ui/gantt-chart";
 import { RoseChart } from "@/components/ui/rose-chart";
 import { RadialBarChart } from "@/components/ui/radial-bar-chart";
+import { RangeChart } from "@/components/ui/range-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -557,7 +558,27 @@ function RadialBarChartDemo({ compact }: DemoProps) {
   );
 }
 
+const activeRange = Array.from({ length: 14 }, (_, i) => {
+  const mid = 210 + Math.sin(i * 0.7) * 40 + i * 3;
+  const spread = 30 + Math.abs(Math.sin(i * 1.9)) * 55;
+  return { day: `Feb ${i + 1}`, min: Math.round(mid - spread), max: Math.round(mid + spread) };
+});
+
+function RangeChartDemo({ compact }: DemoProps) {
+  return (
+    <RangeChart
+      height={compact ? 170 : undefined}
+      label="Daily active users, lowest to highest"
+      data={activeRange}
+      index="day"
+      low="min"
+      high="max"
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "range-chart": RangeChartDemo,
   "radial-bar-chart": RadialBarChartDemo,
   "rose-chart": RoseChartDemo,
   "gantt-chart": GanttChartDemo,

@@ -2,7 +2,7 @@
 
 import { CartesianChart, type CartesianChartProps } from "@/components/ui/chart";
 
-export type CombChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero" | "grid">;
+export type CombChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero" | "floating" | "legend" | "grid">;
 
 export function CombChart(props: CombChartProps) {
   return (

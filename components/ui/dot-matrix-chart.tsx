@@ -2,7 +2,7 @@
 
 import { CartesianChart, type CartesianChartProps } from "@/components/ui/chart";
 
-export type DotMatrixChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero" | "grid"> & {
+export type DotMatrixChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero" | "floating" | "legend" | "grid"> & {
   rows?: number;
 };
 

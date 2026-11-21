@@ -4,7 +4,7 @@ import { useId } from "react";
 import { smoothPath, type Point } from "@/lib/chart";
 import { CartesianChart, type CartesianChartProps, type Format } from "@/components/ui/chart";
 
-export type SparklineProps = Omit<CartesianChartProps, "children" | "slot" | "data" | "index" | "series" | "stacked" | "bars" | "bare" | "zero"> & {
+export type SparklineProps = Omit<CartesianChartProps, "children" | "slot" | "data" | "index" | "series" | "stacked" | "bars" | "bare" | "zero" | "floating" | "legend"> & {
   data: number[];
   labels?: string[];
   color?: string;

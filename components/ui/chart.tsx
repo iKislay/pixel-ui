@@ -190,6 +190,8 @@ export type CartesianChartProps = Omit<ComponentProps<"figure">, "children"> & {
   bars?: boolean;
   bare?: boolean;
   grid?: boolean;
+  floating?: boolean;
+  legend?: boolean;
   slot: string;
   children: (context: CartesianContext) => ReactNode;
 };
@@ -209,6 +211,8 @@ export function CartesianChart({
   bars = false,
   bare = false,
   grid = true,
+  floating = false,
+  legend = true,
   slot,
   children,
   className,
@@ -225,7 +229,7 @@ export function CartesianChart({
     stacked ? series.reduce((sum, s) => sum + value(row, s.key), 0) : Math.max(...series.map((s) => value(row, s.key))),
   );
   const lows = data.map((row) => Math.min(...series.map((s) => value(row, s.key))));
-  const low = bars || stacked || zero ? Math.min(0, ...lows) : Math.min(...lows);
+  const low = (bars && !floating) || stacked || zero ? Math.min(0, ...lows) : Math.min(...lows);
   const ticks = niceTicks(low, Math.max(...totals), bare ? 1 : 4);
   const domain: [number, number] = bare ? [Math.min(...lows), Math.max(...totals)] : [ticks[0], ticks.at(-1)!];
 
@@ -249,7 +253,7 @@ export function CartesianChart({
 
   return (
     <figure data-slot={slot} className={cn("flex w-full flex-col gap-3", className)} {...props}>
-      {!bare && series.length > 1 && <ChartLegend items={series} />}
+      {!bare && legend && series.length > 1 && <ChartLegend items={series} />}
       <div
         ref={ref}
         role="group"

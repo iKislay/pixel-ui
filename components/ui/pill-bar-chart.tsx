@@ -4,7 +4,7 @@ import { useId } from "react";
 import { CartesianChart, type CartesianChartProps } from "@/components/ui/chart";
 import { formatCompact } from "@/lib/chart";
 
-export type PillBarChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero" | "grid"> & {
+export type PillBarChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero" | "floating" | "legend" | "grid"> & {
   highlight?: number;
 };
 

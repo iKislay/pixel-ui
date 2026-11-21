@@ -2,7 +2,7 @@
 
 import { CartesianChart, type CartesianChartProps } from "@/components/ui/chart";
 
-export type LollipopChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero">;
+export type LollipopChartProps = Omit<CartesianChartProps, "children" | "slot" | "stacked" | "bars" | "bare" | "zero" | "floating" | "legend">;
 
 export function LollipopChart(props: LollipopChartProps) {
   return (

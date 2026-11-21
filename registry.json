@@ -1348,6 +1348,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "range-chart",
+      "type": "registry:ui",
+      "title": "Range Chart",
+      "description": "Floating capsules that span each period's low to its high.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/range-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }
