@@ -1376,6 +1376,32 @@
       ]
     },
     {
+      "name": "threshold-chart",
+      "type": "registry:ui",
+      "title": "Threshold Chart",
+      "description": "Bars with a draggable alert line that marks every period crossing it.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/threshold-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
       "name": "spending-ring",
       "type": "registry:ui",
       "title": "Spending Ring",
