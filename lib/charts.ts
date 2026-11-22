@@ -1550,4 +1550,41 @@ export function Demo() {
   return <TickTape ref={tape} label="Requests" />
 }`,
   }),
+  chart("capsule-stack-chart", {
+    name: "Capsule Stack Chart",
+    category: "comparison",
+    description: "Soft capsules stacked in each column, with a hatched cap for what is left of the whole.",
+    interaction: `Each column builds up from the bottom as separate rounded capsules in soft tints, one column after another, and a faint hatched cap fills the space left to the top. Hover a column, or tab in and use the arrow keys, and each capsule shows its value in a small dark pill. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: the columns appear at once.`,
+    props: [
+      ...cartesianProps.map((prop) => (prop.name === "format" ? { ...prop, default: "percent", description: "Formats each value in its pill and the table. Defaults to whole percents." } : prop)),
+      {
+        name: "max",
+        type: "number",
+        default: "100",
+        description: "The amount a full column stands for. The hatched cap fills the gap between a column's sum and this.",
+      },
+      classNameProp,
+    ],
+    usage: `import { CapsuleStackChart } from "@/components/ui/capsule-stack-chart"
+
+const data = [
+  { day: "27 Jun", focus: 32, meetings: 40 },
+  { day: "28 Jun", focus: 25, meetings: 38 },
+  { day: "29 Jun", focus: 34, meetings: 41 },
+]
+
+export function Demo() {
+  return (
+    <CapsuleStackChart
+      label="Share of the workday"
+      data={data}
+      index="day"
+      series={[
+        { key: "focus", label: "Focus" },
+        { key: "meetings", label: "Meetings", color: "var(--chart-4)" },
+      ]}
+    />
+  )
+}`,
+  }),
 ];

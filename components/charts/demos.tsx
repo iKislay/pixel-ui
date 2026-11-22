@@ -29,6 +29,7 @@ import { RangeChart } from "@/components/ui/range-chart";
 import { ThresholdChart } from "@/components/ui/threshold-chart";
 import { LensBars } from "@/components/ui/lens-bars";
 import { SpendingRing } from "@/components/ui/spending-ring";
+import { CapsuleStackChart } from "@/components/ui/capsule-stack-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -677,7 +678,30 @@ function TickTapeDemo({ compact, effect }: DemoProps) {
   return <TickTape effect={effect} ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
 }
 
+const workdays = ["27 Jun", "28 Jun", "29 Jun", "30 Jun", "1 Jul", "2 Jul", "3 Jul"].map((day, i) => ({
+  day,
+  focus: [32, 25, 34, 37, 37, 46, 25][i],
+  meetings: [40, 38, 41, 30, 50, 22, 50][i],
+}));
+
+function CapsuleStackChartDemo({ compact, effect }: DemoProps) {
+  return (
+    <CapsuleStackChart
+      effect={effect}
+      height={compact ? 180 : undefined}
+      label="Share of the workday"
+      data={workdays}
+      index="day"
+      series={[
+        { key: "focus", label: "Focus" },
+        { key: "meetings", label: "Meetings", color: "var(--chart-4)" },
+      ]}
+    />
+  );
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "capsule-stack-chart": CapsuleStackChartDemo,
   "tick-tape": TickTapeDemo,
   "threshold-chart": ThresholdChartDemo,
   "lens-bars": LensBarsDemo,

@@ -1500,6 +1500,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "capsule-stack-chart",
+      "type": "registry:ui",
+      "title": "Capsule Stack Chart",
+      "description": "Soft capsules stacked in each column, with a hatched cap for what is left of the whole.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/capsule-stack-chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }
