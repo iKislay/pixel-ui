@@ -54,6 +54,22 @@ export function Heatmap({
   const r = active === null ? 0 : Math.floor(active / columns.length);
   const c = active === null ? 0 : active % columns.length;
   const current = active === null ? null : (data[r]?.[c] ?? 0);
+  const grid = rows.flatMap((_, i) => columns.map((_, j) => ({ i, j, value: data[i]?.[j] ?? 0 })));
+  const square = ({ i, j, value }: (typeof grid)[number]) => {
+    const grow = Math.min(Math.max(progress * 1.6 - ((i + j) / (rows.length + columns.length)) * 0.6, 0), 1);
+    return (
+      <rect
+        key={`${i}-${j}`}
+        x={LEFT + cell * j + gap / 2}
+        y={TOP + cell * i + gap / 2}
+        width={Math.max(cell - gap, 0)}
+        height={Math.max(cell - gap, 0)}
+        rx={Math.min(cell / 4, 8)}
+        fill={color}
+        fillOpacity={strength(value) * grow}
+      />
+    );
+  };
 
   return (
     <figure data-slot="heatmap" className={cn("flex w-full flex-col gap-3", className)} {...props}>
@@ -82,28 +98,9 @@ export function Heatmap({
                 {row}
               </text>
             ))}
-            <EffectLayer effect={effect}>
-              {rows.map((row, i) => (
-                <g key={row}>
-                  {columns.map((column, j) => {
-                    const value = data[i]?.[j] ?? 0;
-                    const grow = Math.min(Math.max(progress * 1.6 - ((i + j) / (rows.length + columns.length)) * 0.6, 0), 1);
-                    return (
-                      <rect
-                        key={column}
-                        x={LEFT + cell * j + gap / 2}
-                        y={TOP + cell * i + gap / 2}
-                        width={Math.max(cell - gap, 0)}
-                        height={Math.max(cell - gap, 0)}
-                        rx={Math.min(cell / 4, 8)}
-                        fill={color}
-                        fillOpacity={strength(value) * grow}
-                      />
-                    );
-                  })}
-                </g>
-              ))}
-            </EffectLayer>
+            {/* empty cells are the quiet part of the grid, so they stay out of any effect */}
+            {grid.filter((g) => g.value <= 0).map(square)}
+            <EffectLayer effect={effect}>{grid.filter((g) => g.value > 0).map(square)}</EffectLayer>
             {current !== null && (
               <rect
                 x={LEFT + cell * c + gap / 2}

@@ -40,6 +40,21 @@ export function CalendarHeatmap({ data, label, format = formatCompact, color = "
   };
 
   const cell = active === null ? null : cells[active];
+  const day = (c: (typeof cells)[number]) => {
+    const shown = Math.min(Math.max(progress * 1.5 - (c.week / Math.max(weeks, 1)) * 0.5, 0), 1);
+    return (
+      <rect
+        key={c.date}
+        x={LEFT + c.week * size + 1.5}
+        y={TOP + c.day * size + 1.5}
+        width={Math.max(size - 3, 0)}
+        height={Math.max(size - 3, 0)}
+        rx={size / 3.5}
+        fill={color}
+        fillOpacity={level(c.value) * shown}
+      />
+    );
+  };
 
   return (
     <figure data-slot="calendar-heatmap" className={cn("flex w-full flex-col gap-3", className)} {...props}>
@@ -68,23 +83,9 @@ export function CalendarHeatmap({ data, label, format = formatCompact, color = "
                 </text>
               ) : null,
             )}
-            <EffectLayer effect={effect}>
-              {cells.map((c) => {
-                const shown = Math.min(Math.max(progress * 1.5 - (c.week / Math.max(weeks, 1)) * 0.5, 0), 1);
-                return (
-                  <rect
-                    key={c.date}
-                    x={LEFT + c.week * size + 1.5}
-                    y={TOP + c.day * size + 1.5}
-                    width={Math.max(size - 3, 0)}
-                    height={Math.max(size - 3, 0)}
-                    rx={size / 3.5}
-                    fill={color}
-                    fillOpacity={level(c.value) * shown}
-                  />
-                );
-              })}
-            </EffectLayer>
+            {/* empty days are the quiet part of the calendar, so they stay out of any effect */}
+            {cells.filter((c) => c.value <= 0).map(day)}
+            <EffectLayer effect={effect}>{cells.filter((c) => c.value > 0).map(day)}</EffectLayer>
             {cell && (
               <rect
                 x={LEFT + cell.week * size + 1.5}
