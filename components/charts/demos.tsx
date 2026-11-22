@@ -25,6 +25,7 @@ import { GanttChart } from "@/components/ui/gantt-chart";
 import { RoseChart } from "@/components/ui/rose-chart";
 import { RadialBarChart } from "@/components/ui/radial-bar-chart";
 import { RangeChart } from "@/components/ui/range-chart";
+import { ThresholdChart } from "@/components/ui/threshold-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -579,7 +580,50 @@ function RangeChartDemo({ compact }: DemoProps) {
   );
 }
 
+const latency = Array.from({ length: 30 }, (_, i) => ({
+  day: `Oct ${i + 1}`,
+  p95: Math.round(180 + 60 * Math.sin(i / 3.1) + 45 * Math.sin(i * 1.7) + (i % 9 === 4 ? 140 : 0)),
+}));
+
+function ThresholdChartDemo({ compact }: DemoProps) {
+  return (
+    <ThresholdChart
+      height={compact ? 170 : undefined}
+      label="p95 latency in ms, last 30 days"
+      data={latency}
+      index="day"
+      value="p95"
+      valueLabel="p95"
+      defaultThreshold={300}
+      caption="days would have alerted"
+    />
+  );
+}
+
+const routes = ["GET /orders", "GET /users", "POST /checkout", "GET /search"];
+
+function TickTapeDemo({ compact }: DemoProps) {
+  const tape = useRef<TickTapeHandle>(null);
+  useEffect(() => {
+    let timer = 0;
+    const tick = () => {
+      const error = Math.random() < 0.04;
+      const route = routes[Math.floor(Math.random() * routes.length)];
+      tape.current?.push({
+        value: error ? 400 + Math.random() * 600 : 30 + Math.random() ** 3 * 480,
+        error,
+        label: `${route} · ${error ? 500 : 200}`,
+      });
+      timer = window.setTimeout(tick, 60 + Math.random() * 240);
+    };
+    tick();
+    return () => window.clearTimeout(timer);
+  }, []);
+  return <TickTape ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "threshold-chart": ThresholdChartDemo,
   "range-chart": RangeChartDemo,
   "radial-bar-chart": RadialBarChartDemo,
   "rose-chart": RoseChartDemo,

@@ -1315,4 +1315,92 @@ export function Demo() {
   return <RangeChart label="Daily active range" data={data} index="day" low="min" high="max" />
 }`,
   }),
+  chart("threshold-chart", {
+    name: "Threshold Chart",
+    category: "trends",
+    description: "Bars with a draggable alert line that marks every period crossing it.",
+    interaction: `Drag the dashed line up or down, or tab to it and use the arrow keys; it snaps to round steps. The part of each bar past the line turns red and the count above updates as you go. ${cartesianInteraction("each value")}`,
+    props: [
+      {
+        name: "data",
+        type: "Record<string, string | number>[]",
+        required: true,
+        description: "One object per period along the x axis.",
+      },
+      {
+        name: "index",
+        type: "string",
+        required: true,
+        description: "The key in each object that labels the x axis.",
+      },
+      {
+        name: "value",
+        type: "string",
+        required: true,
+        description: "The key that holds each bar's value.",
+      },
+      {
+        name: "valueLabel",
+        type: "string",
+        description: "Names the value in the tooltip. Defaults to the key.",
+      },
+      {
+        name: "threshold",
+        type: "number",
+        description: "The line's value, when you control it.",
+      },
+      {
+        name: "defaultThreshold",
+        type: "number",
+        description: "Where the line starts when uncontrolled. Defaults to 70% of the highest bar.",
+      },
+      {
+        name: "onThresholdChange",
+        type: "(threshold: number) => void",
+        description: "Called each time the line lands on a new step.",
+      },
+      {
+        name: "direction",
+        type: '"above" | "below"',
+        default: '"above"',
+        description: "Whether bars over the line or under it count.",
+      },
+      {
+        name: "step",
+        type: "number",
+        description: "What the line snaps to. Defaults to about a fortieth of the scale, rounded.",
+      },
+      {
+        name: "caption",
+        type: "string",
+        description: "The words after the count. Defaults to \"over the line\" or \"under the line\".",
+      },
+      labelProp,
+      {
+        name: "height",
+        type: "number",
+        default: "240",
+        description: "Height in pixels. The width fills the parent.",
+      },
+      formatProp,
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for the bars below the line.",
+      },
+      classNameProp,
+    ],
+    usage: `import { ThresholdChart } from "@/components/ui/threshold-chart"
+
+const data = [
+  { day: "Mon", p95: 180 },
+  { day: "Tue", p95: 320 },
+  { day: "Wed", p95: 210 },
+]
+
+export function Demo() {
+  return <ThresholdChart label="p95 latency" data={data} index="day" value="p95" defaultThreshold={250} />
+}`,
+  }),
 ];

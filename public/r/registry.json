@@ -1374,6 +1374,32 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "spending-ring",
+      "type": "registry:ui",
+      "title": "Spending Ring",
+      "description": "A ring of thick tiles showing where the money went, where each category opens into a ring of its own parts.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/spending-ring.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }
