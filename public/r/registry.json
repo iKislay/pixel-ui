@@ -20,6 +20,28 @@
       ]
     },
     {
+      "name": "chart",
+      "type": "registry:ui",
+      "title": "Chart",
+      "description": "The shared frame, helpers and effect hook that every Pixel UI chart is built on.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
       "name": "theme-toggle",
       "type": "registry:ui",
       "title": "Theme Toggle",
