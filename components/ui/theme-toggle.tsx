@@ -27,6 +27,46 @@ export function tick() {
   } catch {}
 }
 
+export function revealTheme(update: () => void, x: number, y: number) {
+  const doc = document as Document & {
+    startViewTransition?: (callback: () => void | Promise<void>) => {
+      ready: Promise<void>;
+    };
+  };
+
+  if (!doc.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    update();
+    return;
+  }
+
+  const endRadius = Math.hypot(
+    Math.max(x, window.innerWidth - x),
+    Math.max(y, window.innerHeight - y),
+  );
+
+  const transition = doc.startViewTransition(() => {
+    flushSync(update);
+  });
+
+  transition.ready
+    .then(() => {
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`,
+          ],
+        },
+        {
+          duration: 450,
+          easing: "ease-in-out",
+          pseudoElement: "::view-transition-new(root)",
+        },
+      );
+    })
+    .catch(() => {});
+}
+
 export function ThemeToggle({
   className,
   onClick,
@@ -42,55 +82,12 @@ export function ThemeToggle({
 
     const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
 
-    const prefersReducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const doc = document as Document & {
-      startViewTransition?: (callback: () => void | Promise<void>) => {
-        ready: Promise<void>;
-      };
-    };
-
-    if (!doc.startViewTransition || prefersReducedMotion) {
-      setTheme(nextTheme);
-      return;
-    }
-
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = event.clientX || rect.left + rect.width / 2;
-    const y = event.clientY || rect.top + rect.height / 2;
-
-    const endRadius = Math.hypot(
-      Math.max(x, window.innerWidth - x),
-      Math.max(y, window.innerHeight - y),
+    revealTheme(
+      () => setTheme(nextTheme),
+      event.clientX || rect.left + rect.width / 2,
+      event.clientY || rect.top + rect.height / 2,
     );
-
-    const transition = doc.startViewTransition(() => {
-      flushSync(() => {
-        setTheme(nextTheme);
-      });
-    });
-
-    transition.ready
-      .then(() => {
-        const clipPath = [
-          `circle(0px at ${x}px ${y}px)`,
-          `circle(${endRadius}px at ${x}px ${y}px)`,
-        ];
-
-        document.documentElement.animate(
-          {
-            clipPath,
-          },
-          {
-            duration: 450,
-            easing: "ease-in-out",
-            pseudoElement: "::view-transition-new(root)",
-          },
-        );
-      })
-      .catch(() => {});
   };
 
   return (
