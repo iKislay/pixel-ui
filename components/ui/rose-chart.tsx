@@ -2,7 +2,7 @@
 
 import { useId, type ComponentProps } from "react";
 import { arcPath, formatCompact, seriesColor } from "@/lib/chart";
-import { ChartTable, chartFocus, useChartNav, useDrawIn, type Format } from "@/components/ui/chart";
+import { ChartTable, chartFocus, useChartNav, useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type RoseDatum = { label: string; value: number; color?: string };
@@ -11,6 +11,7 @@ export type RoseChartProps = Omit<ComponentProps<"figure">, "children"> & {
   data: RoseDatum[];
   label: string;
   format?: Format;
+  effect?: ChartEffect;
 };
 
 const C = 100;
@@ -19,7 +20,7 @@ const OUTER = 94;
 // petals are drawn this much smaller and stroked back out, which rounds every corner
 const SOFT = 4;
 
-export function RoseChart({ data, label, format = formatCompact, className, ...props }: RoseChartProps) {
+export function RoseChart({ data, label, format = formatCompact, effect, className, ...props }: RoseChartProps) {
   const id = useId().replace(/[^\w-]/g, "");
   const { active, setActive, handlers } = useChartNav(data.length);
   const progress = useDrawIn();
@@ -40,35 +41,37 @@ export function RoseChart({ data, label, format = formatCompact, className, ...p
         {...handlers}
       >
         <svg viewBox="0 0 200 200" aria-hidden className="size-full overflow-visible">
-          <defs>
-            <pattern id={id} width={5} height={5} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <line x1={0} y1={0} x2={0} y2={5} stroke="currentColor" strokeWidth={1.5} className="text-foreground/15" />
-            </pattern>
-          </defs>
-          {data.map((d, i) => {
-            const start = i * step + pad;
-            const end = (i + 1) * step - pad;
-            const color = seriesColor(i % 5, d.color);
-            const grow = Math.min(Math.max(progress * 1.4 - (i / data.length) * 0.4, 0), 1);
-            const r = INNER + (reach(d.value) - INNER) * grow;
-            const lit = active === null || active === i;
-            return (
-              <g key={d.label} onPointerEnter={() => setActive(i)}>
-                <path d={arcPath(C, C, OUTER - SOFT, INNER + SOFT, start, end)} fill={`url(#${id})`} stroke={`url(#${id})`} strokeWidth={SOFT * 2} strokeLinejoin="round" />
-                {r - SOFT > INNER + SOFT && (
-                  <path
-                    d={arcPath(C, C, r - SOFT, INNER + SOFT, start, end)}
-                    fill={color}
-                    stroke={color}
-                    strokeWidth={SOFT * 2}
-                    strokeLinejoin="round"
-                    opacity={lit ? 1 : 0.35}
-                    className="transition-opacity duration-200 motion-reduce:transition-none"
-                  />
-                )}
-              </g>
-            );
-          })}
+          <EffectLayer effect={effect}>
+            <defs>
+              <pattern id={id} width={5} height={5} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1={0} y1={0} x2={0} y2={5} stroke="currentColor" strokeWidth={1.5} className="text-foreground/15" />
+              </pattern>
+            </defs>
+            {data.map((d, i) => {
+              const start = i * step + pad;
+              const end = (i + 1) * step - pad;
+              const color = seriesColor(i % 5, d.color);
+              const grow = Math.min(Math.max(progress * 1.4 - (i / data.length) * 0.4, 0), 1);
+              const r = INNER + (reach(d.value) - INNER) * grow;
+              const lit = active === null || active === i;
+              return (
+                <g key={d.label} onPointerEnter={() => setActive(i)}>
+                  <path d={arcPath(C, C, OUTER - SOFT, INNER + SOFT, start, end)} fill={`url(#${id})`} stroke={`url(#${id})`} strokeWidth={SOFT * 2} strokeLinejoin="round" />
+                  {r - SOFT > INNER + SOFT && (
+                    <path
+                      d={arcPath(C, C, r - SOFT, INNER + SOFT, start, end)}
+                      fill={color}
+                      stroke={color}
+                      strokeWidth={SOFT * 2}
+                      strokeLinejoin="round"
+                      opacity={lit ? 1 : 0.35}
+                      className="transition-opacity duration-200 motion-reduce:transition-none"
+                    />
+                  )}
+                </g>
+              );
+            })}
+          </EffectLayer>
         </svg>
         <p aria-live="polite" className="sr-only">
           {current ? `${current.label}: ${format(current.value)}` : ""}

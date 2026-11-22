@@ -1416,6 +1416,14 @@
         {
           "path": "components/ui/tick-tape.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
         }
       ]
     },

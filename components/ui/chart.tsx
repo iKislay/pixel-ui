@@ -22,6 +22,34 @@ export type ChartSeries = {
 
 export type Format = (value: number) => string;
 
+// a paint applied to a chart's marks only: svg defs it needs, a filter for the marks, and an optional series paint
+export type ChartEffect = {
+  defs: ReactNode;
+  filter?: string;
+  fill?: (color: string, index: number) => string;
+};
+
+// wraps marks inside an svg so the effect touches them and leaves axes, labels and tooltips plain
+export function EffectLayer({ effect, children }: { effect?: ChartEffect; children: ReactNode }) {
+  if (!effect) return <>{children}</>;
+  return (
+    <>
+      <defs>{effect.defs}</defs>
+      <g filter={effect.filter}>{children}</g>
+    </>
+  );
+}
+
+// html and canvas charts keep the effect's defs here and put effect.filter on their marks as a css filter
+export function EffectDefs({ effect }: { effect?: ChartEffect }) {
+  if (!effect) return null;
+  return (
+    <svg aria-hidden className="pointer-events-none absolute size-0 overflow-hidden">
+      <defs>{effect.defs}</defs>
+    </svg>
+  );
+}
+
 export function useChartWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   const [width, setWidth] = useState(0);
@@ -193,6 +221,7 @@ export type CartesianChartProps = Omit<ComponentProps<"figure">, "children"> & {
   floating?: boolean;
   legend?: boolean;
   header?: ReactNode;
+  effect?: ChartEffect;
   slot: string;
   children: (context: CartesianContext) => ReactNode;
 };
@@ -215,6 +244,7 @@ export function CartesianChart({
   floating = false,
   legend = true,
   header,
+  effect,
   slot,
   children,
   className,
@@ -318,7 +348,21 @@ export function CartesianChart({
                 className="text-foreground/25"
               />
             )}
-            {children({ data, series, width, height, x, band, y, top: margin.top, floor: y(domain[0]), active, progress })}
+            <EffectLayer effect={effect}>
+              {children({
+                data,
+                series: effect?.fill ? series.map((s, i) => ({ ...s, color: effect.fill!(s.color, i) })) : series,
+                width,
+                height,
+                x,
+                band,
+                y,
+                top: margin.top,
+                floor: y(domain[0]),
+                active,
+                progress,
+              })}
+            </EffectLayer>
           </svg>
         )}
         <ChartTooltip

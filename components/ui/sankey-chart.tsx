@@ -2,7 +2,7 @@
 
 import { useId, useState, type ComponentProps } from "react";
 import { formatCompact, ribbonPath, sankeyLayout, seriesColor, type SankeyLinkInput, type SankeyNodeInput } from "@/lib/chart";
-import { ChartTable, ChartTooltip, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format } from "@/components/ui/chart";
+import { ChartTable, ChartTooltip, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type SankeyChartProps = Omit<ComponentProps<"figure">, "children"> & {
@@ -12,6 +12,7 @@ export type SankeyChartProps = Omit<ComponentProps<"figure">, "children"> & {
   format?: Format;
   height?: number;
   nodeWidth?: number;
+  effect?: ChartEffect;
 };
 
 const SIDE = 112;
@@ -23,6 +24,7 @@ export function SankeyChart({
   format = formatCompact,
   height = 320,
   nodeWidth = 10,
+  effect,
   className,
   ...props
 }: SankeyChartProps) {
@@ -66,18 +68,20 @@ export function SankeyChart({
                 </linearGradient>
               ))}
             </defs>
-            <g clipPath={`url(#${id}-reveal)`} transform={`translate(${SIDE},0)`}>
-              {layout.links.map((l, i) => (
-                <path
-                  key={i}
-                  d={ribbonPath(l.x0, l.sy, l.x1, l.ty, Math.max(l.w, 1))}
-                  fill={`url(#${id}-${i})`}
-                  fillOpacity={lit(l, i) ? 0.42 : 0.1}
-                  onPointerEnter={() => setActive(i)}
-                  className="transition-[fill-opacity] duration-200 motion-reduce:transition-none"
-                />
-              ))}
-            </g>
+            <EffectLayer effect={effect}>
+              <g clipPath={`url(#${id}-reveal)`} transform={`translate(${SIDE},0)`}>
+                {layout.links.map((l, i) => (
+                  <path
+                    key={i}
+                    d={ribbonPath(l.x0, l.sy, l.x1, l.ty, Math.max(l.w, 1))}
+                    fill={`url(#${id}-${i})`}
+                    fillOpacity={lit(l, i) ? 0.42 : 0.1}
+                    onPointerEnter={() => setActive(i)}
+                    className="transition-[fill-opacity] duration-200 motion-reduce:transition-none"
+                  />
+                ))}
+              </g>
+            </EffectLayer>
             <g transform={`translate(${SIDE},0)`}>
               {layout.nodes.map((n) => {
                 const tx = n.column === 0 ? n.x - 10 : n.x + nodeWidth + 10;

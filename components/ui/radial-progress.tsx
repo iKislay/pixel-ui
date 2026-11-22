@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentProps } from "react";
-import { useDrawIn, type Format } from "@/components/ui/chart";
+import { useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type RadialProgressProps = Omit<ComponentProps<"div">, "children"> & {
@@ -12,6 +12,7 @@ export type RadialProgressProps = Omit<ComponentProps<"div">, "children"> & {
   format?: Format;
   color?: string;
   thickness?: number;
+  effect?: ChartEffect;
 };
 
 export function RadialProgress({
@@ -22,6 +23,7 @@ export function RadialProgress({
   format,
   color = "var(--brand)",
   thickness = 10,
+  effect,
   className,
   ...props
 }: RadialProgressProps) {
@@ -43,20 +45,22 @@ export function RadialProgress({
       {...props}
     >
       <svg viewBox="0 0 100 100" aria-hidden className="size-full -rotate-90">
-        <circle cx={50} cy={50} r={r} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-foreground/[0.07]" />
-        {ratio > 0 && (
-          <circle
-            cx={50}
-            cy={50}
-            r={r}
-            fill="none"
-            stroke={color}
-            strokeWidth={thickness}
-            strokeLinecap="round"
-            pathLength={1}
-            strokeDasharray={`${ratio * progress} 1`}
-          />
-        )}
+        <EffectLayer effect={effect}>
+          <circle cx={50} cy={50} r={r} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-foreground/[0.07]" />
+          {ratio > 0 && (
+            <circle
+              cx={50}
+              cy={50}
+              r={r}
+              fill="none"
+              stroke={color}
+              strokeWidth={thickness}
+              strokeLinecap="round"
+              pathLength={1}
+              strokeDasharray={`${ratio * progress} 1`}
+            />
+          )}
+        </EffectLayer>
       </svg>
       <div aria-hidden className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <span className="font-mono text-2xl font-medium tabular-nums">

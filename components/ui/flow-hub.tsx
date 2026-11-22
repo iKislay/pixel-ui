@@ -2,7 +2,7 @@
 
 import { useId, type ComponentProps } from "react";
 import { formatCompact, ribbonPath, seriesColor } from "@/lib/chart";
-import { ChartTable, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format } from "@/components/ui/chart";
+import { ChartTable, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type FlowHubItem = { label: string; value: number; color?: string };
@@ -14,6 +14,7 @@ export type FlowHubProps = Omit<ComponentProps<"figure">, "children"> & {
   totalLabel?: string;
   format?: Format;
   height?: number;
+  effect?: ChartEffect;
 };
 
 const SIDE = 104;
@@ -43,6 +44,7 @@ export function FlowHub({
   totalLabel = "Total",
   format = formatCompact,
   height = 300,
+  effect,
   className,
   ...props
 }: FlowHubProps) {
@@ -87,17 +89,27 @@ export function FlowHub({
                 </linearGradient>
               ))}
             </defs>
+            <EffectLayer effect={effect}>
+              {placed.map((p, i) => {
+                const edge = p.side === "in" ? SIDE + NODE : width - SIDE - NODE;
+                // ribbons reach in from the edges as the chart draws
+                const reach = edge + (cx - edge) * progress;
+                return (
+                  <path
+                    key={i}
+                    d={p.side === "in" ? ribbonPath(edge, p.y, reach, p.hubY, p.h, p.hubH) : ribbonPath(reach, p.hubY, edge, p.y, p.hubH, p.h)}
+                    fill={`url(#${id}-${i})`}
+                    onPointerEnter={() => setActive(i)}
+                    opacity={active !== null && active !== i ? 0.25 : 1}
+                    className="transition-opacity duration-200 motion-reduce:transition-none"
+                  />
+                );
+              })}
+            </EffectLayer>
             {placed.map((p, i) => {
-              const edge = p.side === "in" ? SIDE + NODE : width - SIDE - NODE;
-              // ribbons reach in from the edges as the chart draws
-              const reach = edge + (cx - edge) * progress;
               const dim = active !== null && active !== i;
               return (
                 <g key={i} onPointerEnter={() => setActive(i)} opacity={dim ? 0.25 : 1} className="transition-opacity duration-200 motion-reduce:transition-none">
-                  <path
-                    d={p.side === "in" ? ribbonPath(edge, p.y, reach, p.hubY, p.h, p.hubH) : ribbonPath(reach, p.hubY, edge, p.y, p.hubH, p.h)}
-                    fill={`url(#${id}-${i})`}
-                  />
                   <rect x={p.side === "in" ? SIDE : width - SIDE - NODE} y={p.y} width={NODE} height={Math.max(p.h, 2)} rx={NODE / 2} fill={p.color} />
                   <text
                     x={p.side === "in" ? SIDE - 12 : width - SIDE + 12}

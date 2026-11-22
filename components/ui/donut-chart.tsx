@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { arcLine, formatCompact, seriesColor } from "@/lib/chart";
-import { ChartTable, chartFocus, useChartNav, useDrawIn, type Format } from "@/components/ui/chart";
+import { ChartTable, chartFocus, useChartNav, useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type DonutSlice = { label: string; value: number; color?: string };
@@ -13,6 +13,7 @@ export type DonutChartProps = Omit<ComponentProps<"figure">, "children"> & {
   format?: Format;
   thickness?: number;
   totalLabel?: string;
+  effect?: ChartEffect;
 };
 
 const SIZE = 200;
@@ -25,6 +26,7 @@ export function DonutChart({
   format = formatCompact,
   thickness = 24,
   totalLabel = "Total",
+  effect,
   className,
   ...props
 }: DonutChartProps) {
@@ -54,28 +56,30 @@ export function DonutChart({
         {...handlers}
       >
         <svg viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden className="size-full overflow-visible">
-          {slices.map((slice, i) => {
-            if (slice.end <= slice.start) return null;
-            const lifted = active === i;
-            const whole = slices.filter((s) => s.end > s.start).length === 1;
-            const start = whole ? slice.start : slice.start + trim;
-            // a slice too thin for two caps shrinks to a dot at its middle
-            const end = whole ? slice.end : Math.max(slice.end - trim, start + 1e-3);
-            const middle = (slice.start + slice.end) / 2;
-            return (
-              <path
-                key={slice.label}
-                d={end - start < 2e-3 ? arcLine(SIZE / 2, SIZE / 2, r, middle, middle + 1e-3) : arcLine(SIZE / 2, SIZE / 2, r, start, end)}
-                fill="none"
-                stroke={slice.color}
-                strokeWidth={thickness + (lifted ? 6 : 0)}
-                strokeLinecap="round"
-                opacity={active === null || lifted ? 1 : 0.35}
-                onPointerEnter={() => setActive(i)}
-                className="transition-[opacity,stroke-width] duration-200 motion-reduce:transition-none"
-              />
-            );
-          })}
+          <EffectLayer effect={effect}>
+            {slices.map((slice, i) => {
+              if (slice.end <= slice.start) return null;
+              const lifted = active === i;
+              const whole = slices.filter((s) => s.end > s.start).length === 1;
+              const start = whole ? slice.start : slice.start + trim;
+              // a slice too thin for two caps shrinks to a dot at its middle
+              const end = whole ? slice.end : Math.max(slice.end - trim, start + 1e-3);
+              const middle = (slice.start + slice.end) / 2;
+              return (
+                <path
+                  key={slice.label}
+                  d={end - start < 2e-3 ? arcLine(SIZE / 2, SIZE / 2, r, middle, middle + 1e-3) : arcLine(SIZE / 2, SIZE / 2, r, start, end)}
+                  fill="none"
+                  stroke={slice.color}
+                  strokeWidth={thickness + (lifted ? 6 : 0)}
+                  strokeLinecap="round"
+                  opacity={active === null || lifted ? 1 : 0.35}
+                  onPointerEnter={() => setActive(i)}
+                  className="transition-[opacity,stroke-width] duration-200 motion-reduce:transition-none"
+                />
+              );
+            })}
+          </EffectLayer>
         </svg>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
           <span className="font-mono text-2xl font-medium tabular-nums">{format(current ? current.value : total)}</span>

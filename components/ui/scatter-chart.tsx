@@ -2,16 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { formatCompact, niceTicks, scaleLinear, seriesColor } from "@/lib/chart";
-import {
-  ChartLegend,
-  ChartTable,
-  ChartTooltip,
-  chartFocus,
-  useChartNav,
-  useChartWidth,
-  useDrawIn,
-  type Format,
-} from "@/components/ui/chart";
+import { ChartLegend, ChartTable, ChartTooltip, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type ScatterPoint = { x: number; y: number; label?: string };
@@ -26,6 +17,7 @@ export type ScatterChartProps = Omit<ComponentProps<"figure">, "children"> & {
   height?: number;
   format?: Format;
   formatX?: Format;
+  effect?: ChartEffect;
 };
 
 const MARGIN = { top: 12, right: 12, bottom: 40, left: 44 };
@@ -38,6 +30,7 @@ export function ScatterChart({
   height = 280,
   format = formatCompact,
   formatX = formatCompact,
+  effect,
   className,
   ...props
 }: ScatterChartProps) {
@@ -102,23 +95,25 @@ export function ScatterChart({
             <text x={width - MARGIN.right} y={height - 4} textAnchor="end" className="fill-muted-foreground text-[11px] font-semibold">
               {xLabel} →
             </text>
-            {points.map((p, i) => {
-              // dots pop in from left to right
-              const grow = Math.min(Math.max(progress * 1.5 - (i / points.length) * 0.5, 0), 1);
-              return (
-                <circle
-                  key={i}
-                  cx={x(p.x)}
-                  cy={y(p.y)}
-                  r={(active === i ? 7 : 5) * grow}
-                  fill={p.color}
-                  fillOpacity={active === null || active === i ? 0.9 : 0.35}
-                  stroke="var(--background)"
-                  strokeWidth={2}
-                  className="transition-[fill-opacity] duration-200 motion-reduce:transition-none"
-                />
-              );
-            })}
+            <EffectLayer effect={effect}>
+              {points.map((p, i) => {
+                // dots pop in from left to right
+                const grow = Math.min(Math.max(progress * 1.5 - (i / points.length) * 0.5, 0), 1);
+                return (
+                  <circle
+                    key={i}
+                    cx={x(p.x)}
+                    cy={y(p.y)}
+                    r={(active === i ? 7 : 5) * grow}
+                    fill={p.color}
+                    fillOpacity={active === null || active === i ? 0.9 : 0.35}
+                    stroke="var(--background)"
+                    strokeWidth={2}
+                    className="transition-[fill-opacity] duration-200 motion-reduce:transition-none"
+                  />
+                );
+              })}
+            </EffectLayer>
           </svg>
         )}
         <ChartTooltip

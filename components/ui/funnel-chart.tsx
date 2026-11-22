@@ -2,7 +2,7 @@
 
 import { Fragment, useState, type ComponentProps } from "react";
 import { formatCompact } from "@/lib/chart";
-import { useDrawIn, type Format } from "@/components/ui/chart";
+import { useDrawIn, type Format, EffectDefs, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type FunnelStep = { label: string; value: number };
@@ -12,9 +12,10 @@ export type FunnelChartProps = Omit<ComponentProps<"figure">, "children"> & {
   label: string;
   format?: Format;
   color?: string;
+  effect?: ChartEffect;
 };
 
-export function FunnelChart({ data, label, format = formatCompact, color = "var(--brand)", className, ...props }: FunnelChartProps) {
+export function FunnelChart({ data, label, format = formatCompact, color = "var(--brand)", effect, className, ...props }: FunnelChartProps) {
   const progress = useDrawIn();
   const [active, setActive] = useState<number | null>(null);
   const first = Math.max(data[0]?.value ?? 0, 0) || 1;
@@ -22,6 +23,7 @@ export function FunnelChart({ data, label, format = formatCompact, color = "var(
   return (
     <figure data-slot="funnel-chart" className={cn("w-full", className)} {...props}>
       <figcaption className="sr-only">{label}</figcaption>
+      <EffectDefs effect={effect} />
       <ol className="flex flex-col items-center" onPointerLeave={() => setActive(null)}>
         {data.map((step, i) => {
           const share = Math.min(Math.max(step.value, 0) / first, 1);
@@ -51,6 +53,7 @@ export function FunnelChart({ data, label, format = formatCompact, color = "var(
                     width: `${Math.max(share * 100, 4) * progress}%`,
                     background: color,
                     opacity: 1 - (i / Math.max(data.length, 1)) * 0.5,
+                    filter: effect?.filter,
                   }}
                 />
               </li>

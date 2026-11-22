@@ -2,7 +2,7 @@
 
 import { useState, type ComponentProps } from "react";
 import { allocate, formatCompact, seriesColor } from "@/lib/chart";
-import { useDrawIn, type Format } from "@/components/ui/chart";
+import { useDrawIn, type Format, EffectDefs, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type WaffleDatum = { label: string; value: number; color?: string };
@@ -14,6 +14,7 @@ export type WaffleChartProps = Omit<ComponentProps<"figure">, "children"> & {
   columns?: number;
   rows?: number;
   format?: Format;
+  effect?: ChartEffect;
 };
 
 export function WaffleChart({
@@ -23,6 +24,7 @@ export function WaffleChart({
   columns = 10,
   rows = 10,
   format = formatCompact,
+  effect,
   className,
   ...props
 }: WaffleChartProps) {
@@ -38,10 +40,11 @@ export function WaffleChart({
   return (
     <figure data-slot="waffle-chart" className={cn("flex flex-wrap items-center justify-center gap-x-10 gap-y-6", className)} {...props}>
       <figcaption className="sr-only">{label}</figcaption>
+      <EffectDefs effect={effect} />
       <div
         aria-hidden
         className="grid w-full max-w-52 gap-1"
-        style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+        style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, filter: effect?.filter }}
         onPointerLeave={() => setActive(null)}
       >
         {owners.map((owner, k) => {

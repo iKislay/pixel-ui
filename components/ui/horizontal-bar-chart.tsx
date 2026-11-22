@@ -2,7 +2,7 @@
 
 import { useState, type ComponentProps } from "react";
 import { formatCompact } from "@/lib/chart";
-import { useDrawIn, type Format } from "@/components/ui/chart";
+import { useDrawIn, type Format, EffectDefs, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type HorizontalBarDatum = { label: string; value: number; color?: string };
@@ -13,6 +13,7 @@ export type HorizontalBarChartProps = Omit<ComponentProps<"figure">, "children">
   format?: Format;
   max?: number;
   color?: string;
+  effect?: ChartEffect;
 };
 
 export function HorizontalBarChart({
@@ -21,6 +22,7 @@ export function HorizontalBarChart({
   format = formatCompact,
   max,
   color = "var(--brand)",
+  effect,
   className,
   ...props
 }: HorizontalBarChartProps) {
@@ -31,6 +33,7 @@ export function HorizontalBarChart({
   return (
     <figure data-slot="horizontal-bar-chart" className={cn("w-full", className)} {...props}>
       <figcaption className="sr-only">{label}</figcaption>
+      <EffectDefs effect={effect} />
       <ul className="flex flex-col gap-3.5" onPointerLeave={() => setActive(null)}>
         {data.map((d, i) => {
           const grow = Math.min(Math.max(progress * 1.4 - (i / data.length) * 0.4, 0), 1);
@@ -51,7 +54,7 @@ export function HorizontalBarChart({
               <div aria-hidden className="h-2.5 overflow-hidden rounded-full bg-foreground/[0.06]">
                 <div
                   className="h-full rounded-full"
-                  style={{ width: `${share * grow * 100}%`, background: d.color ?? color }}
+                  style={{ width: `${share * grow * 100}%`, background: d.color ?? color, filter: effect?.filter }}
                 />
               </div>
             </li>

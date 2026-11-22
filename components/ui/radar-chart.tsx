@@ -2,16 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { closedCurve, formatCompact, niceTicks, roundedPolygon, seriesColor, type Point } from "@/lib/chart";
-import {
-  ChartLegend,
-  ChartTable,
-  chartFocus,
-  useChartNav,
-  useDrawIn,
-  type ChartDatum,
-  type ChartSeries,
-  type Format,
-} from "@/components/ui/chart";
+import { ChartLegend, ChartTable, chartFocus, useChartNav, useDrawIn, type ChartDatum, type ChartSeries, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type RadarChartProps = Omit<ComponentProps<"figure">, "children"> & {
@@ -22,6 +13,7 @@ export type RadarChartProps = Omit<ComponentProps<"figure">, "children"> & {
   format?: Format;
   curve?: "rounded" | "smooth";
   grid?: "circle" | "polygon";
+  effect?: ChartEffect;
 };
 
 const round = (n: number) => Math.round(n * 100) / 100;
@@ -36,6 +28,7 @@ export function RadarChart({
   format = formatCompact,
   curve = "rounded",
   grid = "circle",
+  effect,
   className,
   ...props
 }: RadarChartProps) {
@@ -95,17 +88,19 @@ export function RadarChart({
               </g>
             );
           })}
-          {series.map((s) => {
-            const points = data.map((d, i) => at(i, (value(d, s.key) / top) * R * progress));
-            return (
-              <g key={s.key}>
-                <path d={curve === "smooth" ? closedCurve(points) : roundedPolygon(points, 8 * progress)} fill={s.color} fillOpacity={0.14} stroke={s.color} strokeWidth={2} strokeLinejoin="round" />
-                {active !== null && (
-                  <circle cx={points[active][0]} cy={points[active][1]} r={4.5} fill={s.color} stroke="var(--background)" strokeWidth={2} />
-                )}
-              </g>
-            );
-          })}
+          <EffectLayer effect={effect}>
+            {series.map((s) => {
+              const points = data.map((d, i) => at(i, (value(d, s.key) / top) * R * progress));
+              return (
+                <g key={s.key}>
+                  <path d={curve === "smooth" ? closedCurve(points) : roundedPolygon(points, 8 * progress)} fill={s.color} fillOpacity={0.14} stroke={s.color} strokeWidth={2} strokeLinejoin="round" />
+                  {active !== null && (
+                    <circle cx={points[active][0]} cy={points[active][1]} r={4.5} fill={s.color} stroke="var(--background)" strokeWidth={2} />
+                  )}
+                </g>
+              );
+            })}
+          </EffectLayer>
         </svg>
         {row && (
           <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[14px] border border-foreground/[0.06] bg-background/90 px-3 py-2 text-xs shadow-lg backdrop-blur-md [corner-shape:squircle]">

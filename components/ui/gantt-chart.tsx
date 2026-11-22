@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { formatCompact, niceTicks, scaleLinear, seriesColor } from "@/lib/chart";
-import { ChartTable, ChartTooltip, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format } from "@/components/ui/chart";
+import { ChartTable, ChartTooltip, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type GanttTask = { label: string; start: number; end: number; progress?: number; color?: string };
@@ -12,12 +12,13 @@ export type GanttChartProps = Omit<ComponentProps<"figure">, "children"> & {
   label: string;
   formatTime?: Format;
   rowHeight?: number;
+  effect?: ChartEffect;
 };
 
 const LEFT = 76;
 const TOP = 26;
 
-export function GanttChart({ tasks, label, formatTime = formatCompact, rowHeight = 40, className, ...props }: GanttChartProps) {
+export function GanttChart({ tasks, label, formatTime = formatCompact, rowHeight = 40, effect, className, ...props }: GanttChartProps) {
   const [ref, width] = useChartWidth<HTMLDivElement>();
   const progress = useDrawIn();
   const { active, setActive, handlers } = useChartNav(tasks.length);
@@ -57,26 +58,40 @@ export function GanttChart({ tasks, label, formatTime = formatCompact, rowHeight
                 {row}
               </text>
             ))}
+            <EffectLayer effect={effect}>
+              {tasks.map((t, i) => {
+                const row = rows.indexOf(t.label);
+                const color = seriesColor(row % 5, t.color);
+                const left = x(t.start);
+                const full = Math.max(x(t.end) - left, bar);
+                const grow = Math.min(Math.max(progress * 1.4 - (i / tasks.length) * 0.4, 0), 1);
+                const span = full * grow;
+                const y = TOP + rowHeight * row + (rowHeight - bar) / 2;
+                const inner = Math.max((span - 8) * Math.min(Math.max(t.progress ?? 0, 0), 1), 0);
+                return (
+                  <g
+                    key={i}
+                    onPointerEnter={() => setActive(i)}
+                    opacity={active === null || active === i ? 1 : 0.4}
+                    className="transition-opacity duration-200 motion-reduce:transition-none"
+                  >
+                    <rect x={left} y={y} width={span} height={bar} rx={bar / 2} fill={color} fillOpacity={done(t) ? 1 : 0.28} />
+                    {!done(t) && inner > 0 && (
+                      <rect x={left + 4} y={y + 4} width={Math.max(inner, bar - 8)} height={bar - 8} rx={(bar - 8) / 2} fill={color} />
+                    )}
+                  </g>
+                );
+              })}
+            </EffectLayer>
             {tasks.map((t, i) => {
               const row = rows.indexOf(t.label);
-              const color = seriesColor(row % 5, t.color);
               const left = x(t.start);
               const full = Math.max(x(t.end) - left, bar);
               const grow = Math.min(Math.max(progress * 1.4 - (i / tasks.length) * 0.4, 0), 1);
               const span = full * grow;
               const y = TOP + rowHeight * row + (rowHeight - bar) / 2;
-              const inner = Math.max((span - 8) * Math.min(Math.max(t.progress ?? 0, 0), 1), 0);
               return (
-                <g
-                  key={i}
-                  onPointerEnter={() => setActive(i)}
-                  opacity={active === null || active === i ? 1 : 0.4}
-                  className="transition-opacity duration-200 motion-reduce:transition-none"
-                >
-                  <rect x={left} y={y} width={span} height={bar} rx={bar / 2} fill={color} fillOpacity={done(t) ? 1 : 0.28} />
-                  {!done(t) && inner > 0 && (
-                    <rect x={left + 4} y={y + 4} width={Math.max(inner, bar - 8)} height={bar - 8} rx={(bar - 8) / 2} fill={color} />
-                  )}
+                <g key={i} opacity={active === null || active === i ? 1 : 0.4} className="pointer-events-none">
                   {grow === 1 &&
                     (done(t) ? (
                       <path

@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState, type ComponentProps, type KeyboardEvent } from "react";
 import { animate, useMotionValue, useMotionValueEvent, useReducedMotion, type AnimationPlaybackControls } from "motion/react";
 import { arcPath, formatCompact, seriesColor } from "@/lib/chart";
-import { ChartTable, chartFocus, useChartNav, useDrawIn, type Format } from "@/components/ui/chart";
+import { ChartTable, chartFocus, useChartNav, useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type SpendCategory = {
@@ -20,6 +20,7 @@ export type SpendingRingProps = Omit<ComponentProps<"figure">, "children"> & {
   format?: Format;
   thickness?: number;
   totalLabel?: string;
+  effect?: ChartEffect;
 };
 
 const C = 100;
@@ -44,6 +45,7 @@ export function SpendingRing({
   format = formatCompact,
   thickness = 34,
   totalLabel = "Spent",
+  effect,
   className,
   ...props
 }: SpendingRingProps) {
@@ -165,16 +167,46 @@ export function SpendingRing({
               <rect width={2} height={5} fill="rgb(255 255 255 / 0.55)" />
             </pattern>
           </defs>
+          <EffectLayer effect={effect}>
+            {tiles.map((t) => {
+              if (t.to - t.from <= (2 * SOFT) / R || t.opacity <= 0.01) return null;
+              const index = rows.findIndex((r) => r.key === t.key);
+              const lifted = active !== null && index === active;
+              const quiet = active !== null && index !== active;
+              const mid = (t.from + t.to) / 2;
+              const r0 = R - t.width / 2 + SOFT;
+              const r1 = R + t.width / 2 - SOFT;
+              const s = SOFT / R;
+              const over = t.budget !== undefined && t.value > t.budget ? (t.value - t.budget) / t.value : 0;
+              return (
+                <g
+                  key={t.key}
+                  opacity={t.opacity * (quiet ? 0.35 : 1)}
+                  transform={lifted ? `translate(${(Math.sin(mid) * LIFT).toFixed(2)} ${(-Math.cos(mid) * LIFT).toFixed(2)})` : undefined}
+                  onPointerEnter={() => settled && index >= 0 && setActive(index)}
+                  onClick={() => index >= 0 && rows[index].opens && go(t.key)}
+                  className={cn("transition-[opacity,transform] duration-200 motion-reduce:transition-none", index >= 0 && rows[index].opens && "cursor-pointer")}
+                >
+                  <path d={arcPath(C, C, r1, r0, t.from + s, t.to - s)} style={{ fill: t.color, stroke: t.color }} strokeWidth={SOFT * 2} strokeLinejoin="round" />
+                  {over > 0 && (
+                    <path
+                      d={arcPath(C, C, r1, r0, Math.max(t.to - (t.to - t.from) * over, t.from + s), t.to - s)}
+                      fill={`url(#${hatch})`}
+                      stroke={`url(#${hatch})`}
+                      strokeWidth={SOFT * 2}
+                      strokeLinejoin="round"
+                    />
+                  )}
+                </g>
+              );
+            })}
+          </EffectLayer>
           {tiles.map((t) => {
             if (t.to - t.from <= (2 * SOFT) / R || t.opacity <= 0.01) return null;
             const index = rows.findIndex((r) => r.key === t.key);
             const lifted = active !== null && index === active;
             const quiet = active !== null && index !== active;
             const mid = (t.from + t.to) / 2;
-            const r0 = R - t.width / 2 + SOFT;
-            const r1 = R + t.width / 2 - SOFT;
-            const s = SOFT / R;
-            const over = t.budget !== undefined && t.value > t.budget ? (t.value - t.budget) / t.value : 0;
             const text = format(t.value);
             const fits = (t.to - t.from) * R >= text.length * 5.6 + 12 && t.width > 24;
             return (
@@ -182,20 +214,8 @@ export function SpendingRing({
                 key={t.key}
                 opacity={t.opacity * (quiet ? 0.35 : 1)}
                 transform={lifted ? `translate(${(Math.sin(mid) * LIFT).toFixed(2)} ${(-Math.cos(mid) * LIFT).toFixed(2)})` : undefined}
-                onPointerEnter={() => settled && index >= 0 && setActive(index)}
-                onClick={() => index >= 0 && rows[index].opens && go(t.key)}
-                className={cn("transition-[opacity,transform] duration-200 motion-reduce:transition-none", index >= 0 && rows[index].opens && "cursor-pointer")}
+                className="pointer-events-none transition-[opacity,transform] duration-200 motion-reduce:transition-none"
               >
-                <path d={arcPath(C, C, r1, r0, t.from + s, t.to - s)} style={{ fill: t.color, stroke: t.color }} strokeWidth={SOFT * 2} strokeLinejoin="round" />
-                {over > 0 && (
-                  <path
-                    d={arcPath(C, C, r1, r0, Math.max(t.to - (t.to - t.from) * over, t.from + s), t.to - s)}
-                    fill={`url(#${hatch})`}
-                    stroke={`url(#${hatch})`}
-                    strokeWidth={SOFT * 2}
-                    strokeLinejoin="round"
-                  />
-                )}
                 <text
                   x={(C + R * Math.sin(mid)).toFixed(2)}
                   y={(C - R * Math.cos(mid)).toFixed(2)}

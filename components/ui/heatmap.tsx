@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { formatCompact } from "@/lib/chart";
-import { ChartTable, ChartTooltip, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format } from "@/components/ui/chart";
+import { ChartTable, ChartTooltip, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type HeatmapProps = Omit<ComponentProps<"figure">, "children"> & {
@@ -13,6 +13,7 @@ export type HeatmapProps = Omit<ComponentProps<"figure">, "children"> & {
   format?: Format;
   color?: string;
   gap?: number;
+  effect?: ChartEffect;
 };
 
 const LEFT = 44;
@@ -26,6 +27,7 @@ export function Heatmap({
   format = formatCompact,
   color = "var(--brand)",
   gap = 3,
+  effect,
   className,
   ...props
 }: HeatmapProps) {
@@ -76,31 +78,44 @@ export function Heatmap({
               ) : null,
             )}
             {rows.map((row, i) => (
-              <g key={row}>
-                <text x={LEFT - 10} y={TOP + cell * (i + 0.5)} dy="0.32em" textAnchor="end" className="fill-muted-foreground text-[11px] font-medium">
-                  {row}
-                </text>
-                {columns.map((column, j) => {
-                  const value = data[i]?.[j] ?? 0;
-                  const grow = Math.min(Math.max(progress * 1.6 - ((i + j) / (rows.length + columns.length)) * 0.6, 0), 1);
-                  const on = active === i * columns.length + j;
-                  return (
-                    <rect
-                      key={column}
-                      x={LEFT + cell * j + gap / 2}
-                      y={TOP + cell * i + gap / 2}
-                      width={Math.max(cell - gap, 0)}
-                      height={Math.max(cell - gap, 0)}
-                      rx={Math.min(cell / 4, 8)}
-                      fill={color}
-                      fillOpacity={strength(value) * grow}
-                      stroke={on ? "var(--foreground)" : "none"}
-                      strokeWidth={1.5}
-                    />
-                  );
-                })}
-              </g>
+              <text key={row} x={LEFT - 10} y={TOP + cell * (i + 0.5)} dy="0.32em" textAnchor="end" className="fill-muted-foreground text-[11px] font-medium">
+                {row}
+              </text>
             ))}
+            <EffectLayer effect={effect}>
+              {rows.map((row, i) => (
+                <g key={row}>
+                  {columns.map((column, j) => {
+                    const value = data[i]?.[j] ?? 0;
+                    const grow = Math.min(Math.max(progress * 1.6 - ((i + j) / (rows.length + columns.length)) * 0.6, 0), 1);
+                    return (
+                      <rect
+                        key={column}
+                        x={LEFT + cell * j + gap / 2}
+                        y={TOP + cell * i + gap / 2}
+                        width={Math.max(cell - gap, 0)}
+                        height={Math.max(cell - gap, 0)}
+                        rx={Math.min(cell / 4, 8)}
+                        fill={color}
+                        fillOpacity={strength(value) * grow}
+                      />
+                    );
+                  })}
+                </g>
+              ))}
+            </EffectLayer>
+            {current !== null && (
+              <rect
+                x={LEFT + cell * c + gap / 2}
+                y={TOP + cell * r + gap / 2}
+                width={Math.max(cell - gap, 0)}
+                height={Math.max(cell - gap, 0)}
+                rx={Math.min(cell / 4, 8)}
+                fill="none"
+                stroke="var(--foreground)"
+                strokeWidth={1.5}
+              />
+            )}
           </svg>
         )}
         <ChartTooltip

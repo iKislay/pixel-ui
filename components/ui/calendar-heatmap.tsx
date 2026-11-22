@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { calendarCells, formatCompact } from "@/lib/chart";
-import { ChartTable, ChartTooltip, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format } from "@/components/ui/chart";
+import { ChartTable, ChartTooltip, chartFocus, useChartNav, useChartWidth, useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type CalendarHeatmapProps = Omit<ComponentProps<"figure">, "children"> & {
@@ -10,6 +10,7 @@ export type CalendarHeatmapProps = Omit<ComponentProps<"figure">, "children"> & 
   label: string;
   format?: Format;
   color?: string;
+  effect?: ChartEffect;
 };
 
 const LEFT = 30;
@@ -20,7 +21,7 @@ const LEVELS = [0.07, 0.3, 0.52, 0.76, 1];
 const pretty = (date: string) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 
-export function CalendarHeatmap({ data, label, format = formatCompact, color = "var(--brand)", className, ...props }: CalendarHeatmapProps) {
+export function CalendarHeatmap({ data, label, format = formatCompact, color = "var(--brand)", effect, className, ...props }: CalendarHeatmapProps) {
   const [ref, width] = useChartWidth<HTMLDivElement>();
   const progress = useDrawIn();
   const { weeks, cells, months } = calendarCells(data);
@@ -67,23 +68,35 @@ export function CalendarHeatmap({ data, label, format = formatCompact, color = "
                 </text>
               ) : null,
             )}
-            {cells.map((c, i) => {
-              const shown = Math.min(Math.max(progress * 1.5 - (c.week / Math.max(weeks, 1)) * 0.5, 0), 1);
-              return (
-                <rect
-                  key={c.date}
-                  x={LEFT + c.week * size + 1.5}
-                  y={TOP + c.day * size + 1.5}
-                  width={Math.max(size - 3, 0)}
-                  height={Math.max(size - 3, 0)}
-                  rx={size / 3.5}
-                  fill={color}
-                  fillOpacity={level(c.value) * shown}
-                  stroke={active === i ? "var(--foreground)" : "none"}
-                  strokeWidth={1.5}
-                />
-              );
-            })}
+            <EffectLayer effect={effect}>
+              {cells.map((c) => {
+                const shown = Math.min(Math.max(progress * 1.5 - (c.week / Math.max(weeks, 1)) * 0.5, 0), 1);
+                return (
+                  <rect
+                    key={c.date}
+                    x={LEFT + c.week * size + 1.5}
+                    y={TOP + c.day * size + 1.5}
+                    width={Math.max(size - 3, 0)}
+                    height={Math.max(size - 3, 0)}
+                    rx={size / 3.5}
+                    fill={color}
+                    fillOpacity={level(c.value) * shown}
+                  />
+                );
+              })}
+            </EffectLayer>
+            {cell && (
+              <rect
+                x={LEFT + cell.week * size + 1.5}
+                y={TOP + cell.day * size + 1.5}
+                width={Math.max(size - 3, 0)}
+                height={Math.max(size - 3, 0)}
+                rx={size / 3.5}
+                fill="none"
+                stroke="var(--foreground)"
+                strokeWidth={1.5}
+              />
+            )}
           </svg>
         )}
         <ChartTooltip

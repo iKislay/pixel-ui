@@ -2,7 +2,7 @@
 
 import { useId, type ComponentProps } from "react";
 import { formatCompact, scaleLinear, smoothPath, type Point } from "@/lib/chart";
-import { useDrawIn, type Format } from "@/components/ui/chart";
+import { useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type StatTileProps = Omit<ComponentProps<"div">, "children"> & {
@@ -14,9 +14,10 @@ export type StatTileProps = Omit<ComponentProps<"div">, "children"> & {
   format?: Format;
   invert?: boolean;
   color?: string;
+  effect?: ChartEffect;
 };
 
-function Trend({ data, color }: { data: number[]; color: string }) {
+function Trend({ data, color, effect }: { data: number[]; color: string; effect?: ChartEffect }) {
   const id = useId().replace(/[^\w-]/g, "");
   const progress = useDrawIn(0.15);
   const x = scaleLinear([0, data.length - 1], [2, 118]);
@@ -32,19 +33,21 @@ function Trend({ data, color }: { data: number[]; color: string }) {
           <stop offset="100%" stopColor={color} stopOpacity={0} />
         </linearGradient>
       </defs>
-      <path d={`${line}L118,40L2,40Z`} fill={`url(#${id})`} opacity={progress} />
-      <path
-        d={line}
-        fill="none"
-        stroke={color}
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        vectorEffect="non-scaling-stroke"
-        pathLength={1}
-        strokeDasharray="1 1"
-        strokeDashoffset={1 - progress}
-      />
+      <EffectLayer effect={effect}>
+        <path d={`${line}L118,40L2,40Z`} fill={`url(#${id})`} opacity={progress} />
+        <path
+          d={line}
+          fill="none"
+          stroke={color}
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+          pathLength={1}
+          strokeDasharray="1 1"
+          strokeDashoffset={1 - progress}
+        />
+      </EffectLayer>
     </svg>
   );
 }
@@ -58,6 +61,7 @@ export function StatTile({
   format = formatCompact,
   invert = false,
   color = "var(--brand)",
+  effect,
   className,
   ...props
 }: StatTileProps) {
@@ -79,7 +83,7 @@ export function StatTile({
       </p>
       <div aria-hidden className="flex items-end justify-between gap-4">
         <p className="font-mono text-3xl font-medium tracking-tight tabular-nums">{format(value * progress)}</p>
-        {trend && trend.length > 1 && <Trend data={trend} color={color} />}
+        {trend && trend.length > 1 && <Trend data={trend} color={color} effect={effect} />}
       </div>
       {(change !== undefined || caption) && (
         <p aria-hidden className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
