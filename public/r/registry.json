@@ -1444,6 +1444,32 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "lens-bars",
+      "type": "registry:ui",
+      "title": "Lens Bars",
+      "description": "A year of days as thin bars, with a lens that widens the ones under the pointer.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/lens-bars.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "components/ui/chart.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "lib/chart.ts",
+          "type": "registry:lib"
+        }
+      ]
     }
   ]
 }

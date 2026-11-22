@@ -25,8 +25,9 @@ import { GanttChart } from "@/components/ui/gantt-chart";
 import { RoseChart } from "@/components/ui/rose-chart";
 import { RadialBarChart } from "@/components/ui/radial-bar-chart";
 import { RangeChart } from "@/components/ui/range-chart";
-import { SpendingRing } from "@/components/ui/spending-ring";
 import { ThresholdChart } from "@/components/ui/threshold-chart";
+import { LensBars } from "@/components/ui/lens-bars";
+import { SpendingRing } from "@/components/ui/spending-ring";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
 import { RadialProgress } from "@/components/ui/radial-progress";
@@ -582,6 +583,57 @@ function RangeChartDemo({ compact }: DemoProps) {
   );
 }
 
+const october = [
+  {
+    label: "Food",
+    value: 640,
+    budget: 600,
+    children: [
+      { label: "Groceries", value: 380 },
+      { label: "Dining", value: 190 },
+      { label: "Coffee", value: 70 },
+    ],
+  },
+  { label: "Rent", value: 1400 },
+  {
+    label: "Transport",
+    value: 260,
+    children: [
+      { label: "Transit", value: 120 },
+      { label: "Rideshare", value: 90 },
+      { label: "Fuel", value: 50 },
+    ],
+  },
+  {
+    label: "Fun",
+    value: 310,
+    budget: 250,
+    children: [
+      { label: "Concerts", value: 160 },
+      { label: "Games", value: 90 },
+      { label: "Books", value: 60 },
+    ],
+  },
+  { label: "Bills", value: 230 },
+];
+
+const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+
+function SpendingRingDemo({ compact }: DemoProps) {
+  return <SpendingRing className={compact ? "[&>div]:max-w-48" : undefined} label="Spent in October" data={october} format={usd} />;
+}
+
+const dailySignups = Array.from({ length: 365 }, (_, i) => {
+  const date = new Date(Date.UTC(2025, 10, 22) + i * 86_400_000).toISOString().slice(0, 10);
+  const weekend = [0, 6].includes(new Date(`${date}T00:00:00Z`).getUTCDay());
+  const noise = Math.sin(i * 12.9898) * 0.5 + 0.5;
+  return { date, value: Math.round((60 + i * 0.12 + Math.sin(i / 40) * 14) * (weekend ? 0.85 : 1) + noise * 10) };
+});
+
+function LensBarsDemo({ compact }: DemoProps) {
+  return <LensBars height={compact ? 150 : undefined} label="Signups over the last year" data={dailySignups} />;
+}
+
 const latency = Array.from({ length: 30 }, (_, i) => ({
   day: `Oct ${i + 1}`,
   p95: Math.round(180 + 60 * Math.sin(i / 3.1) + 45 * Math.sin(i * 1.7) + (i % 9 === 4 ? 140 : 0)),
@@ -624,50 +676,11 @@ function TickTapeDemo({ compact }: DemoProps) {
   return <TickTape ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
 }
 
-const october = [
-  {
-    label: "Food",
-    value: 640,
-    budget: 600,
-    children: [
-      { label: "Groceries", value: 380 },
-      { label: "Dining", value: 190 },
-      { label: "Coffee", value: 70 },
-    ],
-  },
-  { label: "Rent", value: 1400 },
-  {
-    label: "Transport",
-    value: 260,
-    children: [
-      { label: "Transit", value: 120 },
-      { label: "Rideshare", value: 90 },
-      { label: "Fuel", value: 50 },
-    ],
-  },
-  {
-    label: "Fun",
-    value: 310,
-    budget: 250,
-    children: [
-      { label: "Concerts", value: 160 },
-      { label: "Games", value: 90 },
-      { label: "Books", value: 60 },
-    ],
-  },
-  { label: "Bills", value: 230 },
-];
-
-const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
-
-function SpendingRingDemo({ compact }: DemoProps) {
-  return <SpendingRing className={compact ? "[&>div]:max-w-48" : undefined} label="Spent in October" data={october} format={usd} />;
-}
-
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
-  "spending-ring": SpendingRingDemo,
   "tick-tape": TickTapeDemo,
   "threshold-chart": ThresholdChartDemo,
+  "lens-bars": LensBarsDemo,
+  "spending-ring": SpendingRingDemo,
   "range-chart": RangeChartDemo,
   "radial-bar-chart": RadialBarChartDemo,
   "rose-chart": RoseChartDemo,

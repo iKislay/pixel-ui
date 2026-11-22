@@ -1403,6 +1403,98 @@ export function Demo() {
   return <ThresholdChart label="p95 latency" data={data} index="day" value="p95" defaultThreshold={250} />
 }`,
   }),
+  chart("spending-ring", {
+    name: "Spending Ring",
+    category: "composition",
+    description: "A ring of thick tiles showing where the money went, where each category opens into a ring of its own parts.",
+    interaction:
+      "Each category is a thick tile with its amount written on it. Hover a tile, or tab in and use the arrow keys, and it slides out while the others fade back; the center shows its amount and share. Click a category, or press Enter, and it blooms open into its parts until it fills the ring. Click All or press Escape to fold it home. The overspent end of a tile is hatched in red and the center says how far over it went. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: categories open at once.",
+    props: [
+      {
+        name: "data",
+        type: "{ label: string; value: number; budget?: number; color?: string; children?: { label: string; value: number; budget?: number; color?: string }[] }[]",
+        required: true,
+        description: "One tile per category, clockwise from the top. A category with children opens into them; parts without a color take shades of their category.",
+      },
+      labelProp,
+      formatProp,
+      {
+        name: "thickness",
+        type: "number",
+        default: "34",
+        description: "Width of the ring in chart units, out of a 200 unit square.",
+      },
+      {
+        name: "totalLabel",
+        type: "string",
+        default: '"Spent"',
+        description: "The caption above the total in the center.",
+      },
+      classNameProp,
+    ],
+    usage: `import { SpendingRing } from "@/components/ui/spending-ring"
+
+const data = [
+  {
+    label: "Food",
+    value: 640,
+    budget: 600,
+    children: [
+      { label: "Groceries", value: 380 },
+      { label: "Dining", value: 190 },
+      { label: "Coffee", value: 70 },
+    ],
+  },
+  { label: "Rent", value: 1400 },
+  { label: "Transport", value: 220 },
+]
+
+const usd = (n: number) => "$" + n.toLocaleString("en-US")
+
+export function Demo() {
+  return <SpendingRing label="Spent in October" data={data} format={usd} />
+}`,
+  }),
+  chart("lens-bars", {
+    name: "Lens Bars",
+    category: "trends",
+    description: "A year of days as thin bars, with a lens that widens the ones under the pointer.",
+    interaction:
+      "The bars grow up from the baseline, left to right. Move across the chart and the days under the pointer spread apart to 16px wide while the rest squeeze aside and dim, so any single day is easy to land on; a soft tooltip reads its date and value. Tab in and use the arrow keys to walk day by day, Escape lets go. A hidden table carries every day for screen readers. Honors prefers-reduced-motion: the bars appear at once and the lens snaps instead of easing.",
+    props: [
+      {
+        name: "data",
+        type: "{ date: string; value: number }[]",
+        required: true,
+        description: "One entry per day in order, with an ISO date like 2026-03-04. The first of each month gets a label.",
+      },
+      labelProp,
+      {
+        name: "height",
+        type: "number",
+        default: "200",
+        description: "Height of the bars in pixels. The width fills the parent.",
+      },
+      formatProp,
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for the bars.",
+      },
+      classNameProp,
+    ],
+    usage: `import { LensBars } from "@/components/ui/lens-bars"
+
+const data = Array.from({ length: 365 }, (_, i) => ({
+  date: new Date(Date.UTC(2026, 0, 1) + i * 86_400_000).toISOString().slice(0, 10),
+  value: Math.round(80 + Math.sin(i / 20) * 30),
+}))
+
+export function Demo() {
+  return <LensBars label="Signups" data={data} />
+}`,
+  }),
   chart("tick-tape", {
     name: "Tick Tape",
     category: "trends",
@@ -1456,58 +1548,6 @@ export function Demo() {
   }, [])
 
   return <TickTape ref={tape} label="Requests" />
-}`,
-  }),
-  chart("spending-ring", {
-    name: "Spending Ring",
-    category: "composition",
-    description: "A ring of thick tiles showing where the money went, where each category opens into a ring of its own parts.",
-    interaction:
-      "Each category is a thick tile with its amount written on it. Hover a tile, or tab in and use the arrow keys, and it slides out while the others fade back; the center shows its amount and share. Click a category, or press Enter, and it blooms open into its parts until it fills the ring. Click All or press Escape to fold it home. The overspent end of a tile is hatched in red and the center says how far over it went. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: categories open at once.",
-    props: [
-      {
-        name: "data",
-        type: "{ label: string; value: number; budget?: number; color?: string; children?: { label: string; value: number; budget?: number; color?: string }[] }[]",
-        required: true,
-        description: "One tile per category, clockwise from the top. A category with children opens into them; parts without a color take shades of their category.",
-      },
-      labelProp,
-      formatProp,
-      {
-        name: "thickness",
-        type: "number",
-        default: "34",
-        description: "Width of the ring in chart units, out of a 200 unit square.",
-      },
-      {
-        name: "totalLabel",
-        type: "string",
-        default: '"Spent"',
-        description: "The caption above the total in the center.",
-      },
-      classNameProp,
-    ],
-    usage: `import { SpendingRing } from "@/components/ui/spending-ring"
-
-const data = [
-  {
-    label: "Food",
-    value: 640,
-    budget: 600,
-    children: [
-      { label: "Groceries", value: 380 },
-      { label: "Dining", value: 190 },
-      { label: "Coffee", value: 70 },
-    ],
-  },
-  { label: "Rent", value: 1400 },
-  { label: "Transport", value: 220 },
-]
-
-const usd = (n: number) => "$" + n.toLocaleString("en-US")
-
-export function Demo() {
-  return <SpendingRing label="Spent in October" data={data} format={usd} />
 }`,
   }),
 ];
