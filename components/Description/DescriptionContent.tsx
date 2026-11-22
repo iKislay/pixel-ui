@@ -8,6 +8,8 @@ import InstallCommand from "./InstallCommand";
 import SourceCodePreview from "./SourceCodePreview";
 import DependencyPill from "./DependencyPill";
 import PropsTable from "./PropsTable";
+import { ChartEffectNotice } from "../charts/ChartEffectControls";
+import { useChartEffect } from "@/lib/chart-effects";
 
 type DescriptionContentProps = {
   item?: ComponentItem;
@@ -34,6 +36,7 @@ export default function DescriptionContent({
   onOpenCode,
   className,
 }: DescriptionContentProps) {
+  const { choice: effect } = useChartEffect();
   return (
     <div className={cn("flex flex-col gap-12 text-left", className)}>
       <div className="flex flex-col gap-4">
@@ -57,7 +60,11 @@ export default function DescriptionContent({
       {item?.registry && (
         <div className="flex flex-col gap-3">
           <SectionLabel as="h2">Installation</SectionLabel>
-          <InstallCommand item={item} />
+          {effect ? (
+            <ChartEffectNotice>The {effect.label.toLowerCase()} effect installs from the Pro registry.</ChartEffectNotice>
+          ) : (
+            <InstallCommand item={item} />
+          )}
         </div>
       )}
 
@@ -85,7 +92,11 @@ export default function DescriptionContent({
               </Link>
             </div>
           ) : (
-            <SourceCodePreview item={item} onOpenCode={onOpenCode} />
+            effect ? (
+              <ChartEffectNotice>The {effect.label.toLowerCase()} source comes with Pro.</ChartEffectNotice>
+            ) : (
+              <SourceCodePreview item={item} onOpenCode={onOpenCode} />
+            )
           )}
         </div>
       )}

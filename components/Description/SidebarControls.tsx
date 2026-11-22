@@ -17,6 +17,8 @@ import {
 } from "@/lib/distortion-wave-controls";
 import { VOICE_PICKERS, VOICE_SLIDERS, useVoiceStyle } from "@/lib/voice-glow-controls";
 import { METAL_PICKERS, METAL_SLIDERS, useMetalStyle } from "@/lib/metal-button-controls";
+import { useChartEffect } from "@/lib/chart-effects";
+import { ChartEffectControls } from "../charts/ChartEffectControls";
 
 type SidebarControlsProps = {
   item?: ComponentItem;
@@ -774,6 +776,7 @@ export default function SidebarControls({
 }: SidebarControlsProps) {
   const pathname = usePathname();
   const activeItem = item ?? activeComponent(pathname);
+  const { choice: effect } = useChartEffect();
 
   const scrollToDocs = () => {
     document.getElementById("component-docs")?.scrollIntoView({ behavior: "smooth" });
@@ -802,13 +805,14 @@ export default function SidebarControls({
       {pathname === "/components/distortion-wave" && <DistortionWaveControls />}
       {pathname === "/components/voice-glow" && <VoiceGlowControls />}
       {pathname === "/components/metal-button" && <MetalControls />}
+      {pathname.startsWith("/charts/") && <ChartEffectControls />}
 
       <ColorSwatches showLabel />
 
       <PreviewBehaviorControls />
 
       <div className="flex flex-col gap-2 pt-4">
-        {onOpenCode && !activeItem?.pro && (
+        {onOpenCode && !activeItem?.pro && !effect && (
           <button
             type="button"
             onClick={onOpenCode}
