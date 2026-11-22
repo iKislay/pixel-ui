@@ -56,6 +56,8 @@ export function CapsuleStackChart({
   const scale = (v: number) => (Math.min(v, max) / (max || 1)) * plot;
   const radius = Math.min(w / 3.2, 18);
   const row = active === null ? null : data[active];
+  // keep about 44px between day labels
+  const every = Math.max(Math.ceil(44 / (band || 1)), 1);
 
   // every capsule in a column, bottom up, with the hatched remainder above them
   const columns = data.map((d, i) => {
@@ -107,14 +109,15 @@ export function CapsuleStackChart({
                       width={w}
                       height={p.h - GAP}
                       rx={Math.min(radius, (p.h - GAP) / 2)}
-                      style={{ fill: `color-mix(in oklab, ${effect?.fill?.(p.color, j) ?? p.color} 42%, var(--background))` }}
+                      // an effect lightens by thinning dots, so it gets the full colour instead of the soft tint
+                      style={{ fill: effect ? (effect.fill?.(p.color, j) ?? p.color) : `color-mix(in oklab, ${p.color} 42%, var(--background))` }}
                     />
                   ) : null,
                 ),
               )}
             </EffectLayer>
             {data.map((d, i) => (
-              <text
+              (i % every === 0 || active === i) && <text
                 key={i}
                 x={band * (i + 0.5)}
                 y={height - 8}
