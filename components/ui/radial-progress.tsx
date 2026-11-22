@@ -45,8 +45,8 @@ export function RadialProgress({
       {...props}
     >
       <svg viewBox="0 0 100 100" aria-hidden className="size-full -rotate-90">
+        <circle cx={50} cy={50} r={r} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-foreground/[0.07]" />
         <EffectLayer effect={effect}>
-          <circle cx={50} cy={50} r={r} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-foreground/[0.07]" />
           {ratio > 0 && (
             <circle
               cx={50}

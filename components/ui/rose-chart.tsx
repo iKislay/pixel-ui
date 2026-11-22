@@ -41,12 +41,24 @@ export function RoseChart({ data, label, format = formatCompact, effect, classNa
         {...handlers}
       >
         <svg viewBox="0 0 200 200" aria-hidden className="size-full overflow-visible">
+          <defs>
+            <pattern id={id} width={5} height={5} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1={0} y1={0} x2={0} y2={5} stroke="currentColor" strokeWidth={1.5} className="text-foreground/15" />
+            </pattern>
+          </defs>
+          {/* the hatched outlines are the empty part of each petal, so they stay out of any effect */}
+          {data.map((d, i) => (
+            <path
+              key={d.label}
+              d={arcPath(C, C, OUTER - SOFT, INNER + SOFT, i * step + pad, (i + 1) * step - pad)}
+              fill={`url(#${id})`}
+              stroke={`url(#${id})`}
+              strokeWidth={SOFT * 2}
+              strokeLinejoin="round"
+              onPointerEnter={() => setActive(i)}
+            />
+          ))}
           <EffectLayer effect={effect}>
-            <defs>
-              <pattern id={id} width={5} height={5} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                <line x1={0} y1={0} x2={0} y2={5} stroke="currentColor" strokeWidth={1.5} className="text-foreground/15" />
-              </pattern>
-            </defs>
             {data.map((d, i) => {
               const start = i * step + pad;
               const end = (i + 1) * step - pad;
@@ -54,22 +66,19 @@ export function RoseChart({ data, label, format = formatCompact, effect, classNa
               const grow = Math.min(Math.max(progress * 1.4 - (i / data.length) * 0.4, 0), 1);
               const r = INNER + (reach(d.value) - INNER) * grow;
               const lit = active === null || active === i;
-              return (
-                <g key={d.label} onPointerEnter={() => setActive(i)}>
-                  <path d={arcPath(C, C, OUTER - SOFT, INNER + SOFT, start, end)} fill={`url(#${id})`} stroke={`url(#${id})`} strokeWidth={SOFT * 2} strokeLinejoin="round" />
-                  {r - SOFT > INNER + SOFT && (
-                    <path
-                      d={arcPath(C, C, r - SOFT, INNER + SOFT, start, end)}
-                      fill={color}
-                      stroke={color}
-                      strokeWidth={SOFT * 2}
-                      strokeLinejoin="round"
-                      opacity={lit ? 1 : 0.35}
-                      className="transition-opacity duration-200 motion-reduce:transition-none"
-                    />
-                  )}
-                </g>
-              );
+              return r - SOFT > INNER + SOFT ? (
+                <path
+                  key={d.label}
+                  d={arcPath(C, C, r - SOFT, INNER + SOFT, start, end)}
+                  fill={color}
+                  stroke={color}
+                  strokeWidth={SOFT * 2}
+                  strokeLinejoin="round"
+                  opacity={lit ? 1 : 0.35}
+                  onPointerEnter={() => setActive(i)}
+                  className="transition-opacity duration-200 motion-reduce:transition-none"
+                />
+              ) : null;
             })}
           </EffectLayer>
         </svg>

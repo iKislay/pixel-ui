@@ -37,10 +37,23 @@ export function ActivityRings({
     <figure data-slot="activity-rings" className={cn("flex flex-wrap items-center justify-center gap-x-10 gap-y-6", className)} {...props}>
       <figcaption className="sr-only">{label}</figcaption>
       <svg viewBox="0 0 200 200" aria-hidden className="w-full max-w-48 -rotate-90 overflow-visible">
+        {rings.map((ring, i) => (
+          <circle
+            key={ring.label}
+            cx={100}
+            cy={100}
+            r={ring.r}
+            fill="none"
+            stroke={ring.color}
+            strokeOpacity={0.14}
+            strokeWidth={thickness}
+            opacity={active === null || active === i ? 1 : 0.35}
+            className="transition-opacity duration-200 motion-reduce:transition-none"
+          />
+        ))}
         <EffectLayer effect={effect}>
           {rings.map((ring, i) => (
             <g key={ring.label} opacity={active === null || active === i ? 1 : 0.35} className="transition-opacity duration-200 motion-reduce:transition-none">
-              <circle cx={100} cy={100} r={ring.r} fill="none" stroke={ring.color} strokeOpacity={0.14} strokeWidth={thickness} />
               {ring.ratio > 0 && (
                 <circle
                   cx={100}
