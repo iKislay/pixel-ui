@@ -248,3 +248,24 @@ export function arcPath(cx: number, cy: number, outer: number, inner: number, st
     "Z",
   ].join("");
 }
+
+// bar edges with the days near focus widened up to zoom times, each side scaled back so the point under focus stays put
+export function lensEdges(count: number, width: number, focus: number, open: number, zoom: number, reach = 8) {
+  const slot = width / count;
+  const edges = [0];
+  const near: number[] = [];
+  for (let i = 0; i < count; i++) {
+    const d = Math.abs((i + 0.5) * slot - focus) / (reach * slot);
+    const g = d < 1 ? (1 - d * d) ** 2 : 0;
+    near.push(g);
+    edges.push(edges[i] + slot * (1 + (zoom - 1) * open * g));
+  }
+  const total = edges[count];
+  const at = Math.min(Math.max(focus / slot, 0), count - 1e-6);
+  const i = Math.floor(at);
+  const pivot = edges[i] + (at - i) * (edges[i + 1] - edges[i]);
+  const to = Math.min(Math.max(focus, 0), width);
+  const left = pivot > 0 ? to / pivot : 1;
+  const right = total > pivot ? (width - to) / (total - pivot) : 1;
+  return { edges: edges.map((x) => (x <= pivot ? x * left : to + (x - pivot) * right)), near };
+}

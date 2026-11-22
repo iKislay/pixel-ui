@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allocate, arcLine, arcPath, barPath, calendarCells, closedCurve, formatCompact, linePath, niceTicks, ribbonPath, roundedPolygon, sankeyLayout, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
+import { allocate, arcLine, arcPath, barPath, calendarCells, closedCurve, formatCompact, lensEdges, linePath, niceTicks, ribbonPath, roundedPolygon, sankeyLayout, scaleLinear, seriesColor, smoothPath } from "@/lib/chart";
 
 describe("niceTicks", () => {
   it("rounds the range out to round steps", () => {
@@ -209,5 +209,23 @@ describe("paths", () => {
 
   it("keeps a full circle drawable", () => {
     expect(arcPath(0, 0, 10, 0, 0, Math.PI * 2)).toMatch(/A10,10 0 1 1/);
+  });
+});
+
+describe("lensEdges", () => {
+  it("lays the bars out evenly while the lens is shut", () => {
+    const { edges } = lensEdges(4, 100, 30, 0, 5);
+    expect(edges).toEqual([0, 25, 50, 75, 100]);
+  });
+
+  it("widens the day under the lens and keeps the focus and both ends in place", () => {
+    const { edges, near } = lensEdges(100, 300, 151.5, 1, 6);
+    expect(edges[0]).toBe(0);
+    expect(edges[100]).toBeCloseTo(300);
+    expect(edges[51] - edges[50]).toBeGreaterThan(10);
+    expect((edges[50] + edges[51]) / 2).toBeCloseTo(151.5, 1);
+    expect(near[50]).toBeGreaterThan(0.99);
+    expect(near[0]).toBe(0);
+    for (let i = 0; i < 100; i++) expect(edges[i + 1]).toBeGreaterThan(edges[i]);
   });
 });
