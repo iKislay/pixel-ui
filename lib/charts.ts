@@ -1408,7 +1408,7 @@ export function Demo() {
     category: "trends",
     description: "A live tape of events, one thin line each, as tall as its value.",
     interaction:
-      "Each event rises in at the right edge and drifts left, bright when it lands and fading as it ages; errors are red and stay lit longer. Above the tape, events per second, p95 and the error share over the last 30 seconds update once a second. Point at the tape to hold it still and read the event under the pointer; let go and it catches up smoothly. The Live pill pauses and resumes it. Honors prefers-reduced-motion: the tape steps once a second instead of gliding.",
+      "Each event rises in at the right edge and drifts left, bright when it lands and fading as it ages; errors are red and stay lit longer. Above the tape, events per second, p95 and the error share over the last 30 seconds update once a second, and a dashed line on the tape marks the p95. Point at the tape to hold it still and read the event under the pointer; let go and it catches up smoothly. The Live pill pauses and resumes it. Honors prefers-reduced-motion: the tape steps once a second instead of gliding.",
     props: [
       {
         name: "ref",
