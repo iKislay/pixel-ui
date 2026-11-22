@@ -623,28 +623,6 @@ function TickTapeDemo({ compact }: DemoProps) {
   return <TickTape ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
 }
 
-const routes = ["GET /orders", "GET /users", "POST /checkout", "GET /search"];
-
-function TickTapeDemo({ compact }: DemoProps) {
-  const tape = useRef<TickTapeHandle>(null);
-  useEffect(() => {
-    let timer = 0;
-    const tick = () => {
-      const error = Math.random() < 0.04;
-      const route = routes[Math.floor(Math.random() * routes.length)];
-      tape.current?.push({
-        value: error ? 400 + Math.random() * 600 : 30 + Math.random() ** 3 * 480,
-        error,
-        label: `${route} · ${error ? 500 : 200}`,
-      });
-      timer = window.setTimeout(tick, 60 + Math.random() * 240);
-    };
-    tick();
-    return () => window.clearTimeout(timer);
-  }, []);
-  return <TickTape ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
-}
-
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
   "tick-tape": TickTapeDemo,
   "threshold-chart": ThresholdChartDemo,
