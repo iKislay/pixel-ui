@@ -35,19 +35,19 @@ function Trend({ data, color, effect }: { data: number[]; color: string; effect?
       </defs>
       <EffectLayer effect={effect}>
         <path d={`${line}L118,40L2,40Z`} fill={`url(#${id})`} opacity={progress} />
-        <path
-          d={line}
-          fill="none"
-          stroke={color}
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-          pathLength={1}
-          strokeDasharray="1 1"
-          strokeDashoffset={1 - progress}
-        />
       </EffectLayer>
+      <path
+        d={line}
+        fill="none"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+        pathLength={1}
+        strokeDasharray="1 1"
+        strokeDashoffset={1 - progress}
+      />
     </svg>
   );
 }

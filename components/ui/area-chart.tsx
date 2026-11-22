@@ -13,28 +13,17 @@ export function AreaChart({ curve = "smooth", ...props }: AreaChartProps) {
   const draw = curve === "smooth" ? smoothPath : linePath;
 
   return (
-    <CartesianChart slot="area-chart" zero {...props}>
-      {({ data, series, x, y, floor, active, progress }) =>
-        series.map((s, index) => {
+    <CartesianChart
+      slot="area-chart"
+      zero
+      {...props}
+      overlay={({ data, series, x, y, active, progress }) =>
+        series.map((s) => {
           const points = data.map((d, i): Point => [x(i), y(Number(d[s.key]) || 0)]);
-          const line = draw(points);
-          const fill = `${id}-${index}`;
           return (
             <g key={s.key}>
-              <defs>
-                <linearGradient id={fill} x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor={s.color} stopOpacity={0.22} />
-                  <stop offset="100%" stopColor={s.color} stopOpacity={0} />
-                </linearGradient>
-              </defs>
               <path
-                d={`${line}L${points.at(-1)![0]},${floor}L${points[0][0]},${floor}Z`}
-                fill={`url(#${fill})`}
-                opacity={progress}
-                style={{ transform: `translateY(${(1 - progress) * 12}px)` }}
-              />
-              <path
-                d={line}
+                d={draw(points)}
                 fill="none"
                 stroke={s.color}
                 strokeWidth={2}
@@ -47,6 +36,29 @@ export function AreaChart({ curve = "smooth", ...props }: AreaChartProps) {
               {active !== null && (
                 <circle cx={points[active][0]} cy={points[active][1]} r={4.5} fill={s.color} stroke="var(--background)" strokeWidth={2} />
               )}
+            </g>
+          );
+        })
+      }
+    >
+      {({ data, series, x, y, floor, progress }) =>
+        series.map((s, index) => {
+          const points = data.map((d, i): Point => [x(i), y(Number(d[s.key]) || 0)]);
+          const fill = `${id}-${index}`;
+          return (
+            <g key={s.key}>
+              <defs>
+                <linearGradient id={fill} x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor={s.color} stopOpacity={props.effect ? 0.75 : 0.22} />
+                  <stop offset="100%" stopColor={s.color} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <path
+                d={`${draw(points)}L${points.at(-1)![0]},${floor}L${points[0][0]},${floor}Z`}
+                fill={`url(#${fill})`}
+                opacity={progress}
+                style={{ transform: `translateY(${(1 - progress) * 12}px)` }}
+              />
             </g>
           );
         })

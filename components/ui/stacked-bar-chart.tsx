@@ -9,14 +9,21 @@ export type StackedBarChartProps = Omit<CartesianChartProps, "children" | "slot"
 
 export function StackedBarChart({ radius = 6, ...props }: StackedBarChartProps) {
   return (
-    <CartesianChart slot="stacked-bar-chart" bars stacked {...props}>
-      {({ data, series, x, band, y, top, floor, active, progress }) => {
+    <CartesianChart
+      slot="stacked-bar-chart"
+      bars
+      stacked
+      {...props}
+      overlay={({ x, band, top, floor, active }) =>
+        active !== null && (
+          <rect x={x(active) - band / 2 + 2} y={top} width={band - 4} height={floor - top} rx={10} className="pointer-events-none fill-foreground/[0.04]" />
+        )
+      }
+    >
+      {({ data, series, x, band, y, active, progress }) => {
         const width = Math.min(band * 0.56, 44);
         return (
           <>
-            {active !== null && (
-              <rect x={x(active) - band / 2 + 2} y={top} width={band - 4} height={floor - top} rx={10} className="fill-foreground/[0.04]" />
-            )}
             {data.map((d, i) => {
               const grow = Math.min(Math.max(progress * 1.4 - (i / data.length) * 0.4, 0), 1);
               const values = series.map((s) => Math.max(Number(d[s.key]) || 0, 0));

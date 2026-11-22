@@ -24,22 +24,13 @@ export function Sparkline({ data, labels, color = "var(--brand)", height = 48, .
       series={[{ key: "value", label: props.label, color }]}
       height={height}
       {...props}
-    >
-      {({ x, y, floor, active, progress }) => {
+      overlay={({ x, y, active, progress }) => {
         const points = data.map((value, i): Point => [x(i), y(value)]);
-        const line = smoothPath(points);
         const end = points[active ?? points.length - 1];
         return (
           <>
-            <defs>
-              <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor={color} stopOpacity={0.2} />
-                <stop offset="100%" stopColor={color} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <path d={`${line}L${points.at(-1)![0]},${floor}L${points[0][0]},${floor}Z`} fill={`url(#${id})`} opacity={progress} />
             <path
-              d={line}
+              d={smoothPath(points)}
               fill="none"
               stroke={color}
               strokeWidth={2}
@@ -50,6 +41,22 @@ export function Sparkline({ data, labels, color = "var(--brand)", height = 48, .
               strokeDashoffset={1 - progress}
             />
             {end && progress === 1 && <circle cx={end[0]} cy={end[1]} r={3.5} fill={color} stroke="var(--background)" strokeWidth={2} />}
+          </>
+        );
+      }}
+    >
+      {({ x, y, floor, progress }) => {
+        const points = data.map((value, i): Point => [x(i), y(value)]);
+        const line = smoothPath(points);
+        return (
+          <>
+            <defs>
+              <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor={color} stopOpacity={0.2} />
+                <stop offset="100%" stopColor={color} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <path d={`${line}L${points.at(-1)![0]},${floor}L${points[0][0]},${floor}Z`} fill={`url(#${id})`} opacity={progress} />
           </>
         );
       }}

@@ -224,6 +224,8 @@ export type CartesianChartProps = Omit<ComponentProps<"figure">, "children"> & {
   effect?: ChartEffect;
   slot: string;
   children: (context: CartesianContext) => ReactNode;
+  // drawn above the marks and outside any effect: hover dots, tags, handles
+  overlay?: (context: CartesianContext) => ReactNode;
 };
 
 const MARGIN = { top: 12, right: 8, bottom: 28, left: 40 };
@@ -247,6 +249,7 @@ export function CartesianChart({
   effect,
   slot,
   children,
+  overlay,
   className,
   ...props
 }: CartesianChartProps) {
@@ -282,6 +285,19 @@ export function CartesianChart({
   };
 
   const row = active === null ? null : data[active];
+  const context: CartesianContext = {
+    data,
+    series: effect?.fill ? series.map((s, i) => ({ ...s, color: effect.fill!(s.color, i) })) : series,
+    width,
+    height,
+    x,
+    band,
+    y,
+    top: margin.top,
+    floor: y(domain[0]),
+    active,
+    progress,
+  };
 
   return (
     <figure data-slot={slot} className={cn("flex w-full flex-col gap-3", className)} {...props}>
@@ -348,21 +364,8 @@ export function CartesianChart({
                 className="text-foreground/25"
               />
             )}
-            <EffectLayer effect={effect}>
-              {children({
-                data,
-                series: effect?.fill ? series.map((s, i) => ({ ...s, color: effect.fill!(s.color, i) })) : series,
-                width,
-                height,
-                x,
-                band,
-                y,
-                top: margin.top,
-                floor: y(domain[0]),
-                active,
-                progress,
-              })}
-            </EffectLayer>
+            <EffectLayer effect={effect}>{children(context)}</EffectLayer>
+            {overlay?.(context)}
           </svg>
         )}
         <ChartTooltip

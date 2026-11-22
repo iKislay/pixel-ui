@@ -6,8 +6,13 @@ export type CombChartProps = Omit<CartesianChartProps, "children" | "slot" | "st
 
 export function CombChart(props: CombChartProps) {
   return (
-    <CartesianChart slot="comb-chart" bars grid={false} {...props}>
-      {({ data, series, x, band, y, floor, active, progress }) => {
+    // its teeth are lines, which never take the effect, so the chart draws in the overlay
+    <CartesianChart
+      slot="comb-chart"
+      bars
+      grid={false}
+      {...props}
+      overlay={({ data, series, x, band, y, floor, active, progress }) => {
         const s = series[0];
         const width = Math.min(Math.max(band * 0.45, 2), 8);
         return data.map((d, i) => {
@@ -30,6 +35,8 @@ export function CombChart(props: CombChartProps) {
           );
         });
       }}
+    >
+      {() => null}
     </CartesianChart>
   );
 }

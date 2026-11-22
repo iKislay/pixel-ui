@@ -332,12 +332,12 @@ function CombChartDemo({ compact, effect }: DemoProps) {
   );
 }
 
-function GaugeDemo({ compact, effect }: DemoProps) {
+function GaugeDemo({ compact }: DemoProps) {
   return (
     <div className="flex items-center justify-center gap-8">
-      <Gauge effect={effect} label="Server load" value={68} caption="CPU load" format={(n) => `${Math.round(n)}%`} />
+      <Gauge label="Server load" value={68} caption="CPU load" format={(n) => `${Math.round(n)}%`} />
       {!compact && (
-        <Gauge effect={effect}
+        <Gauge
           label="Response time"
           value={182}
           max={400}
@@ -553,9 +553,9 @@ const byHour = Array.from({ length: 24 }, (_, hour) => ({
   orders: Math.round(Math.max(4, 26 + 22 * Math.sin((hour - 9) / 3.8) + 6 * Math.sin(hour * 1.3))),
 }));
 
-function RadialBarChartDemo({ compact, effect }: DemoProps) {
+function RadialBarChartDemo({ compact }: DemoProps) {
   return (
-    <RadialBarChart effect={effect}
+    <RadialBarChart
       className={compact ? "[&>div]:max-w-48" : undefined}
       label="Orders by hour"
       data={byHour}
@@ -632,8 +632,8 @@ const dailySignups = Array.from({ length: 365 }, (_, i) => {
   return { date, value: Math.round((60 + i * 0.12 + Math.sin(i / 40) * 14) * (weekend ? 0.85 : 1) + noise * 10) };
 });
 
-function LensBarsDemo({ compact, effect }: DemoProps) {
-  return <LensBars effect={effect} height={compact ? 150 : undefined} label="Signups over the last year" data={dailySignups} />;
+function LensBarsDemo({ compact }: DemoProps) {
+  return <LensBars height={compact ? 150 : undefined} label="Signups over the last year" data={dailySignups} />;
 }
 
 const latency = Array.from({ length: 30 }, (_, i) => ({
@@ -658,7 +658,7 @@ function ThresholdChartDemo({ compact, effect }: DemoProps) {
 
 const routes = ["GET /orders", "GET /users", "POST /checkout", "GET /search"];
 
-function TickTapeDemo({ compact, effect }: DemoProps) {
+function TickTapeDemo({ compact }: DemoProps) {
   const tape = useRef<TickTapeHandle>(null);
   useEffect(() => {
     let timer = 0;
@@ -675,7 +675,7 @@ function TickTapeDemo({ compact, effect }: DemoProps) {
     tick();
     return () => window.clearTimeout(timer);
   }, []);
-  return <TickTape effect={effect} ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
+  return <TickTape ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
 }
 
 const workdays = ["27 Jun", "28 Jun", "29 Jun", "30 Jun", "1 Jul", "2 Jul", "3 Jul"].map((day, i) => ({

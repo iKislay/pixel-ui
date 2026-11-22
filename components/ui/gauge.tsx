@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { formatCompact } from "@/lib/chart";
-import { useDrawIn, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
+import { useDrawIn, type Format } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type GaugeProps = Omit<ComponentProps<"div">, "children"> & {
@@ -14,7 +14,6 @@ export type GaugeProps = Omit<ComponentProps<"div">, "children"> & {
   format?: Format;
   color?: string;
   ticks?: number;
-  effect?: ChartEffect;
 };
 
 // server and browser can differ in the last digit of sin and cos, which breaks hydration
@@ -29,7 +28,6 @@ export function Gauge({
   format = formatCompact,
   color = "var(--brand)",
   ticks = 41,
-  effect,
   className,
   ...props
 }: GaugeProps) {
@@ -55,25 +53,23 @@ export function Gauge({
           aria-hidden
           className="w-full overflow-visible"
         >
-          <EffectLayer effect={effect}>
-            {Array.from({ length: ticks }, (_, i) => {
-              const angle = -Math.PI / 2 + (Math.PI * i) / (ticks - 1);
-              const on = i <= lit + 1e-6;
-              return (
-                <line
-                  key={i}
-                  x1={round(100 + 72 * Math.sin(angle))}
-                  y1={round(100 - 72 * Math.cos(angle))}
-                  x2={round(100 + 92 * Math.sin(angle))}
-                  y2={round(100 - 92 * Math.cos(angle))}
-                  stroke={on ? color : "currentColor"}
-                  strokeWidth={4}
-                  strokeLinecap="round"
-                  className={on ? undefined : "text-foreground/[0.09]"}
-                />
-              );
-            })}
-          </EffectLayer>
+          {Array.from({ length: ticks }, (_, i) => {
+            const angle = -Math.PI / 2 + (Math.PI * i) / (ticks - 1);
+            const on = i <= lit + 1e-6;
+            return (
+              <line
+                key={i}
+                x1={round(100 + 72 * Math.sin(angle))}
+                y1={round(100 - 72 * Math.cos(angle))}
+                x2={round(100 + 92 * Math.sin(angle))}
+                y2={round(100 - 92 * Math.cos(angle))}
+                stroke={on ? color : "currentColor"}
+                strokeWidth={4}
+                strokeLinecap="round"
+                className={on ? undefined : "text-foreground/[0.09]"}
+              />
+            );
+          })}
         </svg>
         <div
           aria-hidden

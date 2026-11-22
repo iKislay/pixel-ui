@@ -12,14 +12,34 @@ export function PillBarChart({ highlight, format = formatCompact, ...props }: Pi
   const id = useId().replace(/[^\w-]/g, "");
 
   return (
-    <CartesianChart slot="pill-bar-chart" bars grid={false} format={format} {...props}>
+    <CartesianChart
+      slot="pill-bar-chart"
+      bars
+      grid={false}
+      format={format}
+      {...props}
+      overlay={({ data, series, x, band, y, active, progress }) => {
+        const lit = highlight ?? data.length - 1;
+        if (active !== null || progress < 1 || !data[lit]) return null;
+        const width = Math.min((band * 0.62 - 4 * (series.length - 1)) / series.length, 40);
+        const group = width * series.length + 4 * (series.length - 1);
+        const first = Number(data[lit][series[0].key]) || 0;
+        const tag = format(first);
+        const tagWidth = tag.length * 7 + 16;
+        return (
+          <g transform={`translate(${x(lit) - group / 2 + width / 2}, ${y(first) - 14})`}>
+            <rect x={-tagWidth / 2} y={-11} width={tagWidth} height={22} rx={11} className="fill-foreground" />
+            <text textAnchor="middle" dy="0.35em" className="fill-background font-mono text-[11px] font-medium tabular-nums">
+              {tag}
+            </text>
+          </g>
+        );
+      }}
+    >
       {({ data, series, x, band, y, floor, active, progress }) => {
         const lit = active ?? highlight ?? data.length - 1;
         const width = Math.min((band * 0.62 - 4 * (series.length - 1)) / series.length, 40);
         const group = width * series.length + 4 * (series.length - 1);
-        const first = Number(data[lit]?.[series[0].key]) || 0;
-        const tag = format(first);
-        const tagWidth = tag.length * 7 + 16;
         return (
           <>
             <defs>
@@ -47,14 +67,6 @@ export function PillBarChart({ highlight, format = formatCompact, ...props }: Pi
                 );
               });
             })}
-            {active === null && progress === 1 && data[lit] && (
-              <g transform={`translate(${x(lit) - group / 2 + width / 2}, ${y(first) - 14})`}>
-                <rect x={-tagWidth / 2} y={-11} width={tagWidth} height={22} rx={11} className="fill-foreground" />
-                <text textAnchor="middle" dy="0.35em" className="fill-background font-mono text-[11px] font-medium tabular-nums">
-                  {tag}
-                </text>
-              </g>
-            )}
           </>
         );
       }}

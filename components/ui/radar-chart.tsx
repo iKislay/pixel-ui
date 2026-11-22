@@ -42,6 +42,8 @@ export function RadarChart({
   // rounded so server and browser trig agree during hydration
   const at = (i: number, r: number): Point => [round(C + r * Math.sin(angle(i))), round(C - r * Math.cos(angle(i)))];
   const row = active === null ? null : data[active];
+  const shapes = series.map((s) => ({ key: s.key, color: s.color, points: data.map((d, i) => at(i, (value(d, s.key) / top) * R * progress)) }));
+  const outline = (points: Point[]) => (curve === "smooth" ? closedCurve(points) : roundedPolygon(points, 8 * progress));
 
   return (
     <figure data-slot="radar-chart" className={cn("flex w-full flex-col items-center gap-3", className)} {...props}>
@@ -89,18 +91,17 @@ export function RadarChart({
             );
           })}
           <EffectLayer effect={effect}>
-            {series.map((s) => {
-              const points = data.map((d, i) => at(i, (value(d, s.key) / top) * R * progress));
-              return (
-                <g key={s.key}>
-                  <path d={curve === "smooth" ? closedCurve(points) : roundedPolygon(points, 8 * progress)} fill={s.color} fillOpacity={0.14} stroke={s.color} strokeWidth={2} strokeLinejoin="round" />
-                  {active !== null && (
-                    <circle cx={points[active][0]} cy={points[active][1]} r={4.5} fill={s.color} stroke="var(--background)" strokeWidth={2} />
-                  )}
-                </g>
-              );
-            })}
+            {shapes.map(({ key, color, points }) => (
+              // an effect needs a fuller fill to print; the outline stays plain above it
+              <path key={key} d={outline(points)} fill={color} fillOpacity={effect ? 0.55 : 0.14} />
+            ))}
           </EffectLayer>
+          {shapes.map(({ key, color, points }) => (
+            <g key={key}>
+              <path d={outline(points)} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" />
+              {active !== null && <circle cx={points[active][0]} cy={points[active][1]} r={4.5} fill={color} stroke="var(--background)" strokeWidth={2} />}
+            </g>
+          ))}
         </svg>
         {row && (
           <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[14px] border border-foreground/[0.06] bg-background/90 px-3 py-2 text-xs shadow-lg backdrop-blur-md [corner-shape:squircle]">

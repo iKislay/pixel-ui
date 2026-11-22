@@ -9,23 +9,22 @@ export type BarChartProps = Omit<CartesianChartProps, "children" | "slot" | "sta
 
 export function BarChart({ radius = 6, ...props }: BarChartProps) {
   return (
-    <CartesianChart slot="bar-chart" bars {...props}>
-      {({ data, series, x, band, y, top, floor, active, progress }) => {
+    <CartesianChart
+      slot="bar-chart"
+      bars
+      {...props}
+      overlay={({ x, band, top, floor, active }) =>
+        active !== null && (
+          <rect x={x(active) - band / 2 + 2} y={top} width={band - 4} height={floor - top} rx={10} className="pointer-events-none fill-foreground/[0.04]" />
+        )
+      }
+    >
+      {({ data, series, x, band, y, active, progress }) => {
         const base = y(0);
         const group = Math.min(band * 0.64, 28 * series.length + 2 * (series.length - 1));
         const width = (group - 2 * (series.length - 1)) / series.length;
         return (
           <>
-            {active !== null && (
-              <rect
-                x={x(active) - band / 2 + 2}
-                y={top}
-                width={band - 4}
-                height={floor - top}
-                rx={10}
-                className="fill-foreground/[0.04]"
-              />
-            )}
             {data.map((d, i) => {
               // each bar rises a beat after the one before it
               const grow = Math.min(Math.max(progress * 1.4 - (i / data.length) * 0.4, 0), 1);

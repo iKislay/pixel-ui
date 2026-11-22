@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type ComponentProps, type KeyboardEvent } from "react";
 import { useReducedMotion } from "motion/react";
 import { formatCompact, lensEdges } from "@/lib/chart";
-import { ChartTable, chartFocus, useChartWidth, type Format, EffectDefs, type ChartEffect } from "@/components/ui/chart";
+import { ChartTable, chartFocus, useChartWidth, type Format } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type LensBarsProps = Omit<ComponentProps<"figure">, "children"> & {
@@ -12,7 +12,6 @@ export type LensBarsProps = Omit<ComponentProps<"figure">, "children"> & {
   height?: number;
   format?: Format;
   color?: string;
-  effect?: ChartEffect;
 };
 
 const LENS = 16;
@@ -28,7 +27,7 @@ const pretty = (date: string) =>
   new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 const month = (date: string) => new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
 
-export function LensBars({ data, label, height = 200, format = formatCompact, color = "var(--brand)", effect, className, ...props }: LensBarsProps) {
+export function LensBars({ data, label, height = 200, format = formatCompact, color = "var(--brand)", className, ...props }: LensBarsProps) {
   const [ref, width] = useChartWidth<HTMLDivElement>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const probeRef = useRef<HTMLSpanElement>(null);
@@ -226,8 +225,7 @@ export function LensBars({ data, label, height = 200, format = formatCompact, co
         onKeyDown={onKeyDown}
       >
         <span ref={probeRef} aria-hidden className="hidden" style={{ color }} />
-        <EffectDefs effect={effect} />
-        <canvas ref={canvasRef} aria-hidden className="block w-full" style={{ height, filter: effect?.filter }} />
+        <canvas ref={canvasRef} aria-hidden className="block w-full" style={{ height }} />
         <div aria-hidden className="absolute inset-x-0 border-t border-border" style={{ top: height }} />
         <div ref={ticksRef} aria-hidden className="absolute inset-x-0 overflow-hidden" style={{ top: height + 4, height: TICKS - 4 }}>
           {ticks.map((t) => (

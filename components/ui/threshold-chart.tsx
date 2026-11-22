@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState, type PointerEvent } from "react";
 import { barPath, formatCompact, niceTicks } from "@/lib/chart";
-import { CartesianChart, type CartesianChartProps } from "@/components/ui/chart";
+import { CartesianChart, type CartesianChartProps, type CartesianContext } from "@/components/ui/chart";
 
 export type ThresholdChartProps = Omit<
   CartesianChartProps,
@@ -57,6 +57,83 @@ export function ThresholdChart({
   const [focused, setFocused] = useState(false);
   const dragging = useRef(false);
 
+  // the bars take any chart effect; the threshold line, its tag and its drag handle stay plain on top
+  const draw = ({ x, band, y, top, floor, active, progress }: CartesianContext, layer: "marks" | "guide") => {
+    const base = y(0);
+    const width = Math.min(band * 0.64, 28);
+    const left = x(0) - band / 2;
+    const right = x(data.length - 1) + band / 2;
+    const ly = y(line);
+    const toValue = (event: PointerEvent<SVGRectElement>) => {
+      const box = event.currentTarget.ownerSVGElement!.getBoundingClientRect();
+      return low + ((floor - (event.clientY - box.top)) / (floor - top)) * (high - low);
+    };
+    const drag = {
+      onPointerDown: (event: PointerEvent<SVGRectElement>) => {
+        if (event.button !== 0) return;
+        event.stopPropagation();
+        event.currentTarget.setPointerCapture(event.pointerId);
+        dragging.current = true;
+        set(toValue(event));
+      },
+      onPointerMove: (event: PointerEvent<SVGRectElement>) => {
+        if (!dragging.current) return;
+        event.stopPropagation();
+        set(toValue(event));
+      },
+      onPointerUp: () => (dragging.current = false),
+      onPointerCancel: () => (dragging.current = false),
+    };
+    const tag = format(line);
+    const tagWidth = tag.length * 7 + 16;
+
+    return layer === "marks" ? (
+      <>
+        <clipPath id={clip}>
+          <rect x={left} width={right - left} {...(above ? { y: top - 8, height: Math.max(ly - top + 8, 0) } : { y: ly, height: Math.max(floor - ly, 0) })} />
+        </clipPath>
+        {data.map((d, i) => {
+          // each bar rises a beat after the one before it
+          const grow = Math.min(Math.max(progress * 1.4 - (i / data.length) * 0.4, 0), 1);
+          const path = barPath(x(i) - width / 2, base, width, base + (y(values[i]) - base) * grow, 6);
+          const on = active === null || active === i;
+          return (
+            <g key={i} opacity={on ? 1 : 0.45} className="transition-opacity duration-200 motion-reduce:transition-none">
+              <path d={path} fill={color} opacity={0.35} />
+              {fires(values[i]) && <path d={path} fill="var(--destructive)" clipPath={above ? `url(#${clip})` : undefined} />}
+            </g>
+          );
+        })}
+      </>
+    ) : (
+      <>
+        <line x1={left} x2={right} y1={ly} y2={ly} stroke="var(--destructive)" strokeWidth={1.5} strokeDasharray="4 3" />
+        <g transform={`translate(${right - tagWidth},${ly - 10})`}>
+          <rect
+            width={tagWidth}
+            height={20}
+            rx={10}
+            fill="var(--destructive)"
+            stroke={focused ? "var(--brand)" : "none"}
+            strokeWidth={2}
+          />
+          <text x={tagWidth / 2} y={10} dy="0.34em" textAnchor="middle" className="fill-white font-mono text-[11px] font-semibold tabular-nums">
+            {tag}
+          </text>
+        </g>
+        <rect
+          x={left}
+          y={ly - 12}
+          width={right - left}
+          height={24}
+          fill="transparent"
+          className="cursor-ns-resize touch-none"
+          {...drag}
+        />
+      </>
+    );
+  };
+
   return (
     <CartesianChart
       slot="threshold-chart"
@@ -88,79 +165,9 @@ export function ThresholdChart({
         </div>
       }
       {...props}
+      overlay={(context) => draw(context, "guide")}
     >
-      {({ x, band, y, top, floor, active, progress }) => {
-        const base = y(0);
-        const width = Math.min(band * 0.64, 28);
-        const left = x(0) - band / 2;
-        const right = x(data.length - 1) + band / 2;
-        const ly = y(line);
-        const toValue = (event: PointerEvent<SVGRectElement>) => {
-          const box = event.currentTarget.ownerSVGElement!.getBoundingClientRect();
-          return low + ((floor - (event.clientY - box.top)) / (floor - top)) * (high - low);
-        };
-        const drag = {
-          onPointerDown: (event: PointerEvent<SVGRectElement>) => {
-            if (event.button !== 0) return;
-            event.stopPropagation();
-            event.currentTarget.setPointerCapture(event.pointerId);
-            dragging.current = true;
-            set(toValue(event));
-          },
-          onPointerMove: (event: PointerEvent<SVGRectElement>) => {
-            if (!dragging.current) return;
-            event.stopPropagation();
-            set(toValue(event));
-          },
-          onPointerUp: () => (dragging.current = false),
-          onPointerCancel: () => (dragging.current = false),
-        };
-        const tag = format(line);
-        const tagWidth = tag.length * 7 + 16;
-
-        return (
-          <>
-            <clipPath id={clip}>
-              <rect x={left} width={right - left} {...(above ? { y: top - 8, height: Math.max(ly - top + 8, 0) } : { y: ly, height: Math.max(floor - ly, 0) })} />
-            </clipPath>
-            {data.map((d, i) => {
-              // each bar rises a beat after the one before it
-              const grow = Math.min(Math.max(progress * 1.4 - (i / data.length) * 0.4, 0), 1);
-              const path = barPath(x(i) - width / 2, base, width, base + (y(values[i]) - base) * grow, 6);
-              const on = active === null || active === i;
-              return (
-                <g key={i} opacity={on ? 1 : 0.45} className="transition-opacity duration-200 motion-reduce:transition-none">
-                  <path d={path} fill={color} opacity={0.35} />
-                  {fires(values[i]) && <path d={path} fill="var(--destructive)" clipPath={above ? `url(#${clip})` : undefined} />}
-                </g>
-              );
-            })}
-            <line x1={left} x2={right} y1={ly} y2={ly} stroke="var(--destructive)" strokeWidth={1.5} strokeDasharray="4 3" />
-            <g transform={`translate(${right - tagWidth},${ly - 10})`}>
-              <rect
-                width={tagWidth}
-                height={20}
-                rx={10}
-                fill="var(--destructive)"
-                stroke={focused ? "var(--brand)" : "none"}
-                strokeWidth={2}
-              />
-              <text x={tagWidth / 2} y={10} dy="0.34em" textAnchor="middle" className="fill-white font-mono text-[11px] font-semibold tabular-nums">
-                {tag}
-              </text>
-            </g>
-            <rect
-              x={left}
-              y={ly - 12}
-              width={right - left}
-              height={24}
-              fill="transparent"
-              className="cursor-ns-resize touch-none"
-              {...drag}
-            />
-          </>
-        );
-      }}
+      {(context) => draw(context, "marks")}
     </CartesianChart>
   );
 }

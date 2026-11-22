@@ -3,7 +3,6 @@
 import { useEffect, useImperativeHandle, useRef, useState, type ComponentProps, type Ref } from "react";
 import { useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
-import { EffectDefs, type ChartEffect } from "@/components/ui/chart";
 
 export type TickTapeEvent = {
   value: number;
@@ -24,7 +23,6 @@ export type TickTapeProps = Omit<ComponentProps<"div">, "children" | "ref"> & {
   height?: number;
   format?: (value: number) => string;
   color?: string;
-  effect?: ChartEffect;
 };
 
 type Tick = { t: number; v: number; err: boolean; label?: string };
@@ -53,7 +51,6 @@ export function TickTape({
   height = 140,
   format = ms,
   color = "var(--brand)",
-  effect,
   className,
   ...props
 }: TickTapeProps) {
@@ -401,8 +398,7 @@ export function TickTape({
           onPointerCancel={() => hold(null)}
           className="relative cursor-crosshair touch-pan-y border-b border-foreground/15 select-none"
         >
-          <EffectDefs effect={effect} />
-          <canvas ref={canvasRef} aria-hidden className="block w-full" style={{ height, filter: effect?.filter }} />
+          <canvas ref={canvasRef} aria-hidden className="block w-full" style={{ height }} />
           {top > 0 && (
             <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 font-mono text-[10px] text-muted-foreground tabular-nums" style={{ top: HEAD }}>
               <span className="absolute top-0 left-0 -translate-y-full pb-0.5">{format(top)}</span>

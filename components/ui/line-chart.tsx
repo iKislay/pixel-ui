@@ -11,8 +11,11 @@ export function LineChart({ curve = "smooth", ...props }: LineChartProps) {
   const draw = curve === "smooth" ? smoothPath : linePath;
 
   return (
-    <CartesianChart slot="line-chart" {...props}>
-      {({ data, series, x, y, active, progress }) =>
+    // lines never take the effect, so the whole chart draws in the overlay
+    <CartesianChart
+      slot="line-chart"
+      {...props}
+      overlay={({ data, series, x, y, active, progress }) =>
         series.map((s) => {
           const points = data.map((d, i): Point => [x(i), y(Number(d[s.key]) || 0)]);
           return (
@@ -42,6 +45,8 @@ export function LineChart({ curve = "smooth", ...props }: LineChartProps) {
           );
         })
       }
+    >
+      {() => null}
     </CartesianChart>
   );
 }

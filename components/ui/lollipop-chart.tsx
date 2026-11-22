@@ -6,8 +6,12 @@ export type LollipopChartProps = Omit<CartesianChartProps, "children" | "slot" |
 
 export function LollipopChart(props: LollipopChartProps) {
   return (
-    <CartesianChart slot="lollipop-chart" bars {...props}>
-      {({ data, series, x, band, y, floor, active, progress }) => {
+    // stems are lines, which never take the effect, so the chart draws in the overlay
+    <CartesianChart
+      slot="lollipop-chart"
+      bars
+      {...props}
+      overlay={({ data, series, x, band, y, floor, active, progress }) => {
         const step = Math.min(band * 0.5 / series.length, 18);
         return data.map((d, i) => {
           const grow = Math.min(Math.max(progress * 1.4 - (i / data.length) * 0.4, 0), 1);
@@ -24,6 +28,8 @@ export function LollipopChart(props: LollipopChartProps) {
           });
         });
       }}
+    >
+      {() => null}
     </CartesianChart>
   );
 }

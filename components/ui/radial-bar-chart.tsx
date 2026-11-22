@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from "react";
 import { formatCompact } from "@/lib/chart";
-import { ChartTable, chartFocus, useChartNav, useDrawIn, type ChartDatum, type Format, EffectLayer, type ChartEffect } from "@/components/ui/chart";
+import { ChartTable, chartFocus, useChartNav, useDrawIn, type ChartDatum, type Format } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 
 export type RadialBarChartProps = Omit<ComponentProps<"figure">, "children"> & {
@@ -13,7 +13,6 @@ export type RadialBarChartProps = Omit<ComponentProps<"figure">, "children"> & {
   format?: Format;
   color?: string;
   totalLabel?: string;
-  effect?: ChartEffect;
 };
 
 const C = 100;
@@ -30,7 +29,6 @@ export function RadialBarChart({
   format = formatCompact,
   color = "var(--brand)",
   totalLabel = "Total",
-  effect,
   className,
   ...props
 }: RadialBarChartProps) {
@@ -53,39 +51,37 @@ export function RadialBarChart({
         {...handlers}
       >
         <svg viewBox="0 0 200 200" aria-hidden className="size-full overflow-visible">
-          <EffectLayer effect={effect}>
-            {values.map((v, i) => {
-              const angle = i * step;
-              const grow = Math.min(Math.max(progress * 1.5 - (i / data.length) * 0.5, 0), 1);
-              const r = INNER + width / 2 + (OUTER - INNER - width) * (v / top) * grow;
-              const [sin, cos] = [Math.sin(angle), Math.cos(angle)];
-              return (
-                <g key={i} onPointerEnter={() => setActive(i)}>
-                  <line
-                    x1={round(C + (INNER + width / 2) * sin)}
-                    y1={round(C - (INNER + width / 2) * cos)}
-                    x2={round(C + (OUTER - width / 2) * sin)}
-                    y2={round(C - (OUTER - width / 2) * cos)}
-                    stroke="currentColor"
-                    strokeWidth={width}
-                    strokeLinecap="round"
-                    className="text-foreground/[0.06]"
-                  />
-                  <line
-                    x1={round(C + (INNER + width / 2) * sin)}
-                    y1={round(C - (INNER + width / 2) * cos)}
-                    x2={round(C + r * sin)}
-                    y2={round(C - r * cos)}
-                    stroke={color}
-                    strokeWidth={width}
-                    strokeLinecap="round"
-                    opacity={active === null ? 0.35 + 0.65 * (v / top) : active === i ? 1 : 0.2}
-                    className="transition-opacity duration-200 motion-reduce:transition-none"
-                  />
-                </g>
-              );
-            })}
-          </EffectLayer>
+          {values.map((v, i) => {
+            const angle = i * step;
+            const grow = Math.min(Math.max(progress * 1.5 - (i / data.length) * 0.5, 0), 1);
+            const r = INNER + width / 2 + (OUTER - INNER - width) * (v / top) * grow;
+            const [sin, cos] = [Math.sin(angle), Math.cos(angle)];
+            return (
+              <g key={i} onPointerEnter={() => setActive(i)}>
+                <line
+                  x1={round(C + (INNER + width / 2) * sin)}
+                  y1={round(C - (INNER + width / 2) * cos)}
+                  x2={round(C + (OUTER - width / 2) * sin)}
+                  y2={round(C - (OUTER - width / 2) * cos)}
+                  stroke="currentColor"
+                  strokeWidth={width}
+                  strokeLinecap="round"
+                  className="text-foreground/[0.06]"
+                />
+                <line
+                  x1={round(C + (INNER + width / 2) * sin)}
+                  y1={round(C - (INNER + width / 2) * cos)}
+                  x2={round(C + r * sin)}
+                  y2={round(C - r * cos)}
+                  stroke={color}
+                  strokeWidth={width}
+                  strokeLinecap="round"
+                  opacity={active === null ? 0.35 + 0.65 * (v / top) : active === i ? 1 : 0.2}
+                  className="transition-opacity duration-200 motion-reduce:transition-none"
+                />
+              </g>
+            );
+          })}
         </svg>
         <div aria-hidden className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
           <span className="text-xs font-semibold text-muted-foreground">{current ? String(current[index]) : totalLabel}</span>
