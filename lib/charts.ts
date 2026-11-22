@@ -1403,4 +1403,59 @@ export function Demo() {
   return <ThresholdChart label="p95 latency" data={data} index="day" value="p95" defaultThreshold={250} />
 }`,
   }),
+  chart("tick-tape", {
+    name: "Tick Tape",
+    category: "trends",
+    description: "A live tape of events, one thin line each, as tall as its value.",
+    interaction:
+      "Each event rises in at the right edge and drifts left, bright when it lands and fading as it ages; errors are red and stay lit longer. Above the tape, events per second, p95 and the error share over the last 30 seconds update once a second. Point at the tape to hold it still and read the event under the pointer; let go and it catches up smoothly. The Live pill pauses and resumes it. Honors prefers-reduced-motion: the tape steps once a second instead of gliding.",
+    props: [
+      {
+        name: "ref",
+        type: "Ref<{ push: (event: TickTapeEvent | TickTapeEvent[]) => void; clear: () => void }>",
+        description: "Push events from your own stream, one or many at a time. An event is { value, error?, label?, time? }; time defaults to now.",
+      },
+      labelProp,
+      {
+        name: "seconds",
+        type: "number",
+        default: "12",
+        description: "How many seconds of events the tape shows.",
+      },
+      {
+        name: "height",
+        type: "number",
+        default: "140",
+        description: "Height of the tape in pixels. The width fills the parent.",
+      },
+      {
+        name: "format",
+        type: "(value: number) => string",
+        default: "milliseconds",
+        description: "Formats the p95 figure and the readout. Defaults to whole milliseconds like 240 ms.",
+      },
+      {
+        name: "color",
+        type: "string",
+        default: '"var(--brand)"',
+        description: "Any CSS color for events that are not errors.",
+      },
+      classNameProp,
+    ],
+    usage: `import { useEffect, useRef } from "react"
+import { TickTape, type TickTapeHandle } from "@/components/ui/tick-tape"
+
+export function Demo() {
+  const tape = useRef<TickTapeHandle>(null)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      tape.current?.push({ value: 40 + Math.random() * 300, label: "GET /orders" })
+    }, 150)
+    return () => clearInterval(timer)
+  }, [])
+
+  return <TickTape ref={tape} label="Requests" />
+}`,
+  }),
 ];

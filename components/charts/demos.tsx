@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentType } from "react";
+import { useEffect, useRef, type ComponentType } from "react";
 
 type DemoProps = { compact?: boolean };
 import { formatCompact } from "@/lib/chart";
@@ -33,6 +33,7 @@ import { ScatterChart } from "@/components/ui/scatter-chart";
 import { Sparkline } from "@/components/ui/sparkline";
 import { StackedBarChart } from "@/components/ui/stacked-bar-chart";
 import { StatTile } from "@/components/ui/stat-tile";
+import { TickTape, type TickTapeHandle } from "@/components/ui/tick-tape";
 
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const visitors = [1840, 2120, 1980, 2640, 3010, 2870, 3320, 3580, 3410, 3960, 4280, 4620];
@@ -622,7 +623,30 @@ function TickTapeDemo({ compact }: DemoProps) {
   return <TickTape ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
 }
 
+const routes = ["GET /orders", "GET /users", "POST /checkout", "GET /search"];
+
+function TickTapeDemo({ compact }: DemoProps) {
+  const tape = useRef<TickTapeHandle>(null);
+  useEffect(() => {
+    let timer = 0;
+    const tick = () => {
+      const error = Math.random() < 0.04;
+      const route = routes[Math.floor(Math.random() * routes.length)];
+      tape.current?.push({
+        value: error ? 400 + Math.random() * 600 : 30 + Math.random() ** 3 * 480,
+        error,
+        label: `${route} · ${error ? 500 : 200}`,
+      });
+      timer = window.setTimeout(tick, 60 + Math.random() * 240);
+    };
+    tick();
+    return () => window.clearTimeout(timer);
+  }, []);
+  return <TickTape ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "tick-tape": TickTapeDemo,
   "threshold-chart": ThresholdChartDemo,
   "range-chart": RangeChartDemo,
   "radial-bar-chart": RadialBarChartDemo,
