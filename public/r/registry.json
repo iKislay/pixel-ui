@@ -1400,6 +1400,24 @@
           "type": "registry:lib"
         }
       ]
+    },
+    {
+      "name": "tick-tape",
+      "type": "registry:ui",
+      "title": "Tick Tape",
+      "description": "A live tape of events, one thin line each, as tall as its value.",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/tick-tape.tsx",
+          "type": "registry:ui"
+        }
+      ]
     }
   ]
 }
