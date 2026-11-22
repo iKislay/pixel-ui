@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, type ComponentType } from "react";
 
-type DemoProps = { compact?: boolean };
+type DemoProps = { compact?: boolean; effect?: ChartEffect };
 import { formatCompact } from "@/lib/chart";
+import type { ChartEffect } from "@/components/ui/chart";
 import { AreaChart } from "@/components/ui/area-chart";
 import { BarChart } from "@/components/ui/bar-chart";
 import { DonutChart } from "@/components/ui/donut-chart";
@@ -42,9 +43,9 @@ const visitors = [1840, 2120, 1980, 2640, 3010, 2870, 3320, 3580, 3410, 3960, 42
 const returning = [920, 1010, 1140, 1180, 1360, 1490, 1520, 1710, 1840, 1900, 2150, 2380];
 const traffic = months.map((month, i) => ({ month, visitors: visitors[i], returning: returning[i] }));
 
-function LineChartDemo({ compact }: DemoProps) {
+function LineChartDemo({ compact, effect }: DemoProps) {
   return (
-    <LineChart
+    <LineChart effect={effect}
       height={compact ? 170 : undefined}
       label="Visitors by month"
       data={traffic}
@@ -60,9 +61,9 @@ function LineChartDemo({ compact }: DemoProps) {
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const takings = [4200, 5100, 4800, 6300, 7900, 9400, 8100];
 
-function AreaChartDemo({ compact }: DemoProps) {
+function AreaChartDemo({ compact, effect }: DemoProps) {
   return (
-    <AreaChart
+    <AreaChart effect={effect}
       height={compact ? 170 : undefined}
       label="Revenue by day"
       data={days.map((day, i) => ({ day, revenue: takings[i] }))}
@@ -80,9 +81,9 @@ const signups = [
   { quarter: "Q4", web: 520, mobile: 430 },
 ];
 
-function BarChartDemo({ compact }: DemoProps) {
+function BarChartDemo({ compact, effect }: DemoProps) {
   return (
-    <BarChart
+    <BarChart effect={effect}
       height={compact ? 170 : undefined}
       label="Signups by quarter"
       data={signups}
@@ -102,9 +103,9 @@ const plans = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map((month, i) => ({
   team: [12, 18, 25, 31, 36, 47][i],
 }));
 
-function StackedBarChartDemo({ compact }: DemoProps) {
+function StackedBarChartDemo({ compact, effect }: DemoProps) {
   return (
-    <StackedBarChart
+    <StackedBarChart effect={effect}
       height={compact ? 170 : undefined}
       label="Accounts by plan"
       data={plans}
@@ -124,7 +125,7 @@ const trends = [
   { name: "Refunds", value: "37", data: [9, 7, 8, 6, 7, 5, 6, 4, 5, 4, 3, 4], color: "var(--chart-4)" },
 ];
 
-function SparklineDemo({ compact }: DemoProps) {
+function SparklineDemo({ compact, effect }: DemoProps) {
   return (
     <ul className="mx-auto flex w-full max-w-md flex-col divide-y divide-foreground/[0.06]">
       {trends.slice(0, compact ? 2 : 3).map((trend) => (
@@ -133,7 +134,7 @@ function SparklineDemo({ compact }: DemoProps) {
             <p className="text-sm font-semibold text-muted-foreground">{trend.name}</p>
             <p className="font-mono text-xl font-medium tabular-nums">{trend.value}</p>
           </div>
-          <Sparkline className="w-36" label={`${trend.name} over twelve months`} labels={months} data={trend.data} color={trend.color} />
+          <Sparkline effect={effect} className="w-36" label={`${trend.name} over twelve months`} labels={months} data={trend.data} color={trend.color} />
         </li>
       ))}
     </ul>
@@ -148,9 +149,9 @@ const sources = [
   { label: "Email", value: 620 },
 ];
 
-function DonutChartDemo({ compact }: DemoProps) {
+function DonutChartDemo({ compact, effect }: DemoProps) {
   return (
-    <DonutChart
+    <DonutChart effect={effect}
       label="Traffic by source"
       data={sources}
       totalLabel="Visits"
@@ -159,12 +160,12 @@ function DonutChartDemo({ compact }: DemoProps) {
   );
 }
 
-function RadialProgressDemo({ compact }: DemoProps) {
+function RadialProgressDemo({ compact, effect }: DemoProps) {
   const size = compact ? "w-32" : "w-40";
   return (
     <div className="flex items-center justify-center gap-8">
-      <RadialProgress className={size} label="Storage used" value={72} caption="Storage" />
-      <RadialProgress className={size} label="Weekly goal" value={18} max={25} format={(n) => `${n}/25`} caption="Workouts" color="var(--chart-2)" />
+      <RadialProgress effect={effect} className={size} label="Storage used" value={72} caption="Storage" />
+      <RadialProgress effect={effect} className={size} label="Weekly goal" value={18} max={25} format={(n) => `${n}/25`} caption="Workouts" color="var(--chart-2)" />
     </div>
   );
 }
@@ -177,9 +178,9 @@ const cloud = (seed: number, count: number, slope: number) =>
     return { x: +load.toFixed(2), y: Math.round(Math.max(8, 88 - load * slope + (noise - 0.5) * 26)) };
   });
 
-function ScatterChartDemo({ compact }: DemoProps) {
+function ScatterChartDemo({ compact, effect }: DemoProps) {
   return (
-    <ScatterChart
+    <ScatterChart effect={effect}
       height={compact ? 170 : undefined}
       label="Load time against conversion"
       xLabel="Load time (s)"
@@ -203,14 +204,14 @@ const activity = days.map((_, d) =>
   }),
 );
 
-function HeatmapDemo() {
-  return <Heatmap label="Sessions by day and hour" rows={days} columns={hours} data={activity} />;
+function HeatmapDemo({ effect }: DemoProps) {
+  return <Heatmap effect={effect} label="Sessions by day and hour" rows={days} columns={hours} data={activity} />;
 }
 
-function StatTileDemo({ compact }: DemoProps) {
+function StatTileDemo({ compact, effect }: DemoProps) {
   return (
     <div className={compact ? "grid w-full max-w-64 [&>:nth-child(2)]:hidden" : "grid w-full gap-3 sm:grid-cols-2"}>
-      <StatTile
+      <StatTile effect={effect}
         label="Revenue"
         value={48210}
         change={12.4}
@@ -219,7 +220,7 @@ function StatTileDemo({ compact }: DemoProps) {
         format={(n) => "$" + Math.round(n).toLocaleString("en-US")}
         className="bg-background"
       />
-      <StatTile
+      <StatTile effect={effect}
         label="Churn"
         value={2.1}
         change={-0.6}
@@ -236,9 +237,9 @@ function StatTileDemo({ compact }: DemoProps) {
 
 const focus = days.map((day, i) => ({ day, hours: [5.2, 6.8, 4.9, 7.6, 6.1, 2.4, 1.8][i] }));
 
-function PillBarChartDemo({ compact }: DemoProps) {
+function PillBarChartDemo({ compact, effect }: DemoProps) {
   return (
-    <PillBarChart
+    <PillBarChart effect={effect}
       height={compact ? 170 : undefined}
       label="Focus hours by day"
       data={focus}
@@ -258,9 +259,9 @@ const countries = [
   { label: "Japan", value: 860 },
 ];
 
-function HorizontalBarChartDemo({ compact }: DemoProps) {
+function HorizontalBarChartDemo({ compact, effect }: DemoProps) {
   return (
-    <HorizontalBarChart
+    <HorizontalBarChart effect={effect}
       className="mx-auto max-w-md"
       label="Visitors by country"
       data={compact ? countries.slice(0, 4) : countries}
@@ -276,9 +277,9 @@ const teams = [
   { team: "Ops", now: 69, before: 61 },
 ];
 
-function LollipopChartDemo({ compact }: DemoProps) {
+function LollipopChartDemo({ compact, effect }: DemoProps) {
   return (
-    <LollipopChart
+    <LollipopChart effect={effect}
       height={compact ? 170 : undefined}
       label="Satisfaction by team"
       data={teams}
@@ -297,9 +298,9 @@ const requests = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "1
   writes: [3, 6, 9, 12, 8, 10, 14, 11, 12, 8, 5, 4][i],
 }));
 
-function DotMatrixChartDemo({ compact }: DemoProps) {
+function DotMatrixChartDemo({ compact, effect }: DemoProps) {
   return (
-    <DotMatrixChart
+    <DotMatrixChart effect={effect}
       height={compact ? 170 : undefined}
       rows={compact ? 10 : 14}
       label="Requests by hour"
@@ -318,9 +319,9 @@ const commits = Array.from({ length: 36 }, (_, i) => ({
   commits: Math.round(6 + Math.sin(i * 0.55) * 3 + Math.sin(i * 1.7) * 2 + i * 0.18),
 }));
 
-function CombChartDemo({ compact }: DemoProps) {
+function CombChartDemo({ compact, effect }: DemoProps) {
   return (
-    <CombChart
+    <CombChart effect={effect}
       height={compact ? 170 : undefined}
       label="Commits per day"
       data={commits}
@@ -330,12 +331,12 @@ function CombChartDemo({ compact }: DemoProps) {
   );
 }
 
-function GaugeDemo({ compact }: DemoProps) {
+function GaugeDemo({ compact, effect }: DemoProps) {
   return (
     <div className="flex items-center justify-center gap-8">
-      <Gauge label="Server load" value={68} caption="CPU load" format={(n) => `${Math.round(n)}%`} />
+      <Gauge effect={effect} label="Server load" value={68} caption="CPU load" format={(n) => `${Math.round(n)}%`} />
       {!compact && (
-        <Gauge
+        <Gauge effect={effect}
           label="Response time"
           value={182}
           max={400}
@@ -354,9 +355,9 @@ const goals = [
   { label: "Stand", value: 9, max: 12 },
 ];
 
-function ActivityRingsDemo({ compact }: DemoProps) {
+function ActivityRingsDemo({ compact, effect }: DemoProps) {
   return (
-    <ActivityRings
+    <ActivityRings effect={effect}
       label="Today's goals"
       data={goals}
       className={compact ? "flex-nowrap gap-x-6 [&_svg]:max-w-36 [&_ul]:min-w-0 [&_ul]:text-xs" : undefined}
@@ -372,8 +373,8 @@ const storage = [
   { label: "Other", value: 9 },
 ];
 
-function SegmentedBarDemo() {
-  return <SegmentedBar className="mx-auto max-w-md" label="Storage by type" data={storage} format={(n) => `${n} GB`} />;
+function SegmentedBarDemo({ effect }: DemoProps) {
+  return <SegmentedBar effect={effect} className="mx-auto max-w-md" label="Storage by type" data={storage} format={(n) => `${n} GB`} />;
 }
 
 const renewals = [
@@ -382,9 +383,9 @@ const renewals = [
   { label: "Paused", value: 7 },
 ];
 
-function WaffleChartDemo({ compact }: DemoProps) {
+function WaffleChartDemo({ compact, effect }: DemoProps) {
   return (
-    <WaffleChart
+    <WaffleChart effect={effect}
       label="Subscriptions this year"
       data={renewals}
       total={100}
@@ -403,9 +404,9 @@ const plansCompared = [
   { skill: "Privacy", pro: 84, free: 62 },
 ];
 
-function RadarChartDemo({ compact }: DemoProps) {
+function RadarChartDemo({ compact, effect }: DemoProps) {
   return (
-    <RadarChart
+    <RadarChart effect={effect}
       curve="smooth"
       grid="polygon"
       className={compact ? "[&>div]:max-w-52" : undefined}
@@ -427,8 +428,8 @@ const funnel = [
   { label: "Paid", value: 640 },
 ];
 
-function FunnelChartDemo({ compact }: DemoProps) {
-  return <FunnelChart className="mx-auto max-w-md" label="Signup funnel" data={compact ? funnel.slice(0, 3) : funnel} />;
+function FunnelChartDemo({ compact, effect }: DemoProps) {
+  return <FunnelChart effect={effect} className="mx-auto max-w-md" label="Signup funnel" data={compact ? funnel.slice(0, 3) : funnel} />;
 }
 
 const contributions = Array.from({ length: 26 * 7 - 3 }, (_, i) => {
@@ -439,8 +440,8 @@ const contributions = Array.from({ length: 26 * 7 - 3 }, (_, i) => {
   return { date, value: weekday >= 5 ? Math.round(noise * 3) : Math.round(wave * 8 + noise * 6) };
 });
 
-function CalendarHeatmapDemo({ compact }: DemoProps) {
-  return <CalendarHeatmap label="Contributions over six months" data={compact ? contributions.slice(-18 * 7) : contributions} />;
+function CalendarHeatmapDemo({ compact, effect }: DemoProps) {
+  return <CalendarHeatmap effect={effect} label="Contributions over six months" data={compact ? contributions.slice(-18 * 7) : contributions} />;
 }
 
 const budgetNodes = [
@@ -464,9 +465,9 @@ const budgetLinks = [
   { source: "income", target: "savings", value: 2500 },
 ];
 
-function SankeyChartDemo({ compact }: DemoProps) {
+function SankeyChartDemo({ compact, effect }: DemoProps) {
   return (
-    <SankeyChart
+    <SankeyChart effect={effect}
       height={compact ? 190 : undefined}
       label="Monthly budget"
       nodes={budgetNodes}
@@ -490,9 +491,9 @@ const hubOutputs = [
   { label: "Reserves", value: 19842 },
 ];
 
-function FlowHubDemo({ compact }: DemoProps) {
+function FlowHubDemo({ compact, effect }: DemoProps) {
   return (
-    <FlowHub
+    <FlowHub effect={effect}
       height={compact ? 200 : undefined}
       label="Sales by source and destination"
       totalLabel="Total sales"
@@ -515,9 +516,9 @@ const plan = [
 
 const hour = (h: number) => `${Math.floor(h) % 12 || 12}${h < 12 ? "am" : "pm"}`;
 
-function GanttChartDemo({ compact }: DemoProps) {
+function GanttChartDemo({ compact, effect }: DemoProps) {
   return (
-    <GanttChart
+    <GanttChart effect={effect}
       label="Today's plan"
       tasks={compact ? plan.slice(0, 5) : plan}
       formatTime={hour}
@@ -535,9 +536,9 @@ const moods = [
   { label: "Proud", value: 9 },
 ];
 
-function RoseChartDemo({ compact }: DemoProps) {
+function RoseChartDemo({ compact, effect }: DemoProps) {
   return (
-    <RoseChart
+    <RoseChart effect={effect}
       label="How the release felt"
       data={moods}
       format={(n) => `${n}`}
@@ -551,9 +552,9 @@ const byHour = Array.from({ length: 24 }, (_, hour) => ({
   orders: Math.round(Math.max(4, 26 + 22 * Math.sin((hour - 9) / 3.8) + 6 * Math.sin(hour * 1.3))),
 }));
 
-function RadialBarChartDemo({ compact }: DemoProps) {
+function RadialBarChartDemo({ compact, effect }: DemoProps) {
   return (
-    <RadialBarChart
+    <RadialBarChart effect={effect}
       className={compact ? "[&>div]:max-w-48" : undefined}
       label="Orders by hour"
       data={byHour}
@@ -570,9 +571,9 @@ const activeRange = Array.from({ length: 14 }, (_, i) => {
   return { day: `Feb ${i + 1}`, min: Math.round(mid - spread), max: Math.round(mid + spread) };
 });
 
-function RangeChartDemo({ compact }: DemoProps) {
+function RangeChartDemo({ compact, effect }: DemoProps) {
   return (
-    <RangeChart
+    <RangeChart effect={effect}
       height={compact ? 170 : undefined}
       label="Daily active users, lowest to highest"
       data={activeRange}
@@ -619,8 +620,8 @@ const october = [
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 
-function SpendingRingDemo({ compact }: DemoProps) {
-  return <SpendingRing className={compact ? "[&>div]:max-w-48" : undefined} label="Spent in October" data={october} format={usd} />;
+function SpendingRingDemo({ compact, effect }: DemoProps) {
+  return <SpendingRing effect={effect} className={compact ? "[&>div]:max-w-48" : undefined} label="Spent in October" data={october} format={usd} />;
 }
 
 const dailySignups = Array.from({ length: 365 }, (_, i) => {
@@ -630,8 +631,8 @@ const dailySignups = Array.from({ length: 365 }, (_, i) => {
   return { date, value: Math.round((60 + i * 0.12 + Math.sin(i / 40) * 14) * (weekend ? 0.85 : 1) + noise * 10) };
 });
 
-function LensBarsDemo({ compact }: DemoProps) {
-  return <LensBars height={compact ? 150 : undefined} label="Signups over the last year" data={dailySignups} />;
+function LensBarsDemo({ compact, effect }: DemoProps) {
+  return <LensBars effect={effect} height={compact ? 150 : undefined} label="Signups over the last year" data={dailySignups} />;
 }
 
 const latency = Array.from({ length: 30 }, (_, i) => ({
@@ -639,9 +640,9 @@ const latency = Array.from({ length: 30 }, (_, i) => ({
   p95: Math.round(180 + 60 * Math.sin(i / 3.1) + 45 * Math.sin(i * 1.7) + (i % 9 === 4 ? 140 : 0)),
 }));
 
-function ThresholdChartDemo({ compact }: DemoProps) {
+function ThresholdChartDemo({ compact, effect }: DemoProps) {
   return (
-    <ThresholdChart
+    <ThresholdChart effect={effect}
       height={compact ? 170 : undefined}
       label="p95 latency in ms, last 30 days"
       data={latency}
@@ -656,7 +657,7 @@ function ThresholdChartDemo({ compact }: DemoProps) {
 
 const routes = ["GET /orders", "GET /users", "POST /checkout", "GET /search"];
 
-function TickTapeDemo({ compact }: DemoProps) {
+function TickTapeDemo({ compact, effect }: DemoProps) {
   const tape = useRef<TickTapeHandle>(null);
   useEffect(() => {
     let timer = 0;
@@ -673,7 +674,7 @@ function TickTapeDemo({ compact }: DemoProps) {
     tick();
     return () => window.clearTimeout(timer);
   }, []);
-  return <TickTape ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
+  return <TickTape effect={effect} ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
 }
 
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
@@ -711,7 +712,7 @@ export const DEMOS: Record<string, ComponentType<DemoProps>> = {
   "bar-chart": BarChartDemo,
 };
 
-export default function ChartDemo({ slug, compact }: { slug: string } & DemoProps) {
+export default function ChartDemo({ slug, compact, effect }: { slug: string } & DemoProps) {
   const Demo = DEMOS[slug];
-  return Demo ? <Demo compact={compact} /> : null;
+  return Demo ? <Demo compact={compact} effect={effect} /> : null;
 }

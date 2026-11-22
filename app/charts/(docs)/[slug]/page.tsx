@@ -1,5 +1,5 @@
 import JsonLd from "@/components/JsonLd";
-import ChartDemo from "@/components/charts/demos";
+import ChartPreview from "@/components/charts/ChartPreview";
 import { charts } from "@/lib/charts";
 import { componentJsonLd, componentPageMetadata } from "@/lib/seo";
 
@@ -24,7 +24,7 @@ export default async function Page({ params }: Props) {
       <JsonLd data={componentJsonLd(`/charts/${slug}`)} />
       <div className="flex min-h-[500px] w-full items-center justify-center px-6 py-10">
         <div className="w-full max-w-2xl">
-          <ChartDemo slug={slug} />
+          <ChartPreview slug={slug} />
         </div>
       </div>
     </>
