@@ -1458,4 +1458,56 @@ export function Demo() {
   return <TickTape ref={tape} label="Requests" />
 }`,
   }),
+  chart("spending-ring", {
+    name: "Spending Ring",
+    category: "composition",
+    description: "A ring of thick tiles showing where the money went, where each category opens into a ring of its own parts.",
+    interaction:
+      "Each category is a thick tile with its amount written on it. Hover a tile, or tab in and use the arrow keys, and it slides out while the others fade back; the center shows its amount and share. Click a category, or press Enter, and it blooms open into its parts until it fills the ring. Click All or press Escape to fold it home. The overspent end of a tile is hatched in red and the center says how far over it went. A hidden table carries every value for screen readers. Honors prefers-reduced-motion: categories open at once.",
+    props: [
+      {
+        name: "data",
+        type: "{ label: string; value: number; budget?: number; color?: string; children?: { label: string; value: number; budget?: number; color?: string }[] }[]",
+        required: true,
+        description: "One tile per category, clockwise from the top. A category with children opens into them; parts without a color take shades of their category.",
+      },
+      labelProp,
+      formatProp,
+      {
+        name: "thickness",
+        type: "number",
+        default: "34",
+        description: "Width of the ring in chart units, out of a 200 unit square.",
+      },
+      {
+        name: "totalLabel",
+        type: "string",
+        default: '"Spent"',
+        description: "The caption above the total in the center.",
+      },
+      classNameProp,
+    ],
+    usage: `import { SpendingRing } from "@/components/ui/spending-ring"
+
+const data = [
+  {
+    label: "Food",
+    value: 640,
+    budget: 600,
+    children: [
+      { label: "Groceries", value: 380 },
+      { label: "Dining", value: 190 },
+      { label: "Coffee", value: 70 },
+    ],
+  },
+  { label: "Rent", value: 1400 },
+  { label: "Transport", value: 220 },
+]
+
+const usd = (n: number) => "$" + n.toLocaleString("en-US")
+
+export function Demo() {
+  return <SpendingRing label="Spent in October" data={data} format={usd} />
+}`,
+  }),
 ];

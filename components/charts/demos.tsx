@@ -25,6 +25,7 @@ import { GanttChart } from "@/components/ui/gantt-chart";
 import { RoseChart } from "@/components/ui/rose-chart";
 import { RadialBarChart } from "@/components/ui/radial-bar-chart";
 import { RangeChart } from "@/components/ui/range-chart";
+import { SpendingRing } from "@/components/ui/spending-ring";
 import { ThresholdChart } from "@/components/ui/threshold-chart";
 import { Heatmap } from "@/components/ui/heatmap";
 import { LineChart } from "@/components/ui/line-chart";
@@ -623,7 +624,48 @@ function TickTapeDemo({ compact }: DemoProps) {
   return <TickTape ref={tape} label="Requests" height={compact ? 80 : undefined} className="bg-background" />;
 }
 
+const october = [
+  {
+    label: "Food",
+    value: 640,
+    budget: 600,
+    children: [
+      { label: "Groceries", value: 380 },
+      { label: "Dining", value: 190 },
+      { label: "Coffee", value: 70 },
+    ],
+  },
+  { label: "Rent", value: 1400 },
+  {
+    label: "Transport",
+    value: 260,
+    children: [
+      { label: "Transit", value: 120 },
+      { label: "Rideshare", value: 90 },
+      { label: "Fuel", value: 50 },
+    ],
+  },
+  {
+    label: "Fun",
+    value: 310,
+    budget: 250,
+    children: [
+      { label: "Concerts", value: 160 },
+      { label: "Games", value: 90 },
+      { label: "Books", value: 60 },
+    ],
+  },
+  { label: "Bills", value: 230 },
+];
+
+const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+
+function SpendingRingDemo({ compact }: DemoProps) {
+  return <SpendingRing className={compact ? "[&>div]:max-w-48" : undefined} label="Spent in October" data={october} format={usd} />;
+}
+
 export const DEMOS: Record<string, ComponentType<DemoProps>> = {
+  "spending-ring": SpendingRingDemo,
   "tick-tape": TickTapeDemo,
   "threshold-chart": ThresholdChartDemo,
   "range-chart": RangeChartDemo,
