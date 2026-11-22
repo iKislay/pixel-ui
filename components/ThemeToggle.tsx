@@ -15,6 +15,7 @@ import { useTheme } from "next-themes";
 import { DistortionWave, snapshot, type DistortionWaveHandle } from "distortion-waves";
 import {
   ThemeToggle as UiThemeToggle,
+  revealTheme,
   tick,
   type ThemeToggleProps,
 } from "@/components/ui/theme-toggle";
@@ -28,6 +29,8 @@ type Wave = {
   dark: HTMLCanvasElement | null;
   toDark: boolean;
   source: Element;
+  deadline: number;
+  onLate: () => void;
 };
 
 const SIDES = ["top", "right", "bottom", "left"];
@@ -43,6 +46,9 @@ const WAVE_STYLE = {
   hairlineFade: 1.4,
   particleLife: 1.2,
 };
+
+// a wave that has not started by then would feel broken, so the plain circle reveal runs instead
+const START_BUDGET = 400;
 
 const NO_TRANSITIONS = "*,*::before,*::after{transition:none!important}";
 
@@ -167,9 +173,18 @@ function Picture({ canvas }: { canvas: HTMLCanvasElement }) {
 
 // light is always the first view and dark the second, like the appearance demo:
 // going dark sends the wave out from the toggle, going light pulls it back in
-function ThemeWave({ light, dark, toDark, source, onDone }: Wave & { onDone: () => void }) {
+function ThemeWave({
+  light,
+  dark,
+  toDark,
+  source,
+  deadline,
+  onLate,
+  onDone,
+}: Wave & { onDone: () => void }) {
   const wave = useRef<DistortionWaveHandle>(null);
   const root = useRef<HTMLDivElement>(null);
+  const phase = useRef<"waiting" | "started" | "late">("waiting");
   const [revealed, setRevealed] = useState(!toDark);
   const ready = Boolean(light && dark);
 
@@ -180,10 +195,21 @@ function ThemeWave({ light, dark, toDark, source, onDone }: Wave & { onDone: () 
   }, [onDone]);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      if (phase.current !== "waiting") return;
+      phase.current = "late";
+      onLate();
+    }, deadline - performance.now());
+    return () => clearTimeout(timer);
+  }, [deadline, onLate]);
+
+  useEffect(() => {
     if (!ready) return;
     let cancelled = false;
     wave.current?.prepare().finally(() => {
-      if (!cancelled) setRevealed(toDark);
+      if (cancelled || phase.current === "late") return;
+      phase.current = "started";
+      setRevealed(toDark);
     });
     return () => {
       cancelled = true;
@@ -276,6 +302,14 @@ export default function ThemeToggle({
     if (sound) tick();
 
     const source = event.currentTarget;
+    const deadline = performance.now() + START_BUDGET;
+    const rect = source.getBoundingClientRect();
+    const reveal = (update: () => void) =>
+      revealTheme(
+        update,
+        event.clientX || rect.left + rect.width / 2,
+        event.clientY || rect.top + rect.height / 2,
+      );
     const apply = () => flushSync(() => setTheme(next));
     // a press that never became a click, such as a drag away, leaves pictures too old to trust
     const pressed = pressing.current;
@@ -283,12 +317,27 @@ export default function ThemeToggle({
     const taking =
       pressed && performance.now() - pressed.at < 1000 ? pressed.pictures : takePictures(next);
     try {
-      const { before, after } = await taking;
+      const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), START_BUDGET));
+      const pictures = await Promise.race([taking, timeout]);
+      if (!pictures) {
+        reveal(() => setTheme(next));
+        return;
+      }
+      const { before, after } = pictures;
       const toDark = next === "dark";
       const pair = (b: HTMLCanvasElement, a: HTMLCanvasElement | null) =>
         toDark ? { light: b, dark: a } : { light: a, dark: b };
       // the overlay paints in the same frame as the switch, so the page never shows the new theme early
-      flushSync(() => setWave({ ...pair(before, after), toDark, source }));
+      flushSync(() =>
+        setWave({
+          ...pair(before, after),
+          toDark,
+          source,
+          deadline,
+          // the theme is already applied under the overlay, so lifting it is the switch
+          onLate: () => reveal(() => setWave(null)),
+        }),
+      );
       apply();
       if (!after) {
         const late = await pagePicture();
