@@ -192,6 +192,7 @@ export type CartesianChartProps = Omit<ComponentProps<"figure">, "children"> & {
   grid?: boolean;
   floating?: boolean;
   legend?: boolean;
+  header?: ReactNode;
   slot: string;
   children: (context: CartesianContext) => ReactNode;
 };
@@ -213,6 +214,7 @@ export function CartesianChart({
   grid = true,
   floating = false,
   legend = true,
+  header,
   slot,
   children,
   className,
@@ -253,6 +255,7 @@ export function CartesianChart({
 
   return (
     <figure data-slot={slot} className={cn("flex w-full flex-col gap-3", className)} {...props}>
+      {header}
       {!bare && legend && series.length > 1 && <ChartLegend items={series} />}
       <div
         ref={ref}
