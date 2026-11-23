@@ -155,8 +155,9 @@ function warmOnce() {
   idle(() => void pagePicture().catch(() => {}), { timeout: 5000 });
 }
 
-async function takePictures(next: Theme): Promise<Pictures> {
+async function takePictures(next: Theme, signal: AbortSignal): Promise<Pictures> {
   const before = await pagePicture();
+  signal.throwIfAborted();
   const after = await otherThemePicture(next);
   return { before, after: differs(before, after) ? after : null };
 }
@@ -277,7 +278,11 @@ export default function ThemeToggle({
   ...props
 }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
-  const pressing = useRef<{ pictures: Promise<Pictures>; at: number } | null>(null);
+  const pressing = useRef<{
+    pictures: Promise<Pictures>;
+    stop: AbortController;
+    at: number;
+  } | null>(null);
   const [wave, setWave] = useState<Wave | null>(null);
   const finish = useCallback(() => setWave(null), []);
 
@@ -289,9 +294,10 @@ export default function ThemeToggle({
   const press = () => {
     if (wave) return;
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const pictures = takePictures(next);
+    const stop = new AbortController();
+    const pictures = takePictures(next, stop.signal);
     pictures.catch(() => {});
-    pressing.current = { pictures, at: performance.now() };
+    pressing.current = { pictures, stop, at: performance.now() };
   };
 
   const toggle = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -314,12 +320,16 @@ export default function ThemeToggle({
     // a press that never became a click, such as a drag away, leaves pictures too old to trust
     const pressed = pressing.current;
     pressing.current = null;
-    const taking =
-      pressed && performance.now() - pressed.at < 1000 ? pressed.pictures : takePictures(next);
+    const fresh = pressed && performance.now() - pressed.at < 1000;
+    if (pressed && !fresh) pressed.stop.abort();
+    const stop = fresh ? pressed.stop : new AbortController();
+    const taking = fresh ? pressed.pictures : takePictures(next, stop.signal);
     try {
       const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), START_BUDGET));
       const pictures = await Promise.race([taking, timeout]);
       if (!pictures) {
+        // the picture underway cannot be cut short, but the next one is skipped so the reveal gets the main thread
+        stop.abort();
         reveal(() => setTheme(next));
         return;
       }
