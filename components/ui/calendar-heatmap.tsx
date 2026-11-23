@@ -83,9 +83,9 @@ export function CalendarHeatmap({ data, label, format = formatCompact, color = "
                 </text>
               ) : null,
             )}
-            {/* empty days are the quiet part of the calendar, so they stay out of any effect */}
-            {cells.filter((c) => c.value <= 0).map(day)}
-            <EffectLayer effect={effect}>{cells.filter((c) => c.value > 0).map(day)}</EffectLayer>
+            {/* empty and lowest-shade days are the quiet part of the calendar, so they stay out of any effect */}
+            {cells.filter((c) => level(c.value) <= LEVELS[1]).map(day)}
+            <EffectLayer effect={effect}>{cells.filter((c) => level(c.value) > LEVELS[1]).map(day)}</EffectLayer>
             {cell && (
               <rect
                 x={LEFT + cell.week * size + 1.5}

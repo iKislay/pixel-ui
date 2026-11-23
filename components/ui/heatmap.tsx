@@ -17,6 +17,8 @@ export type HeatmapProps = Omit<ComponentProps<"figure">, "children"> & {
 };
 
 const LEFT = 44;
+// cells at or below this tint read as empty and skip any effect
+const QUIET = 0.3;
 const TOP = 22;
 
 export function Heatmap({
@@ -98,9 +100,9 @@ export function Heatmap({
                 {row}
               </text>
             ))}
-            {/* empty cells are the quiet part of the grid, so they stay out of any effect */}
-            {grid.filter((g) => g.value <= 0).map(square)}
-            <EffectLayer effect={effect}>{grid.filter((g) => g.value > 0).map(square)}</EffectLayer>
+            {/* the faintest cells are the quiet part of the grid, so they stay out of any effect */}
+            {grid.filter((g) => strength(g.value) <= QUIET).map(square)}
+            <EffectLayer effect={effect}>{grid.filter((g) => strength(g.value) > QUIET).map(square)}</EffectLayer>
             {current !== null && (
               <rect
                 x={LEFT + cell * c + gap / 2}
