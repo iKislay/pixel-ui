@@ -431,7 +431,7 @@ function createField(
           const v = ((r + 0.35) * cellCss) / Math.max(cellCss, ch);
           if (v >= 1.04) break;
           const fall = Math.pow(clamp(1 - v), 1.22);
-          const shimmer = 0.035 * Math.sin(c * 0.65 + r * 1.15 - t * 5.6);
+          const shimmer = 0.035 * Math.sin(u * 18 + r * 0.9 - t * 3);
           let e = clamp(fall + boost * 0.22 * (1 - v * 0.4) + glint * 0.18 * (1 - v) + shimmer * (1 - fall * 0.6));
           if (muteMix > 0.01) e = lerp(e, r === 0 ? breath + boost * 0.3 : 0, muteMix);
           if (e <= 0.01) continue;
@@ -487,7 +487,9 @@ function createField(
     dctx.globalCompositeOperation = "source-in";
     dctx.imageSmoothingEnabled = true;
     dctx.drawImage(grid, 0, offY, cols * cellPx, rows * cellPx);
+    ctx.filter = `blur(${0.6 * dpr}px)`;
     ctx.drawImage(dots, 0, 0);
+    ctx.filter = "none";
 
     if (comets.length) {
       ctx.save();
