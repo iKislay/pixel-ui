@@ -326,6 +326,21 @@
       ]
     },
     {
+      "name": "passkey-button",
+      "type": "registry:ui",
+      "title": "Passkey Button",
+      "description": "A passkey sign-in button with a fingerprint that scans while it waits and draws into a check once verified.",
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/passkey-button.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
