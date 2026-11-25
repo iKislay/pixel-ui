@@ -46,8 +46,9 @@ type Rgb = [number, number, number];
 
 const BANDS = 8;
 const CELL = 2;
-// the wave never colors above this share of the bar, so the top stays plain surface
+// only the bottom share of the wave carries the spectrum; the rest is a near white or near black accent tint
 const COLOR_BAND = 0.3;
+const ACCENT: Rgb = [110, 120, 255];
 const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 const SPECTRUM_DARK: Rgb[] = [
@@ -220,6 +221,8 @@ function createField(
   let grains: Grain[] = [];
   const color: Rgb = [0, 0, 0];
   const tmp: Rgb = [0, 0, 0];
+  const mixed: Rgb = [0, 0, 0];
+  const tint: Rgb = [0, 0, 0];
 
   const toRgb = (css: string): Rgb => {
     swatch.clearRect(0, 0, 1, 1);
@@ -232,6 +235,7 @@ function createField(
   const refreshTheme = () => {
     const [r, g, b] = toRgb(getComputedStyle(root).color);
     dark = 0.2126 * r + 0.7152 * g + 0.0722 * b > 130;
+    for (let i = 0; i < 3; i++) tint[i] = dark ? lerp(ACCENT[i], 255, 0.86) : lerp(ACCENT[i], 0, 0.82);
   };
   const stops = () => (dark ? SPECTRUM_DARK : SPECTRUM_LIGHT);
   const thinkStops = () => (dark ? THINK_DARK : THINK_LIGHT);
@@ -338,7 +342,7 @@ function createField(
     }
 
     img.data.fill(0);
-    const maxH = h * COLOR_BAND;
+    const maxH = Math.min(h * 0.56, 62);
     const scanU = 0.5 + 0.44 * Math.sin(scan);
     const scanDir = Math.cos(scan) >= 0 ? 1 : -1;
     const muteMix = weight.mute * weight.listen;
@@ -419,9 +423,10 @@ function createField(
           const shimmer = 0.035 * Math.sin(c * 0.65 + r * 1.15 - t * 5.6);
           let e = clamp(fall + boost * 0.22 * (1 - v * 0.4) + glint * 0.18 * (1 - v) + shimmer * (1 - fall * 0.6));
           if (muteMix > 0.01) e = lerp(e, r === 0 ? breath + boost * 0.3 : 0, muteMix);
-          const a = e * (1 - smoothstep(COLOR_BAND * 0.6, COLOR_BAND, ((r + 0.5) * cellCss) / h));
-          if (a <= 0.01) continue;
-          plot(c, rows - 1 - r, color, Math.pow(a, 0.8));
+          if (e <= 0.01) continue;
+          const toTint = smoothstep(COLOR_BAND * 0.6, COLOR_BAND * 1.5, v);
+          for (let i = 0; i < 3; i++) mixed[i] = lerp(color[i], tint[i], toTint);
+          plot(c, rows - 1 - r, mixed, Math.pow(e, 0.8));
         }
       }
     }
@@ -613,7 +618,7 @@ function createField(
         grains = [];
         const count = clamp(Math.round(w / 17), 18, 32);
         const palette = weight.think > 0.5 ? thinkStops() : stops();
-        const peak = h * COLOR_BAND;
+        const peak = Math.min(h * 0.42, 46);
         comets = [];
         for (let i = 0; i < count; i++) {
           const u = clamp(0.06 + (i / (count - 1)) * 0.8 + (Math.random() - 0.5) * 0.05, 0.04, 0.9);
