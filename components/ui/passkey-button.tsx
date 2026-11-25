@@ -31,33 +31,38 @@ const LABELS: Record<PasskeyStatus, string> = {
 };
 
 const EASE = "ease-[cubic-bezier(0.16,1,0.3,1)]";
-const VERIFY_LIFE = 0.64;
+const EASE_OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
+const VERIFY_LIFE = 0.7;
 const ERROR_LIFE = 0.42;
+const CAPTURE_LOOP = 1.5;
+const GLOW_RADIUS = 22;
 
 function point(r: number, deg: number) {
   const a = (deg * Math.PI) / 180;
   return [12 + r * Math.cos(a), 13 + r * Math.sin(a)];
 }
 
-function ridge(r: number, from: number, to: number) {
+function ridge(r: number, from: number, to: number, order: number) {
   const [x0, y0] = point(r, from);
   const [x1, y1] = point(r, to);
   const large = to - from > 180 ? 1 : 0;
   return {
     d: `M${x0.toFixed(2)} ${y0.toFixed(2)}A${r} ${r} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`,
     y: (13 - r * 0.7) / 24,
+    order,
   };
 }
 
+// order is the capture sequence, from the core of the print outward
 const RIDGES = [
-  ridge(9.5, 205, 335),
-  ridge(7, 175, 330),
-  ridge(7, 345, 372),
-  ridge(4.5, 160, 380),
-  ridge(2, 190, 350),
-  { d: "M12 13v6.5", y: 0.68 },
-  { d: "M7.5 19.4q1.6 1.2 3.2 1.4", y: 0.82 },
-  { d: "M16.5 19.4q-.8.7-1.7 1.1", y: 0.82 },
+  ridge(9.5, 205, 335, 4),
+  ridge(7, 175, 330, 3),
+  ridge(7, 345, 372, 3),
+  ridge(4.5, 160, 380, 2),
+  ridge(2, 190, 350, 0),
+  { d: "M12 13v6.5", y: 0.68, order: 1 },
+  { d: "M7.5 19.4q1.6 1.2 3.2 1.4", y: 0.82, order: 5 },
+  { d: "M16.5 19.4q-.8.7-1.7 1.1", y: 0.82, order: 5 },
 ];
 
 const MINUTIAE = [point(4.5, 270), point(7, 200), point(7, 320), [12, 13]].map(
@@ -104,6 +109,11 @@ const PALETTES: Record<
 };
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
+const smooth = (v: number) => v * v * (3 - 2 * v);
+const approach = (from: number, to: number, dt: number, rate: number) => {
+  const next = from + (to - from) * (1 - Math.exp(-dt * rate));
+  return Math.abs(to - next) < 0.004 ? to : next;
+};
 const mix = (a: Rgb, b: Rgb, t: number): Rgb => [
   a[0] + (b[0] - a[0]) * t,
   a[1] + (b[1] - a[1]) * t,
@@ -157,20 +167,26 @@ export function PasskeyButton({
   const reduced = useReducedMotion();
   const [own, setOwn] = React.useState<PasskeyStatus>("idle");
   const [caught, setCaught] = React.useState<string | null>(null);
+  const [labelWidth, setLabelWidth] = React.useState<number | null>(null);
   const status = controlled ?? own;
-  const labels = { ...LABELS, ...labelOverrides };
+  const label = { ...LABELS, ...labelOverrides }[status];
 
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const wellRef = React.useRef<HTMLSpanElement>(null);
+  const ringRef = React.useRef<HTMLSpanElement>(null);
   const beamRef = React.useRef<SVGGElement>(null);
   const labelRef = React.useRef<HTMLSpanElement>(null);
+  const shimmerRef = React.useRef<HTMLSpanElement>(null);
+  const baseRefs = React.useRef<(SVGPathElement | null)[]>([]);
   const ridgeRefs = React.useRef<(SVGPathElement | null)[]>([]);
   const dotRefs = React.useRef<(SVGCircleElement | null)[]>([]);
   const statusRef = React.useRef(status);
   const variantRef = React.useRef(variant);
   const reducedRef = React.useRef(reduced);
+  const pointer = React.useRef({ u: 0, v: 0, on: false });
   const kickRef = React.useRef<(prev: PasskeyStatus) => void>(() => {});
+  const wakeRef = React.useRef<() => void>(() => {});
   const prevRef = React.useRef(status);
   const alive = React.useRef(true);
   const clipId = React.useId();
@@ -187,6 +203,10 @@ export function PasskeyButton({
     };
   }, []);
 
+  React.useLayoutEffect(() => {
+    if (labelRef.current) setLabelWidth(labelRef.current.offsetWidth);
+  }, [label, size]);
+
   React.useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -202,6 +222,7 @@ export function PasskeyButton({
     let palette = PALETTES.dark([56, 132, 255]);
     let time = 0;
     let sw = statusRef.current === "scanning" ? 1 : 0;
+    let hw = 0;
     let burst: "verify" | "error" | null = null;
     let age = 0;
     let frame = 0;
@@ -219,26 +240,32 @@ export function PasskeyButton({
     };
 
     const draw = (dt: number) => {
+      const still = reducedRef.current;
+      const scanning = statusRef.current === "scanning";
+      const hovering = pointer.current.on && !still && statusRef.current === "idle";
       time += dt;
-      const target = statusRef.current === "scanning" ? 1 : 0;
-      sw += (target - sw) * (1 - Math.exp(-dt * 9));
-      if (Math.abs(target - sw) < 0.004) sw = target;
+      sw = still ? (scanning ? 1 : 0) : approach(sw, scanning ? 1 : 0, dt, 9);
+      hw = approach(hw, hovering ? 1 : 0, dt, 7);
       if (burst) {
         age += dt;
         if (age >= (burst === "verify" ? VERIFY_LIFE : ERROR_LIFE)) burst = null;
       }
 
       const scanY = 0.52 - 0.36 * Math.cos(time * 4.5);
+      const phase = time % CAPTURE_LOOP;
+      const fade = still ? 1 : smooth(clamp01((CAPTURE_LOOP - phase) / 0.3));
       const beam = beamRef.current;
       if (beam) {
-        beam.style.opacity = sw > 0.02 ? sw.toFixed(2) : "0";
+        beam.style.opacity = sw > 0.02 && !still ? sw.toFixed(2) : "0";
         beam.style.transform = `translateY(${(scanY * 24 - 12).toFixed(2)}px)`;
       }
-      RIDGES.forEach(({ y }, i) => {
+      RIDGES.forEach(({ y, order }, i) => {
         const el = ridgeRefs.current[i];
         if (!el) return;
-        const lit = 0.14 + 0.86 * Math.exp(-((y - scanY) ** 2) / 0.024) * sw;
-        el.style.opacity = sw > 0.02 ? lit.toFixed(2) : "0";
+        const traced = still ? 1 : smooth(clamp01((phase - order * 0.09) / 0.38));
+        const lit = Math.exp(-((y - scanY) ** 2) / 0.024);
+        el.style.strokeDashoffset = (1 - traced).toFixed(3);
+        el.style.opacity = sw > 0.02 ? ((0.55 + 0.45 * lit) * sw * fade).toFixed(2) : "0";
       });
       MINUTIAE.forEach(({ v }, i) => {
         const el = dotRefs.current[i];
@@ -247,7 +274,7 @@ export function PasskeyButton({
       });
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (w > 0 && h > 0 && (sw > 0.008 || burst)) {
+      if (w > 0 && h > 0 && (sw > 0.008 || hw > 0.008 || burst)) {
         const cols = Math.ceil(w / 2);
         const rows = Math.ceil(h / 2);
         if (!img || img.width !== cols || img.height !== rows) {
@@ -259,28 +286,38 @@ export function PasskeyButton({
         data.fill(0);
 
         const { scan, verify, error, alpha } = palette;
+        const { u: pu, v: pv } = pointer.current;
         const scanU = wellU + ((time * 0.72) % 1.24) - 0.12;
         const k = burst ? age / (burst === "verify" ? VERIFY_LIFE : ERROR_LIFE) : 0;
         const verifyFront = wellU + (1 - (1 - k) ** 2.3) * 1.12;
         const verifyFade = Math.sin(Math.PI * k ** 0.72);
         const errorFront = wellU + (0.65 - wellU) * (1 - k) ** 1.8;
         const errorFade = Math.sin(Math.PI * k ** 0.6);
+        const glowSpread = 2 * GLOW_RADIUS * GLOW_RADIUS;
 
         for (let r = 0; r < rows; r++) {
           const v = (r + 0.5) / rows;
           const edge = Math.sin(Math.PI * v);
+          const dy = (v - pv) * h;
           for (let c = 0; c < cols; c++) {
             const u = (c + 0.5) / cols;
             let energy = 0;
             let color = scan[0];
 
+            if (hw > 0.008) {
+              const dx = (u - pu) * w;
+              energy = Math.exp(-(dx * dx + dy * dy) / glowSpread) * 0.42 * hw;
+            }
             if (sw > 0.008) {
               const aura = Math.exp(-((u - wellU) ** 2) / 0.022) * 0.52;
               const d = u - scanU;
               const band = Math.exp(-(d * d) / 0.026) * 0.72;
               const wake = d < 0 ? Math.exp(d / 0.18) * 0.28 : 0;
-              energy = (aura + (band + wake) * (0.45 + 0.55 * edge)) * sw;
-              color = mix(scan[0], scan[1], clamp01(band * 1.1));
+              const e = (aura + (band + wake) * (0.45 + 0.55 * edge)) * sw;
+              if (e > energy) {
+                energy = e;
+                color = mix(scan[0], scan[1], clamp01(band * 1.1));
+              }
             }
             if (burst === "verify") {
               const d = u - verifyFront;
@@ -316,7 +353,7 @@ export function PasskeyButton({
         ctx.drawImage(grid, 0, 0, cols * 2 * dpr, rows * 2 * dpr);
       }
 
-      return statusRef.current === "scanning" || sw > 0 || burst !== null;
+      return scanning || sw > 0 || hovering || hw > 0 || burst !== null;
     };
 
     const tick = (now: number) => {
@@ -325,11 +362,17 @@ export function PasskeyButton({
       frame = !reducedRef.current && draw(dt) ? requestAnimationFrame(tick) : 0;
     };
 
+    const wake = () => {
+      if (frame || reducedRef.current) return;
+      last = 0;
+      frame = requestAnimationFrame(tick);
+    };
+    wakeRef.current = wake;
+
     kickRef.current = (prev) => {
       const next = statusRef.current;
       if (reducedRef.current) {
         burst = null;
-        sw = next === "scanning" ? 1 : 0;
         time = 0.5;
         draw(0);
         return;
@@ -337,10 +380,7 @@ export function PasskeyButton({
       if (next === "verified" && prev !== "verified") [burst, age] = ["verify", 0];
       else if (next === "error" && prev !== "error") [burst, age] = ["error", 0];
       else if (next === "scanning") [burst, time] = [null, 0];
-      if (!frame) {
-        last = 0;
-        frame = requestAnimationFrame(tick);
-      }
+      wake();
     };
 
     const resize = () => {
@@ -373,6 +413,7 @@ export function PasskeyButton({
       mo.disconnect();
       cancelAnimationFrame(frame);
       kickRef.current = () => {};
+      wakeRef.current = () => {};
     };
   }, []);
 
@@ -384,13 +425,27 @@ export function PasskeyButton({
     prevRef.current = status;
     kickRef.current(prev);
     if (prev === status || reduced) return;
-    labelRef.current?.animate(
-      [
-        { opacity: 0, filter: "blur(3px)", transform: "translateY(4px)" },
-        { opacity: 1, filter: "blur(0px)", transform: "none" },
-      ],
-      { duration: 260, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+
+    Array.from(labelRef.current?.children ?? []).forEach((char, i) =>
+      char.animate(
+        [
+          { opacity: 0, filter: "blur(4px)", transform: "translateY(0.45em)" },
+          { opacity: 1, filter: "blur(0px)", transform: "none" },
+        ],
+        { duration: 420, delay: i * 16, easing: EASE_OUT, fill: "backwards" },
+      ),
     );
+
+    if (status === "verified") {
+      ringRef.current?.animate(
+        [
+          { opacity: 0.7, transform: "scale(1)" },
+          { opacity: 0, transform: "scale(2.6)" },
+        ],
+        { duration: 700, easing: EASE_OUT },
+      );
+    }
+
     if (status === "error") {
       buttonRef.current?.animate(
         [
@@ -403,8 +458,30 @@ export function PasskeyButton({
         ],
         { duration: 360, easing: "ease-out" },
       );
+      baseRefs.current.forEach((el, i) => {
+        const dx = (i % 2 ? 1 : -1) * (0.8 + (i % 3) * 0.4);
+        el?.animate(
+          [
+            { transform: "none" },
+            { transform: `translate(${dx}px, ${-dx * 0.4}px)` },
+            { transform: `translate(${-dx * 0.6}px, ${dx * 0.3}px)` },
+            { transform: "none" },
+          ],
+          { duration: 380, delay: i * 14, easing: "ease-out" },
+        );
+      });
     }
   }, [status, variant, reduced]);
+
+  React.useEffect(() => {
+    const el = shimmerRef.current;
+    if (status !== "scanning" || reduced || !el) return;
+    const run = el.animate(
+      [{ backgroundPosition: "150% 0" }, { backgroundPosition: "-50% 0" }],
+      { duration: 1600, iterations: Infinity, easing: "ease-in-out" },
+    );
+    return () => run.cancel();
+  }, [status, reduced]);
 
   React.useEffect(() => {
     if (status !== "verified" || resetAfter <= 0) return;
@@ -448,6 +525,17 @@ export function PasskeyButton({
     );
   };
 
+  const handlePointer = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (event.pointerType !== "mouse") return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    pointer.current = {
+      u: (event.clientX - rect.left) / rect.width,
+      v: (event.clientY - rect.top) / rect.height,
+      on: event.type !== "pointerleave",
+    };
+    wakeRef.current();
+  };
+
   return (
     <div
       data-slot="passkey-button"
@@ -465,6 +553,8 @@ export function PasskeyButton({
         disabled={disabled}
         aria-busy={scanning || undefined}
         onClick={handleClick}
+        onPointerMove={handlePointer}
+        onPointerLeave={handlePointer}
         className={cn(
           "group relative isolate inline-flex cursor-pointer items-center overflow-clip rounded-full border font-medium select-none",
           "transition-[background-color,color,scale] duration-200 active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100",
@@ -488,154 +578,194 @@ export function PasskeyButton({
           className="pointer-events-none absolute inset-0 -z-10 size-full"
         />
 
-        <span
-          ref={wellRef}
-          aria-hidden="true"
-          className={cn(
-            "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border transition-[background-color,border-color,color] duration-300",
-            size === "lg" ? "size-9" : "size-8",
-            verified
-              ? primary
-                ? "border-white/30 bg-white/20 text-white"
-                : "border-transparent bg-emerald-600 text-white dark:bg-emerald-500"
-              : failed
-                ? primary
-                  ? "border-red-200/45 bg-red-500/35 text-white"
-                  : "border-red-500/35 bg-red-500/12 text-red-600 dark:text-red-400"
-                : primary
-                  ? "border-white/20 bg-white/14 text-primary-foreground"
-                  : "border-border bg-muted text-foreground",
-          )}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
+        <span aria-hidden="true" className="relative shrink-0">
+          <span
+            ref={ringRef}
             className={cn(
-              "absolute inset-0 m-auto size-5 transition-[scale,opacity] duration-300 motion-reduce:transition-none",
-              EASE,
+              "absolute inset-0 rounded-full border-2 opacity-0",
+              primary ? "border-white/70" : "border-emerald-500",
+            )}
+          />
+          <span
+            ref={wellRef}
+            className={cn(
+              "relative flex items-center justify-center overflow-hidden rounded-full border",
+              "transition-[background-color,border-color,color,scale] duration-300 group-active:scale-[0.9] motion-reduce:transition-none motion-reduce:group-active:scale-100",
+              "ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+              size === "lg" ? "size-9" : "size-8",
               verified
-                ? "scale-[0.68] opacity-0"
-                : scanning
-                  ? "scale-[1.03]"
-                  : "group-hover:scale-[1.02]",
+                ? primary
+                  ? "border-white/30 bg-white/20 text-white"
+                  : "border-transparent bg-emerald-600 text-white dark:bg-emerald-500"
+                : failed
+                  ? primary
+                    ? "border-red-200/45 bg-red-500/35 text-white"
+                    : "border-red-500/35 bg-red-500/12 text-red-600 dark:text-red-400"
+                  : primary
+                    ? "border-white/20 bg-white/14 text-primary-foreground"
+                    : "border-border bg-muted text-foreground",
             )}
           >
-            <defs>
-              <clipPath id={clipId}>
-                <circle cx="12" cy="12" r="9.5" />
-              </clipPath>
-              <linearGradient id={`${clipId}-beam`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="currentColor" stopOpacity="0" />
-                <stop offset="50%" stopColor="currentColor" stopOpacity="0.65" />
-                <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-
-            <g
-              stroke="currentColor"
-              strokeWidth="1.4"
-              strokeLinecap="round"
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
               className={cn(
-                "transition-opacity duration-200",
-                failed
-                  ? "opacity-85"
-                  : scanning
-                    ? "opacity-25"
-                    : "opacity-60 group-hover:opacity-90",
-              )}
-            >
-              {RIDGES.map(({ d }, i) => (
-                <path
-                  key={d}
-                  d={d}
-                  pathLength={1}
-                  strokeDasharray={1}
-                  className={cn(
-                    "transition-[stroke-dashoffset] duration-300 motion-reduce:transition-none",
-                    EASE,
-                  )}
-                  style={{
-                    strokeDashoffset: verified ? 1 : 0,
-                    transitionDelay: verified ? `${i * 12}ms` : "0ms",
-                  }}
-                />
-              ))}
-            </g>
-
-            <g
-              stroke={primary ? "#ffffff" : "var(--primary)"}
-              strokeWidth="1.65"
-              strokeLinecap="round"
-            >
-              {RIDGES.map(({ d }, i) => (
-                <path
-                  key={d}
-                  ref={(el) => {
-                    ridgeRefs.current[i] = el;
-                  }}
-                  d={d}
-                  opacity={0}
-                />
-              ))}
-            </g>
-
-            <g fill={primary ? "#e0f2fe" : "#0ea5e9"}>
-              {MINUTIAE.map(({ x, y }, i) => (
-                <circle
-                  key={`${x}-${y}`}
-                  ref={(el) => {
-                    dotRefs.current[i] = el;
-                  }}
-                  cx={x}
-                  cy={y}
-                  r={1}
-                  opacity={0}
-                />
-              ))}
-            </g>
-
-            <g
-              clipPath={`url(#${clipId})`}
-              className={primary ? "text-sky-200" : "text-primary"}
-            >
-              <g ref={beamRef} opacity={0}>
-                <rect x="2" y="8.4" width="20" height="7.2" fill={`url(#${clipId}-beam)`} opacity={0.5} />
-                <line x1="2.5" x2="21.5" y1="12" y2="12" stroke="currentColor" strokeWidth="1.15" />
-              </g>
-            </g>
-          </svg>
-
-          <svg
-            viewBox="0 0 18 18"
-            fill="none"
-            className={cn(
-              "absolute inset-0 m-auto size-4 transition-[scale,opacity] duration-300 motion-reduce:transition-none",
-              EASE,
-              verified ? "scale-100 opacity-100 delay-75" : "scale-[0.65] opacity-0",
-            )}
-          >
-            <path
-              d="M3.75 9.35 7.25 12.85 14.25 5.4"
-              stroke="currentColor"
-              strokeWidth="2.1"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              pathLength={1}
-              strokeDasharray={1}
-              className={cn(
-                verified && "transition-[stroke-dashoffset] delay-100 duration-[360ms] motion-reduce:transition-none",
+                "absolute inset-0 m-auto size-5 transition-[scale,opacity] duration-300 motion-reduce:transition-none",
                 EASE,
+                verified
+                  ? "scale-[0.68] opacity-0"
+                  : scanning
+                    ? "scale-[1.03]"
+                    : "group-hover:scale-[1.04]",
               )}
-              style={{ strokeDashoffset: verified ? 0 : 1 }}
-            />
-          </svg>
+            >
+              <defs>
+                <clipPath id={clipId}>
+                  <circle cx="12" cy="12" r="9.5" />
+                </clipPath>
+                <linearGradient id={`${clipId}-beam`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="currentColor" stopOpacity="0" />
+                  <stop offset="50%" stopColor="currentColor" stopOpacity="0.65" />
+                  <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+
+              <g
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                className={cn(
+                  "transition-opacity duration-300",
+                  failed
+                    ? "opacity-85"
+                    : scanning
+                      ? "opacity-20"
+                      : "opacity-55 group-hover:opacity-90",
+                )}
+              >
+                {RIDGES.map(({ d, order }, i) => (
+                  <path
+                    key={d}
+                    ref={(el) => {
+                      baseRefs.current[i] = el;
+                    }}
+                    d={d}
+                    pathLength={1}
+                    strokeDasharray={1}
+                    className={cn(
+                      "transition-[stroke-dashoffset] duration-300 motion-reduce:transition-none",
+                      EASE,
+                    )}
+                    style={{
+                      strokeDashoffset: verified ? 1 : 0,
+                      transitionDelay: `${(verified ? 5 - order : order) * 30}ms`,
+                    }}
+                  />
+                ))}
+              </g>
+
+              <g
+                stroke={primary ? "#ffffff" : "var(--primary)"}
+                strokeWidth="1.65"
+                strokeLinecap="round"
+              >
+                {RIDGES.map(({ d }, i) => (
+                  <path
+                    key={d}
+                    ref={(el) => {
+                      ridgeRefs.current[i] = el;
+                    }}
+                    d={d}
+                    pathLength={1}
+                    strokeDasharray={1}
+                    opacity={0}
+                  />
+                ))}
+              </g>
+
+              <g fill={primary ? "#e0f2fe" : "#0ea5e9"}>
+                {MINUTIAE.map(({ x, y }, i) => (
+                  <circle
+                    key={`${x}-${y}`}
+                    ref={(el) => {
+                      dotRefs.current[i] = el;
+                    }}
+                    cx={x}
+                    cy={y}
+                    r={1}
+                    opacity={0}
+                  />
+                ))}
+              </g>
+
+              <g
+                clipPath={`url(#${clipId})`}
+                className={primary ? "text-sky-200" : "text-primary"}
+              >
+                <g ref={beamRef} opacity={0}>
+                  <rect x="2" y="8.4" width="20" height="7.2" fill={`url(#${clipId}-beam)`} opacity={0.5} />
+                  <line x1="2.5" x2="21.5" y1="12" y2="12" stroke="currentColor" strokeWidth="1.15" />
+                </g>
+              </g>
+            </svg>
+
+            <svg
+              viewBox="0 0 18 18"
+              fill="none"
+              className={cn(
+                "absolute inset-0 m-auto size-4 transition-[scale,opacity] duration-500 motion-reduce:transition-none",
+                verified
+                  ? "scale-100 opacity-100 delay-100 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                  : "scale-[0.65] opacity-0 ease-out",
+              )}
+            >
+              <path
+                d="M3.75 9.35 7.25 12.85 14.25 5.4"
+                stroke="currentColor"
+                strokeWidth="2.1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                pathLength={1}
+                strokeDasharray={1}
+                className={cn(
+                  verified && "transition-[stroke-dashoffset] delay-150 duration-[420ms] motion-reduce:transition-none",
+                  EASE,
+                )}
+                style={{ strokeDashoffset: verified ? 0 : 1 }}
+              />
+            </svg>
+          </span>
         </span>
 
         <span
-          ref={labelRef}
-          className="relative whitespace-nowrap tracking-[-0.01em]"
+          className={cn(
+            "relative inline-block text-left whitespace-nowrap tracking-[-0.01em] transition-[width] duration-500 motion-reduce:transition-none",
+            EASE,
+          )}
+          style={{ width: labelWidth ?? undefined }}
         >
-          {labels[status]}
+          <span ref={labelRef} aria-hidden="true" className="inline-block">
+            {Array.from(label).map((char, i) => (
+              <span key={`${status}-${i}`} className="inline-block whitespace-pre">
+                {char}
+              </span>
+            ))}
+          </span>
+          <span
+            ref={shimmerRef}
+            aria-hidden="true"
+            className={cn(
+              "pointer-events-none absolute inset-0 bg-clip-text text-transparent transition-opacity duration-300",
+              scanning && !reduced ? "opacity-100" : "opacity-0",
+            )}
+            style={{
+              backgroundImage: `linear-gradient(100deg, transparent 35%, ${primary ? "rgb(255 255 255 / 0.95)" : "var(--primary)"} 50%, transparent 65%)`,
+              backgroundSize: "250% 100%",
+            }}
+          >
+            {label}
+          </span>
+          <span className="sr-only">{label}</span>
         </span>
       </button>
 
@@ -657,7 +787,7 @@ export function PasskeyButton({
       </div>
 
       <span className="sr-only" role="status" aria-live="polite">
-        {scanning || verified || failed ? labels[status] : ""}
+        {scanning || verified || failed ? label : ""}
       </span>
     </div>
   );
