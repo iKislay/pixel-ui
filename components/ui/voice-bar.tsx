@@ -45,7 +45,7 @@ export type VoiceBarProps = Omit<
 type Rgb = [number, number, number];
 
 const BANDS = 8;
-const CELL = 2;
+const CELL = 3;
 // only the bottom share of the wave carries the spectrum; the rest is a near white or near black accent tint
 const COLOR_BAND = 0.3;
 const ACCENT: Rgb = [110, 120, 255];
@@ -184,8 +184,17 @@ function createField(
   const swatch = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
   const dots = document.createElement("canvas");
   const dctx = dots.getContext("2d")!;
-  let dotMask: CanvasPattern | null = null;
+  const blob = document.createElement("canvas");
+  blob.width = blob.height = 64;
+  const bctx = blob.getContext("2d")!;
+  const falloff = bctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  falloff.addColorStop(0, "#000");
+  falloff.addColorStop(0.45, "#000");
+  falloff.addColorStop(1, "rgba(0,0,0,0)");
+  bctx.fillStyle = falloff;
+  bctx.fillRect(0, 0, 64, 64);
   let img = gctx.createImageData(1, 1);
+  let glow = new Float32Array(0);
   let w = 0;
   let h = 0;
   let dpr = 1;
@@ -264,6 +273,7 @@ function createField(
     img.data[i + 1] = rgb[1];
     img.data[i + 2] = rgb[2];
     img.data[i + 3] = a * 255;
+    glow[row * cols + col] = Math.max(glow[row * cols + col], a);
   };
   const hot = (rgb: Rgb, k: number): Rgb =>
     dark
@@ -342,6 +352,7 @@ function createField(
     }
 
     img.data.fill(0);
+    glow.fill(0);
     const maxH = Math.min(h * 0.56, 62);
     const scanU = 0.5 + 0.44 * Math.sin(scan);
     const scanDir = Math.cos(scan) >= 0 ? 1 : -1;
@@ -462,16 +473,20 @@ function createField(
     ctx.globalCompositeOperation = dark ? "lighter" : "source-over";
     ctx.drawImage(grid, 0, offY, cols * cellPx, rows * cellPx);
     ctx.restore();
-    // a smooth upscale cut through a round-dot mask gives soft pixels instead of hard squares
+    // soft blobs that swell with brightness and overlap into one liquid mass, then take the wave's color
     dctx.globalCompositeOperation = "source-over";
     dctx.clearRect(0, 0, dots.width, dots.height);
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const lv = glow[row * cols + col];
+        if (lv < 0.02) continue;
+        const d = cellPx * (0.55 + 1.05 * Math.sqrt(lv));
+        dctx.drawImage(blob, (col + 0.5) * cellPx - d / 2, offY + (row + 0.5) * cellPx - d / 2, d, d);
+      }
+    }
+    dctx.globalCompositeOperation = "source-in";
     dctx.imageSmoothingEnabled = true;
     dctx.drawImage(grid, 0, offY, cols * cellPx, rows * cellPx);
-    if (dotMask) {
-      dctx.globalCompositeOperation = "destination-in";
-      dctx.fillStyle = dotMask;
-      dctx.fillRect(0, 0, dots.width, dots.height);
-    }
     ctx.drawImage(dots, 0, 0);
 
     if (comets.length) {
@@ -504,7 +519,9 @@ function createField(
         const [hr, hg, hb] = hot(cm.rgb, 0.3);
         ctx.globalAlpha = a;
         ctx.fillStyle = `rgb(${hr | 0},${hg | 0},${hb | 0})`;
-        ctx.fillRect(hx - size / 2, hy - size / 2, size, size);
+        ctx.beginPath();
+        ctx.arc(hx, hy, size / 2, 0, Math.PI * 2);
+        ctx.fill();
         ctx.globalAlpha = 1;
       }
       comets = comets.filter((cm) => cm.age - cm.delay < cm.life);
@@ -556,13 +573,7 @@ function createField(
     img = gctx.createImageData(cols, rows);
     dots.width = canvas.width;
     dots.height = canvas.height;
-    const tile = document.createElement("canvas");
-    tile.width = tile.height = cellPx;
-    const tctx = tile.getContext("2d")!;
-    tctx.arc(cellPx / 2, cellPx / 2, cellPx * 0.46, 0, Math.PI * 2);
-    tctx.fill();
-    dotMask = dctx.createPattern(tile, "repeat");
-    dotMask?.setTransform(new DOMMatrix([1, 0, 0, 1, 0, offY]));
+    glow = new Float32Array(cols * rows);
     heights = new Float32Array(cols);
     boosts = new Float32Array(cols);
     refreshTheme();
