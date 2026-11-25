@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useIsMobile } from "@/lib/use-media-query";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { resetPreviewReducedMotion } from "@/lib/preview-reduced-motion";
 import DesktopShell from "./DesktopShell";
 import MobileShell from "./MobileShell";
@@ -13,7 +13,8 @@ export default function SidebarShell({
 }: {
   children: React.ReactNode;
 }) {
-  const isMobile = useIsMobile();
+  // the side panels take about 590px, so below this width the preview would be squeezed to a sliver
+  const isMobile = useMediaQuery("(max-width: 1199px)");
 
   useEffect(() => () => resetPreviewReducedMotion(), []);
 
