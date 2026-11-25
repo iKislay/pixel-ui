@@ -45,7 +45,9 @@ export type VoiceBarProps = Omit<
 type Rgb = [number, number, number];
 
 const BANDS = 8;
-const CELL = 2.5;
+const CELL = 2;
+// the wave never colors above this share of the bar, so the top stays plain surface
+const COLOR_BAND = 0.3;
 const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 const SPECTRUM_DARK: Rgb[] = [
@@ -80,14 +82,6 @@ const THINK_LIGHT: Rgb[] = [
   [150, 64, 212],
   [30, 118, 220],
 ];
-
-const BAYER = [
-  0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36,
-  14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41,
-  51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23,
-  61, 29, 53, 21,
-].map((v) => (v + 0.5) / 64);
-const bayer = (c: number, r: number) => BAYER[((r & 7) << 3) | (c & 7)];
 
 const clamp = (v: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -187,6 +181,9 @@ function createField(
   const grid = document.createElement("canvas");
   const gctx = grid.getContext("2d")!;
   const swatch = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
+  const dots = document.createElement("canvas");
+  const dctx = dots.getContext("2d")!;
+  let dotMask: CanvasPattern | null = null;
   let img = gctx.createImageData(1, 1);
   let w = 0;
   let h = 0;
@@ -341,7 +338,7 @@ function createField(
     }
 
     img.data.fill(0);
-    const maxH = Math.min(h * 0.56, 62);
+    const maxH = h * COLOR_BAND;
     const scanU = 0.5 + 0.44 * Math.sin(scan);
     const scanDir = Math.cos(scan) >= 0 ? 1 : -1;
     const muteMix = weight.mute * weight.listen;
@@ -406,7 +403,7 @@ function createField(
         heights[c] = Math.min(maxH * 1.3, base + extra * (0.35 + 0.65 * taper));
       }
 
-      const breath = 0.5 + 0.06 * Math.sin(t * 1.6);
+      const breath = 0.75 + 0.1 * Math.sin(t * 1.6);
       for (let c = 0; c < cols; c++) {
         const ch = heights[c];
         if (ch < 1.2) continue;
@@ -422,12 +419,9 @@ function createField(
           const shimmer = 0.035 * Math.sin(c * 0.65 + r * 1.15 - t * 5.6);
           let e = clamp(fall + boost * 0.22 * (1 - v * 0.4) + glint * 0.18 * (1 - v) + shimmer * (1 - fall * 0.6));
           if (muteMix > 0.01) e = lerp(e, r === 0 ? breath + boost * 0.3 : 0, muteMix);
-          const hit = clamp((e - bayer(c, r) + 0.035) / 0.075);
-          if (hit <= 0.02) continue;
-          const k = dark
-            ? Math.min(0.86, (Math.pow(clamp((e - 0.5) / 0.5), 1.35) * 0.7 + boost * 0.32) * (1 - muteMix))
-            : Math.pow(clamp((e - 0.58) / 0.42), 1.15) * 0.5 * (1 - muteMix);
-          plot(c, rows - 1 - r, hot(color, k), hit * (0.55 + 0.45 * Math.pow(e, 0.38)));
+          const a = e * (1 - smoothstep(COLOR_BAND * 0.6, COLOR_BAND, ((r + 0.5) * cellCss) / h));
+          if (a <= 0.01) continue;
+          plot(c, rows - 1 - r, color, Math.pow(a, 0.8));
         }
       }
     }
@@ -447,9 +441,8 @@ function createField(
           continue;
         }
         const after = tl - g.fly;
-        // landed cells switch off in bayer order so the word dissolves, not fades
         const fade = after < 0.16 ? 0 : (after - 0.16) / 0.34;
-        if (fade < bayer(g.col, g.row)) plot(g.col, g.row, after < 0.08 ? hot(g.rgb, 0.6) : g.rgb, 1);
+        if (fade < 1) plot(g.col, g.row, g.rgb, 1 - fade);
       }
       grains = grains.filter((g) => g.age - g.delay < g.fly + 0.5);
     }
@@ -459,13 +452,22 @@ function createField(
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.imageSmoothingEnabled = true;
-    ctx.filter = `blur(${10 * dpr}px)`;
+    ctx.filter = `blur(${6 * dpr}px)`;
     ctx.globalAlpha = dark ? 0.55 : 0.28;
     ctx.globalCompositeOperation = dark ? "lighter" : "source-over";
     ctx.drawImage(grid, 0, offY, cols * cellPx, rows * cellPx);
     ctx.restore();
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(grid, 0, offY, cols * cellPx, rows * cellPx);
+    // a smooth upscale cut through a round-dot mask gives soft pixels instead of hard squares
+    dctx.globalCompositeOperation = "source-over";
+    dctx.clearRect(0, 0, dots.width, dots.height);
+    dctx.imageSmoothingEnabled = true;
+    dctx.drawImage(grid, 0, offY, cols * cellPx, rows * cellPx);
+    if (dotMask) {
+      dctx.globalCompositeOperation = "destination-in";
+      dctx.fillStyle = dotMask;
+      dctx.fillRect(0, 0, dots.width, dots.height);
+    }
+    ctx.drawImage(dots, 0, 0);
 
     if (comets.length) {
       ctx.save();
@@ -547,6 +549,15 @@ function createField(
     grid.width = cols;
     grid.height = rows;
     img = gctx.createImageData(cols, rows);
+    dots.width = canvas.width;
+    dots.height = canvas.height;
+    const tile = document.createElement("canvas");
+    tile.width = tile.height = cellPx;
+    const tctx = tile.getContext("2d")!;
+    tctx.arc(cellPx / 2, cellPx / 2, cellPx * 0.46, 0, Math.PI * 2);
+    tctx.fill();
+    dotMask = dctx.createPattern(tile, "repeat");
+    dotMask?.setTransform(new DOMMatrix([1, 0, 0, 1, 0, offY]));
     heights = new Float32Array(cols);
     boosts = new Float32Array(cols);
     refreshTheme();
@@ -602,7 +613,7 @@ function createField(
         grains = [];
         const count = clamp(Math.round(w / 17), 18, 32);
         const palette = weight.think > 0.5 ? thinkStops() : stops();
-        const peak = Math.min(h * 0.42, 46);
+        const peak = h * COLOR_BAND;
         comets = [];
         for (let i = 0; i < count; i++) {
           const u = clamp(0.06 + (i / (count - 1)) * 0.8 + (Math.random() - 0.5) * 0.05, 0.04, 0.9);
