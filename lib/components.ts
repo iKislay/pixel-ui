@@ -93,6 +93,100 @@ export const REGISTRY_REPO = "ikislay/pixel-ui";
 
 export const components: ComponentItem[] = [
   {
+    name: "Passkey Button",
+    href: "/components/passkey-button",
+    released: "2026-11-25",
+    category: "buttons",
+    registry: "passkey-button",
+    description:
+      "A passkey sign-in button with a fingerprint that scans while it waits and draws into a check once verified.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/passkey-button.tsx`,
+    interaction:
+      "Hover to wake the fingerprint. Click it and a scan line sweeps the ridges while a dithered band of light glides across the pill. On success the ridges fold into a green check and a wave sweeps across. On failure a red flash snaps back, the button shakes, the label reads Try again and the reason appears below. Honors prefers-reduced-motion: the scan holds still and states swap without sweeps or shake.",
+    usage: `import { PasskeyButton } from "@/components/ui/passkey-button";
+import { startAuthentication } from "@simplewebauthn/browser";
+
+export default function Demo() {
+  return (
+    <PasskeyButton
+      onVerify={async () => {
+        const options = await fetch("/api/passkey/options").then((r) => r.json());
+        const response = await startAuthentication({ optionsJSON: options });
+        const res = await fetch("/api/passkey/verify", {
+          method: "POST",
+          body: JSON.stringify(response),
+        });
+        if (!res.ok) throw new Error("That passkey wasn't recognized.");
+      }}
+    />
+  );
+}`,
+    props: [
+      {
+        name: "onVerify",
+        type: "() => unknown",
+        description:
+          "Runs on click. Return a promise to scan until it settles: resolve to verify, throw an Error to show its message. A plain return verifies at once.",
+      },
+      {
+        name: "status",
+        type: '"idle" | "scanning" | "verified" | "error"',
+        options: ["idle", "scanning", "verified", "error"],
+        description:
+          "Controls the state yourself. Leave it out and onVerify drives it.",
+      },
+      {
+        name: "onStatusChange",
+        type: "(status) => void",
+        description: "Called whenever the state changes.",
+      },
+      {
+        name: "labels",
+        type: "Partial<Record<status, string>>",
+        description:
+          'Overrides the text per state. Defaults are "Sign in with passkey", "Verifying passkey", "Verified" and "Try again".',
+      },
+      {
+        name: "errorMessage",
+        type: "ReactNode",
+        description:
+          "Shown under the button on error, in place of the thrown error's message.",
+      },
+      {
+        name: "variant",
+        type: '"surface" | "primary" | "outline"',
+        default: '"surface"',
+        options: ["surface", "primary", "outline"],
+        description: "The button's surface.",
+      },
+      {
+        name: "size",
+        type: '"default" | "lg"',
+        default: '"default"',
+        options: ["default", "lg"],
+        description: "46px or 54px tall.",
+      },
+      {
+        name: "fullWidth",
+        type: "boolean",
+        default: "false",
+        description: "Stretches the button to fill its container.",
+      },
+      {
+        name: "resetAfter",
+        type: "number",
+        default: "0",
+        description:
+          "Milliseconds after Verified to return to idle. 0 keeps it verified until clicked.",
+      },
+      {
+        name: "className",
+        type: "string",
+        description: "Classes applied to the root element.",
+      },
+    ],
+  },
+  {
     name: "Metal Button",
     href: "/components/metal-button",
     released: "2026-11-20",
