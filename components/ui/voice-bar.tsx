@@ -356,6 +356,8 @@ function createField(
     const maxH = Math.min(h * 0.56, 62);
     const scanU = 0.5 + 0.44 * Math.sin(scan);
     const scanDir = Math.cos(scan) >= 0 ? 1 : -1;
+    // the trail fades out as the beam turns so it never flips sides in one frame
+    const trailOn = smoothstep(0, 0.3, Math.abs(Math.cos(scan)));
     const muteMix = weight.mute * weight.listen;
     const muteRow = cellCss * (1.5 + 0.4 * Math.sin(time * 1.6));
     const t = time;
@@ -404,7 +406,7 @@ function createField(
           const think = clamp(
             (0.11 + 0.05 * (0.5 + 0.5 * Math.sin(u * 22 - t * 3.8)) +
               0.54 * Math.tanh(Math.exp(-(dx * dx) / 0.07) * 1.45) +
-              (behind > 0 ? Math.exp(-behind / 0.36) * 0.34 : 0)) * 0.86,
+              Math.exp(-Math.max(0, behind) / 0.36) * 0.34 * trailOn * smoothstep(-0.08, 0.08, behind)) * 0.86,
           );
           const speak = clamp(
             (0.2 + 0.74 * Math.exp(-((u - 0.5) ** 2) / 0.082) + 0.13 * (0.5 + 0.5 * Math.sin(u * 16 + t * 3.8))) *
