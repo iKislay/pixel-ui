@@ -99,7 +99,7 @@ export const components: ComponentItem[] = [
     category: "ai",
     registry: "voice-bar",
     description:
-      "A prompt bar for typing or talking to an AI, with a dithered wave that listens, thinks and speaks.",
+      "A prompt bar for typing or talking to an AI, with a wave of soft pixels along the bottom that listens, thinks and speaks.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/voice-bar.tsx`,
     dependencies: [{ name: "lucide-react" }],
     interaction:

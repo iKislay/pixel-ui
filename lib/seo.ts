@@ -63,7 +63,7 @@ const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
   "/components/otp-input":
     "Type a code into animated slots and watch it verify in place.",
   "/components/voice-bar":
-    "Type or talk and watch each spoken word form out of a dithered wave.",
+    "Type or talk and watch each spoken word form out of a wave of soft pixels.",
   "/components/passkey-button":
     "Press to capture the fingerprint ridge by ridge and watch it fold into a check.",
 };

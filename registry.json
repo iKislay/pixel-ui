@@ -329,7 +329,7 @@
       "name": "voice-bar",
       "type": "registry:ui",
       "title": "Voice Bar",
-      "description": "A prompt bar for typing or talking to an AI, with a dithered wave that listens, thinks and speaks.",
+      "description": "A prompt bar for typing or talking to an AI, with a wave of soft pixels along the bottom that listens, thinks and speaks.",
       "dependencies": [
         "lucide-react"
       ],
