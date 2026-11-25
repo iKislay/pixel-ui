@@ -63,7 +63,7 @@ const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
   "/components/otp-input":
     "Type a code into animated slots and watch it verify in place.",
   "/components/passkey-button":
-    "Click to scan the fingerprint and watch it fold into a check.",
+    "Press to capture the fingerprint ridge by ridge and watch it fold into a check.",
 };
 
 export function componentMetaDescription(item: ComponentItem): string {

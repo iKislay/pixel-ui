@@ -102,7 +102,7 @@ export const components: ComponentItem[] = [
       "A passkey sign-in button with a fingerprint that scans while it waits and draws into a check once verified.",
     source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/passkey-button.tsx`,
     interaction:
-      "Hover to wake the fingerprint. Click it and a scan line sweeps the ridges while a dithered band of light glides across the pill. On success the ridges fold into a green check and a wave sweeps across. On failure a red flash snaps back, the button shakes, the label reads Try again and the reason appears below. Honors prefers-reduced-motion: the scan holds still and states swap without sweeps or shake.",
+      "Hover and a dithered glow follows your cursor while the fingerprint wakes. Press and the sensor gives under your finger. While it verifies, the print is captured ridge by ridge from the core outward, a scan line sweeps it and the label shimmers. On success the ridges fold into a green check, a ring pulses out and a wave sweeps the pill. On failure the ridges jitter out of line, the button shakes and the reason appears below. Labels change letter by letter while the button eases to its new width. Honors prefers-reduced-motion: the print shows fully captured and states swap without glow, sweeps or shake.",
     usage: `import { PasskeyButton } from "@/components/ui/passkey-button";
 import { startAuthentication } from "@simplewebauthn/browser";
 
