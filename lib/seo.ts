@@ -62,6 +62,8 @@ const COMPONENT_INTERACTION_SNIPPETS: Record<string, string> = {
     "Scroll to swing the page on a web line, click to throw webs, and drag items by a thread.",
   "/components/otp-input":
     "Type a code into animated slots and watch it verify in place.",
+  "/components/voice-bar":
+    "Type or talk and watch each spoken word form out of a dithered wave.",
   "/components/passkey-button":
     "Press to capture the fingerprint ridge by ridge and watch it fold into a check.",
 };

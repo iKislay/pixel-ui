@@ -326,6 +326,24 @@
       ]
     },
     {
+      "name": "voice-bar",
+      "type": "registry:ui",
+      "title": "Voice Bar",
+      "description": "A prompt bar for typing or talking to an AI, with a dithered wave that listens, thinks and speaks.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "components/ui/voice-bar.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "passkey-button",
       "type": "registry:ui",
       "title": "Passkey Button",

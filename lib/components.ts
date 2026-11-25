@@ -93,6 +93,129 @@ export const REGISTRY_REPO = "ikislay/pixel-ui";
 
 export const components: ComponentItem[] = [
   {
+    name: "Voice Bar",
+    href: "/components/voice-bar",
+    released: "2026-11-25",
+    category: "ai",
+    registry: "voice-bar",
+    description:
+      "A prompt bar for typing or talking to an AI, with a dithered wave that listens, thinks and speaks.",
+    source: `${REGISTRY_HOMEPAGE}/blob/main/components/ui/voice-bar.tsx`,
+    dependencies: [{ name: "lucide-react" }],
+    interaction:
+      "Type and the prompt grows line by line up to six lines, with a tick in the wave under each key; Enter sends and Shift+Enter adds a line. Tap the waveform and it splits into a mic and a close button while sparks fly out to light a wave along the bottom edge. The wave moves with your voice, and each new word you say forms out of it before the text appears. Muting flattens it into a dotted line. While the reply is worked out, the wave cools into a beam that sweeps side to side, then swells in the middle as the reply is spoken. Press the X or Escape to pull everything back into the button. Honors prefers-reduced-motion: the wave holds still and controls swap without sparks.",
+    usage: `import { useState } from "react";
+import { VoiceBar, useVoiceAudio } from "@/components/ui/voice-bar";
+
+export default function Demo() {
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const audio = useVoiceAudio(stream);
+
+  return (
+    <VoiceBar
+      {...audio}
+      onSubmit={(prompt) => fetch("/api/chat", { method: "POST", body: prompt })}
+      onVoiceStart={async () => setStream(await navigator.mediaDevices.getUserMedia({ audio: true }))}
+      onCancel={() => {
+        stream?.getTracks().forEach((t) => t.stop());
+        setStream(null);
+      }}
+    />
+  );
+}`,
+    props: [
+      {
+        name: "state",
+        type: '"idle" | "listening" | "thinking" | "speaking"',
+        options: ["idle", "listening", "thinking", "speaking"],
+        description:
+          "Controls the mode yourself, with onStateChange. Leave it out and the bar moves on its own: the waveform starts listening, X returns to idle.",
+      },
+      {
+        name: "onSubmit",
+        type: "(value: string) => unknown",
+        description:
+          "Runs when a typed prompt is sent. Return a promise to show Thinking until it settles; a rejection puts the prompt back and shows the error's message.",
+      },
+      {
+        name: "onVoiceStart",
+        type: "() => void",
+        description: "Runs when the waveform button starts voice mode. Start the microphone here.",
+      },
+      {
+        name: "onCancel",
+        type: "() => void",
+        description: "Runs when voice mode ends through the X button or Escape.",
+      },
+      {
+        name: "transcript",
+        type: "string",
+        description:
+          "Live dictation or the streamed reply. Each new word forms out of the wave while listening or speaking.",
+      },
+      {
+        name: "getLevel",
+        type: "() => number",
+        description:
+          "Read every frame for loudness from 0 to 1. Spread useVoiceAudio(stream) to get it and getSpectrum. Without it, the wave plays a simulated voice.",
+      },
+      {
+        name: "getSpectrum",
+        type: "() => ArrayLike<number>",
+        description: "Read every frame for 8 frequency bands from 0 to 1, low to high. Shapes the crest of the wave.",
+      },
+      {
+        name: "muted",
+        type: "boolean",
+        default: "false",
+        description: "Controls the mic toggle yourself, with onMutedChange.",
+      },
+      {
+        name: "value",
+        type: "string",
+        description: "Controls the typed prompt yourself, with onValueChange.",
+      },
+      {
+        name: "attachments",
+        type: "ReactNode",
+        description: "Chips shown above the prompt. The row folds open when set and closed when empty.",
+      },
+      {
+        name: "error",
+        type: "ReactNode",
+        description: "A message shown under the prompt, such as a blocked microphone.",
+      },
+      {
+        name: "leading",
+        type: "ReactNode",
+        description: "Replaces the + button on the left, for example with a mode picker. Pass null to hide it.",
+      },
+      {
+        name: "onAttach",
+        type: "() => void",
+        description: "Runs when the + button is pressed. A ripple runs out of the button into the wave.",
+      },
+      {
+        name: "placeholder",
+        type: "string",
+        default: '"Ask me anything..."',
+        description: "Placeholder and accessible label of the prompt.",
+      },
+      {
+        name: "disabled",
+        type: "boolean",
+        default: "false",
+        description: "Turns off typing and every button.",
+      },
+      {
+        name: "ref",
+        type: "Ref<{ pulse(options?) }>",
+        description:
+          'Call pulse({ kind, origin }) to send a "ripple", "wipe" or "tick" through the wave from an element or a 0 to 1 position.',
+      },
+    ],
+  },
+  {
     name: "Passkey Button",
     href: "/components/passkey-button",
     released: "2026-11-25",
