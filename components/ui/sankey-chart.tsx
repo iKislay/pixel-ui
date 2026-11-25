@@ -32,7 +32,9 @@ export function SankeyChart({
   const [ref, width] = useChartWidth<HTMLDivElement>();
   const progress = useDrawIn();
   const [node, setNode] = useState<number | null>(null);
-  const layout = sankeyLayout(nodes, links, { width: Math.max(width - SIDE * 2, 0), height, nodeWidth });
+  // label gutters shrink on narrow screens so the ribbons keep most of the width
+  const side = Math.min(SIDE, Math.max(64, width * 0.24));
+  const layout = sankeyLayout(nodes, links, { width: Math.max(width - side * 2, 0), height, nodeWidth });
   const { active, setActive, handlers } = useChartNav(layout.links.length);
   const color = (i: number) => seriesColor(i % 5, nodes[i].color);
   const name = (i: number) => nodes[i].label ?? nodes[i].id;
@@ -59,17 +61,17 @@ export function SankeyChart({
           <svg width={width} height={height} aria-hidden className="block overflow-visible">
             <defs>
               <clipPath id={`${id}-reveal`}>
-                <rect x={0} y={-8} width={SIDE + (width - SIDE * 2) * progress} height={height + 16} />
+                <rect x={0} y={-8} width={side + (width - side * 2) * progress} height={height + 16} />
               </clipPath>
               {layout.links.map((l, i) => (
-                <linearGradient key={i} id={`${id}-${i}`} gradientUnits="userSpaceOnUse" x1={SIDE + l.x0} x2={SIDE + l.x1}>
+                <linearGradient key={i} id={`${id}-${i}`} gradientUnits="userSpaceOnUse" x1={side + l.x0} x2={side + l.x1}>
                   <stop offset="0%" stopColor={color(l.s)} />
                   <stop offset="100%" stopColor={color(l.t)} />
                 </linearGradient>
               ))}
             </defs>
             <EffectLayer effect={effect}>
-              <g clipPath={`url(#${id}-reveal)`} transform={`translate(${SIDE},0)`}>
+              <g clipPath={`url(#${id}-reveal)`} transform={`translate(${side},0)`}>
                 {layout.links.map((l, i) => (
                   <path
                     key={i}
@@ -82,7 +84,7 @@ export function SankeyChart({
                 ))}
               </g>
             </EffectLayer>
-            <g transform={`translate(${SIDE},0)`}>
+            <g transform={`translate(${side},0)`}>
               {layout.nodes.map((n) => {
                 const tx = n.column === 0 ? n.x - 10 : n.x + nodeWidth + 10;
                 return (
@@ -113,7 +115,7 @@ export function SankeyChart({
           </svg>
         )}
         <ChartTooltip
-          x={link ? SIDE + (link.x0 + link.x1) / 2 : 0}
+          x={link ? side + (link.x0 + link.x1) / 2 : 0}
           y={link ? (link.sy + link.ty) / 2 : 0}
           width={width}
           title={link ? `${name(link.s)} → ${name(link.t)}` : undefined}

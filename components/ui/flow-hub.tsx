@@ -56,7 +56,9 @@ export function FlowHub({
   const sum = (list: FlowHubItem[]) => list.reduce((a, d) => a + Math.max(d.value, 0), 0);
   const total = sum(inputs);
   const k = Math.min(...[inputs, outputs].map((list) => (height - GAP * (list.length - 1)) / (sum(list) || 1)));
-  const r = Math.min(height * 0.3, 86);
+  // label gutters shrink on narrow screens, and the disc never outgrows the space between them
+  const side = Math.min(SIDE, Math.max(60, width * 0.22));
+  const r = Math.min(height * 0.3, 86, Math.max((width - side * 2) / 2 - 12, 24));
   const hub = Math.min((r * 1.5) / (Math.max(sum(inputs), sum(outputs)) * k || 1), 1);
   const placed = [...stack(inputs, "in", k, height, hub, 0), ...stack(outputs, "out", k, height, hub, inputs.length)];
   const cx = width / 2;
@@ -81,8 +83,8 @@ export function FlowHub({
                   key={i}
                   id={`${id}-${i}`}
                   gradientUnits="userSpaceOnUse"
-                  x1={p.side === "in" ? SIDE : cx}
-                  x2={p.side === "in" ? cx : width - SIDE}
+                  x1={p.side === "in" ? side : cx}
+                  x2={p.side === "in" ? cx : width - side}
                 >
                   <stop offset="0%" stopColor={p.color} stopOpacity={p.side === "in" ? 0.75 : 0.12} />
                   <stop offset="100%" stopColor={p.color} stopOpacity={p.side === "in" ? 0.12 : 0.75} />
@@ -91,7 +93,7 @@ export function FlowHub({
             </defs>
             <EffectLayer effect={effect}>
               {placed.map((p, i) => {
-                const edge = p.side === "in" ? SIDE + NODE : width - SIDE - NODE;
+                const edge = p.side === "in" ? side + NODE : width - side - NODE;
                 // ribbons reach in from the edges as the chart draws
                 const reach = edge + (cx - edge) * progress;
                 return (
@@ -110,18 +112,18 @@ export function FlowHub({
               const dim = active !== null && active !== i;
               return (
                 <g key={i} onPointerEnter={() => setActive(i)} opacity={dim ? 0.25 : 1} className="transition-opacity duration-200 motion-reduce:transition-none">
-                  <rect x={p.side === "in" ? SIDE : width - SIDE - NODE} y={p.y} width={NODE} height={Math.max(p.h, 2)} rx={NODE / 2} fill={p.color} />
+                  <rect x={p.side === "in" ? side : width - side - NODE} y={p.y} width={NODE} height={Math.max(p.h, 2)} rx={NODE / 2} fill={p.color} />
                   <text
-                    x={p.side === "in" ? SIDE - 12 : width - SIDE + 12}
+                    x={p.side === "in" ? side - 12 : width - side + 12}
                     y={p.y + p.h / 2}
                     textAnchor={p.side === "in" ? "end" : "start"}
                     className="fill-foreground text-[12px] font-semibold"
                   >
-                    <tspan x={p.side === "in" ? SIDE - 12 : width - SIDE + 12} dy="-0.2em">
+                    <tspan x={p.side === "in" ? side - 12 : width - side + 12} dy="-0.2em">
                       {p.label}
                     </tspan>
                     <tspan
-                      x={p.side === "in" ? SIDE - 12 : width - SIDE + 12}
+                      x={p.side === "in" ? side - 12 : width - side + 12}
                       dy="1.25em"
                       className="fill-muted-foreground font-mono text-[10px] font-medium"
                     >
